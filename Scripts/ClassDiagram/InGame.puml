@@ -1,0 +1,81 @@
+﻿@startuml
+'https://plantuml.com/class-diagram
+
+namespace SceneSequencer{
+    abstract BaseSceneSequencer
+    class DebugMoveStageSequencer
+    BaseSceneSequencer <|-- DebugMoveStageSequencer
+}
+
+namespace PlayerController{
+    abstract BasePlayerController
+    class DebugPlayerController
+    BasePlayerController <|-- DebugPlayerController
+}
+
+namespace PlayerInstaller{
+    abstract BasePlayerInstaller
+    class CandyInstaller
+    BasePlayerInstaller <|-- CandyInstaller
+}
+namespace PlayerLogicManager{
+    abstract BasePlayerLogicManager
+    class DebugPlayerLogicManager
+    BasePlayerLogicManager <|.. DebugPlayerLogicManager
+}
+
+namespace DebugInput{
+    class DebugCharacterChanger
+}
+
+namespace Logic{
+    class PlayerMoveLogic
+    class PlayerPunchLogic
+    class PlayerReShaperLogic
+    class PlayerUseSkillLogic
+}
+
+namespace MyInput{
+    abstract BasePlayerInput
+    class DebugPlayerInput
+    BasePlayerInput <|-- DebugPlayerInput
+}
+
+namespace Database{
+    class InGameDatabase
+}
+
+namespace Entity{
+    class PlayerStatusEntity
+    class PlayerInputEntity
+    
+    PlayerInputEntity -->MyInput
+    PlayerStatusEntity --> Database
+}
+
+namespace View{
+    abstract BasePlayerView
+    class CandyView
+    BasePlayerView <|-- CandyView
+}
+    
+namespace Parameter{
+    class PlayerParameter
+}
+
+class GameManager
+namespace Application{}
+namespace Utility{}
+
+GameManager --> SceneSequencer
+SceneSequencer --> PlayerController
+SceneSequencer --> Parameter
+PlayerController --> DebugInput
+PlayerController ..> PlayerInstaller
+PlayerInstaller ..> PlayerLogicManager
+PlayerController --> PlayerLogicManager
+PlayerLogicManager --> Logic
+Logic --> Entity
+Logic --> View
+
+@enduml
