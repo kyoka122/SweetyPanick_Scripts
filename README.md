@@ -8,9 +8,9 @@
 
 ## 使用ライブラリ（ライブラリは同封しておりません）
 * [UniTask (ver.2.3.3)](https://github.com/Cysharp/UniTask)
-* [UniRx](https://assetstore.unity.com/packages/tools/integration/unirx-reactive-extensions-for-unity-17276?locale=ja-JP)
-* [DOTween](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676?locale=ja-JP)
-* [AudioManager_KanKikuchi](https://github.com/kankikuchi/AudioManager)
+* [UniRx (ver.7.1.0)](https://assetstore.unity.com/packages/tools/integration/unirx-reactive-extensions-for-unity-17276?locale=ja-JP)
+* [DOTween (ver.1.2.705)](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676?locale=ja-JP)
+* [AudioManager_KanKikuchi (ver.1.2)](https://github.com/kankikuchi/AudioManager)
 * [JoyconLib_plugins](https://github.com/Looking-Glass/JoyconLib)
-* Cinemachine (UnityRegistry)
-* InputSystem (UnityRegistry)
+* Cinemachine (ver.2.8.9) (UnityRegistry)
+* InputSystem (ver.1.3.0) (UnityRegistry)
