@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InGame.MyCamera.Controller;
 using MyApplication;
 using InGame.Database.ScriptableData;
 using UniRx;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace InGame.Database
 {
-    public class InGameDatabase
+    public class InGameDatabase:IDisposable
     {
         public InGameDatabase()
         {
@@ -413,7 +411,21 @@ namespace InGame.Database
         }
 
         #endregion
-        
+
+        #region Colate
+
+        private ColateScriptableData _colateScriptableData;
+        public void SetColateData(ColateScriptableData colateScriptableData)
+        {
+            _colateScriptableData = colateScriptableData;
+        }
+
+        public ColateScriptableData GetColateData()
+        {
+            return _colateScriptableData;
+        }
+
+        #endregion
         
         #region StageGimmick
 
@@ -499,6 +511,18 @@ namespace InGame.Database
         }
 
         #endregion
-        
+
+        public void Dispose()
+        {
+            _candyUpdateableData?.Dispose();
+            _fuUpdateableData?.Dispose();
+            _mashUpdateableData?.Dispose();
+            _kureUpdateableData?.Dispose();
+            _candyInStageData?.Dispose();
+            _fuInStageData?.Dispose();
+            _mashInStageData?.Dispose();
+            _kureInStageData?.Dispose();
+            _fixedSweetsSubject?.Dispose();
+        }
     }
 }

@@ -3,6 +3,7 @@ using InGame.Database;
 using InGame.Player.Controller;
 using InGame.Player.View;
 using MyApplication;
+using OutGame.Database;
 using UnityEngine;
 
 namespace InGame.Player.Installer
@@ -13,6 +14,7 @@ namespace InGame.Player.Installer
         [SerializeField] protected ParticleGeneratorView particleGeneratorView;
         
         
-        public abstract BasePlayerController Install(int playerNum, InGameDatabase inGameDatabase,CommonDatabase commonDatabase);
+        public abstract BasePlayerController Install(int playerNum, InGameDatabase inGameDatabase
+            ,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase);
     }
 }

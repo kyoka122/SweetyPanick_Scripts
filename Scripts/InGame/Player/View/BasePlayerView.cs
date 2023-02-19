@@ -94,6 +94,11 @@ namespace InGame.Player.View
             return _playerChildComponents.ToSweetsRayPos;
         }
         
+        public Vector2 GetToSlopeRayPos()
+        {
+            return _playerChildComponents.ToSlopeRayPos;
+        }
+        
         public void SetScale(Vector3 newScale)
         {
             transform.localScale = newScale;

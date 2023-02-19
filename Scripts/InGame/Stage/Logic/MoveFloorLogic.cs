@@ -21,18 +21,22 @@ namespace InGame.Stage.Logic
             {
                 if (_moveFloorView.Position.y < _moveFloorView.MoveYMax)
                 {
+                    _moveFloorView.SetConstrainsFreeY();
                     _moveFloorView.SetYVelocity(_stageGimmickEntity.MoveFloorSpeed);
                     return;
                 }
+                _moveFloorView.SetConstrainsFreeze();
                 _moveFloorView.SetYVelocity(0);
             }
             else
             {
                 if (_moveFloorView.Position.y > _moveFloorView.InitPos.y)
                 {
+                    _moveFloorView.SetConstrainsFreeY();
                     _moveFloorView.SetYVelocity(-_stageGimmickEntity.MoveFloorSpeed);
                     return;
                 }
+                _moveFloorView.SetConstrainsFreeze();
                 _moveFloorView.SetYVelocity(0);
             }
         }

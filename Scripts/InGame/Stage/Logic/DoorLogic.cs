@@ -4,6 +4,7 @@ using InGame.Stage.View;
 using InGame.Player.View;
 using MyApplication;
 using UniRx;
+using UnityEngine;
 
 namespace InGame.Stage.Logic
 {
@@ -39,12 +40,6 @@ namespace InGame.Stage.Logic
             {
                 case DoorType.None:
                     break;
-                case DoorType.FirstStageMiddle:
-                    _stageEvent.Invoke(StageEvent.EnterFirstStageMiddleDoor);
-                    break;
-                case DoorType.FirstHiddenStage:
-                    _stageEvent.Invoke(StageEvent.EnterFirstHiddenStageDoor);
-                    break;
                 case DoorType.FirstStageGoal:
                     _stageEvent.Invoke(StageEvent.EnterFirstStageGoalDoor);
                     break;
@@ -60,7 +55,8 @@ namespace InGame.Stage.Logic
                 case null:
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(doorType), doorType, null);
+                    Debug.LogError($"Could Not Find. doorType:{doorType}");
+                    break;
             }
         }
 

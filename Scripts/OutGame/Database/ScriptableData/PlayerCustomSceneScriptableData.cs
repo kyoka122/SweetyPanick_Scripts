@@ -11,13 +11,13 @@ namespace OutGame.Database.ScriptableData
         public float PanelPopUpDuration => panelPopUpDuration;
         public float PanelPopDownDuration => panelPopDownDuration;
         
-        public CharacterSelectCursorInstanceManager CharacterSelectCursorInstanceManager=>characterSelectCursorInstanceManager;
+        public CharacterSelectCursorInstaller CharacterSelectCursorInstaller=>characterSelectCursorInstaller;
         public CharacterSelectCursorView CharacterSelectCursorView => characterSelectCursorView;
         public SquareRange CharacterSelectCursorRange => characterSelectCursorRange;
         
         [SerializeField] private float panelPopUpDuration;
         [SerializeField] private float panelPopDownDuration;
-        [SerializeField] private CharacterSelectCursorInstanceManager characterSelectCursorInstanceManager;
+        [SerializeField] private CharacterSelectCursorInstaller characterSelectCursorInstaller;
         [SerializeField] private CharacterSelectCursorView characterSelectCursorView;
         [SerializeField] private SquareRange characterSelectCursorRange;
         

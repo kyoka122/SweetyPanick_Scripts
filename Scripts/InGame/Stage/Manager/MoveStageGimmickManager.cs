@@ -9,14 +9,16 @@ namespace InGame.Stage.Manager
         private readonly DoorLogic _doorLogic;
         private readonly MoveFloorLogic[] _moveFloorLogics;
         private readonly BackgroundLogic _backgroundLogic;
+        private readonly AnimationEventLogic _animationEventLogic;
 
         public MoveStageGimmickManager(HealAnimationLogic healAnimationLogic, DoorLogic doorLogic,
-            MoveFloorLogic[] moveFloorLogics, BackgroundLogic backgroundLogic)
+            MoveFloorLogic[] moveFloorLogics, BackgroundLogic backgroundLogic,AnimationEventLogic animationEventLogic)
         {
             _healAnimationLogic = healAnimationLogic;
             _doorLogic = doorLogic;
             _moveFloorLogics = moveFloorLogics;
             _backgroundLogic = backgroundLogic;
+            _animationEventLogic = animationEventLogic;
         }
 
         public UniTask GetAllPlayerHealAnimationTask()

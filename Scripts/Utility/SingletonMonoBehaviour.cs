@@ -7,6 +7,7 @@ namespace Utility
     {
         protected abstract bool IsDontDestroyOnLoad { get; }
         private static T instance;
+        protected bool isDuplication { get; private set; }
 
         public static T Instance
         {
@@ -31,7 +32,8 @@ namespace Utility
         {
             if (this != Instance)
             {
-                Destroy(this);
+                isDuplication = true;
+                Destroy(gameObject);
                 return;
             }
 

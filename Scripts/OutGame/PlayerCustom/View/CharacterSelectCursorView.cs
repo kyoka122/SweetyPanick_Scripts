@@ -21,6 +21,7 @@ namespace OutGame.PlayerCustom.View
         {
             _rectTransform = GetComponent<RectTransform>();
         }
+        
         public void ChangePlayerNumText(int playerNum)
         {
             playerNumText.text = playerNum+"P";

@@ -67,7 +67,7 @@ namespace InGame.Stage.View
             }
             catch (OperationCanceledException)
             {
-                Debug.Log($"SweetsBreakCanceled");
+                Debug.Log($"SweetsBreakCanceled. token.state{token.IsCancellationRequested}");
                 _fadeInTransitionAtFix.fadeTween.Kill();
                 _fadeOutTransitionAtFix.fadeTween.Kill();
                 _fadeInTransitionAtFix.TransitionFadeInCondition();
@@ -90,12 +90,7 @@ namespace InGame.Stage.View
                 Debug.LogWarning($"Had Not Instance _transition", gameObject);
                 return false;
             }
-            if (fixState != FixState.Broken&&fixState != FixState.Fixing)
-            {
-                Debug.Log($"Can`t Edit. CurrentSweetsCondition is:{fixState}");
-                return false;
-            }
-            return true;
+            return fixState == FixState.Broken;
         }
 
         public bool CanBreakSweets()
@@ -105,11 +100,7 @@ namespace InGame.Stage.View
                 Debug.LogWarning($"Had Not Instance _transition", gameObject);
                 return false;
             }
-            if (fixState != FixState.Fixed&&fixState != FixState.Breaking)
-            {
-                return false;
-            }
-            return true;
+            return fixState == FixState.Fixed;
         }
 
         public Vector3 GetPlayParticlePos()
@@ -129,11 +120,14 @@ namespace InGame.Stage.View
         
         private async UniTask CheckFinishBroken(CancellationToken token)
         {
+            Debug.Log($"UniTask.WhenAll");
             var fadeInTask= UniTask.WaitWhile(() => _fadeInTransitionAtFix.IsActiveFadeOut(),
                 cancellationToken: token);
             var fadeOutTask= UniTask.WaitWhile(() => _fadeOutTransitionAtFix.IsActiveFadeIn(),
                 cancellationToken: token);
+            Debug.Log($"WaitStart!");
             await UniTask.WhenAll(fadeInTask,fadeOutTask);
+            Debug.Log($"TaskFinished!");
             fixState = FixState.Broken;
         }
     }

@@ -13,4 +13,9 @@
         public const string DoorOpened = "Opened";
         public static readonly string Heal = "HealAnimation";
     }
+
+    public static class StageAnimationCallbackName
+    {
+        public const string OnCrepeCameraShake = "OnCrepeCameraShake";
+    }
 }

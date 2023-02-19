@@ -20,18 +20,21 @@ namespace InGame
         [SerializeField] private StageGimmickScriptableData stageGimmickScriptableData;
         [SerializeField] private StageSettingsScriptableData stageSettingsScriptableData;
         [SerializeField] private SceneLoadData sceneLoadData;
-        [SerializeField] private AreaCameraScriptableData areaCameraScriptableData;
+        [SerializeField] private ColateScriptableData colateScriptableData;
+        [SerializeField] private BossStageScriptableData bossStageScriptableData;
         
         public void SetScriptableData(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             AudioVolumeManager.Init(audioScriptableData);
             inGameDatabase.SetStageSettings(stageSettingsScriptableData);
             inGameDatabase.SetEnemyData(enemyScriptableData);
+            enemyScriptableData.EnemyInstaller.Init(inGameDatabase, commonDatabase);
             inGameDatabase.SetStageGimmickData(stageGimmickScriptableData);
             inGameDatabase.SetSceneLoadData(sceneLoadData);
-            commonDatabase.SetCameraData(areaCameraScriptableData.GetAllCameraData());
+            inGameDatabase.SetColateData(colateScriptableData);
             SetCharacterDatabase(inGameDatabase);
             outGameDatabase.SetPlayerCustomSceneData(playerCustomSceneScriptableData);
+            outGameDatabase.SetBossStageScriptableData(bossStageScriptableData);
         }
         
         private void SetCharacterDatabase(InGameDatabase inGameDatabase)

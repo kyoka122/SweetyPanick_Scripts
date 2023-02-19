@@ -9,14 +9,15 @@ namespace InGame.Player.Controller
     {
         private readonly KureSkillLogic _kureSkillLogic;
 
-        public KureController(int playerNum,PlayerMoveLogic playerMoveLogic,PlayerJumpLogic playerJumpLogic, 
-            PlayerPunchLogic playerPunchLogic, KureSkillLogic kureSkillLogic, PlayerReShapeLogic playerReShapeLogic, 
-            PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic, 
-            PlayerFixSweetsLogic playerFixSweetsLogic,PlayerEnterDoorLogic playerEnterDoorLogic,
-            PlayableCharacterSelectLogic playableCharacterSelectLogic,List<IDisposable> disposables,IObservable<bool> onDead) 
-            : base(playerNum,playerMoveLogic, playerJumpLogic,playerPunchLogic, kureSkillLogic, playerReShapeLogic, 
-                playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,playerEnterDoorLogic,
-                playableCharacterSelectLogic,disposables,onDead)
+        public KureController(int playerNum, PlayerMoveLogic playerMoveLogic, PlayerJumpLogic playerJumpLogic,
+            PlayerPunchLogic playerPunchLogic, KureSkillLogic kureSkillLogic, PlayerReShapeLogic playerReShapeLogic,
+            PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic,
+            PlayerFixSweetsLogic playerFixSweetsLogic, PlayerEnterDoorLogic playerEnterDoorLogic,
+            PlayableCharacterSelectLogic playableCharacterSelectLogic, PlayerTalkLogic playerTalkLogic,
+            List<IDisposable> disposables, IObservable<bool> onDead)
+            : base(playerNum, playerMoveLogic, playerJumpLogic, playerPunchLogic, kureSkillLogic, playerReShapeLogic,
+                playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic, playerEnterDoorLogic,
+                playableCharacterSelectLogic, playerTalkLogic, disposables, onDead)
         {
             _kureSkillLogic = kureSkillLogic;
         }

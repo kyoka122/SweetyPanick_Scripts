@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using InGame.Common.Database;
-using InGame.MyCamera.Controller;
 using InGame.Database;
 using InGame.Enemy;
+using InGame.MyCamera.Controller;
 using InGame.Player.Controller;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
@@ -19,20 +19,21 @@ namespace StageManager
         public IReadOnlyList<BasePlayerController> Controllers=>_controllers;
         
         private readonly List<BasePlayerController> _controllers;
-        private readonly EnemyController _enemyController;
-        private readonly MoveStageGimmickManager _stageGimmickGimmickManager;
+        private readonly EnemyManager _enemyManager;
+        private readonly MoveStageGimmickManager _stageGimmickManager;
         private readonly CameraController _cameraController;
         private readonly Action<string> _moveNextSceneEvent;
         private CancellationTokenSource _fadeOutTokenSource;
 
+
         public DebugStageManager(MoveStageGimmickInstaller moveStageGimmickInstaller,CameraController cameraController,
             InGameDatabase inGameDatabase, CommonDatabase commonDatabase,Action<string> moveNextSceneEvent)
         {
-            _stageGimmickGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, inGameDatabase,commonDatabase);
+            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, inGameDatabase,commonDatabase);
             _cameraController = cameraController;
             _moveNextSceneEvent = moveNextSceneEvent;
             _controllers = new List<BasePlayerController>();
-            _enemyController = inGameDatabase.GetEnemyData().EnemyInstaller.Install(inGameDatabase,commonDatabase);
+            _enemyManager = inGameDatabase.GetEnemyData().EnemyInstaller.InstallWithStageEnemies();
         }
         
 
@@ -43,7 +44,16 @@ namespace StageManager
 
         public void FixedUpdateEnemy()
         {
-            _enemyController.FixedUpdate();
+            _enemyManager.FixedUpdate();
+        }
+        
+        public void LateInit()
+        {
+            _stageGimmickManager.LateInit();
+            foreach (var playerController in _controllers)
+            {
+                playerController.LateInit();
+            }
         }
         
         public void FixedUpdatePlayableCharacter(int currentMovePlayer)
@@ -63,7 +73,7 @@ namespace StageManager
 
         public void FixedUpdateStage()
         {
-            _stageGimmickGimmickManager.FixedUpdate();
+            _stageGimmickManager.FixedUpdate();
         }
 
         #region PlayerEvent
@@ -87,7 +97,7 @@ namespace StageManager
         
         private async void OnAllPlayerHealEvent()
         {
-            await _stageGimmickGimmickManager.GetAllPlayerHealAnimationTask();
+            await _stageGimmickManager.GetAllPlayerHealAnimationTask();
             foreach (var controller in _controllers)
             {
                 controller.HealHp();
@@ -107,22 +117,22 @@ namespace StageManager
         {
             switch (stageEvent)
             {
-                case StageEvent.EnterFirstStageMiddleDoor:
-                    MoveStage(StageArea.FirstHiddenStage);
-                    break;
-                case StageEvent.EnterFirstHiddenStageDoor:
-                    MoveStage(StageArea.FirstStageMiddle);
-                    break;
                 case StageEvent.EnterFirstStageGoalDoor:
                     SetAllPlayerStop();
                     _moveNextSceneEvent.Invoke(SceneName.SecondStage);
                     break;
+                case StageEvent.EnterSecondStageMiddleDoor:
+                    MoveStage(StageArea.SecondHiddenStage);
+                    break;
+                case StageEvent.EnterSecondHiddenStageDoor:
+                    MoveStage(StageArea.SecondStageMiddle);
+                    break;
                 case StageEvent.EnterSecondStageGoalDoor:
                     SetAllPlayerStop();
-                    _moveNextSceneEvent.Invoke(SceneName.BossStage);
+                    _moveNextSceneEvent.Invoke(SceneName.ColateStage);
                     break;
                 default:
-                    Debug.LogError($"stageEvent: {stageEvent}");
+                    Debug.LogError($"Could Not Found stageEvent: {stageEvent}");
                     return;
             }
         }

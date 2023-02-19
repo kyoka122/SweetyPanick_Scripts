@@ -22,7 +22,7 @@ namespace InGame.Stage.View
         private bool Fading =>  _transition.IsActiveFadeIn() ||  _transition.IsActiveFadeOut();
         private Transition _transition;
         
-        public void Init()
+        public virtual void Init()
         {
             cancellationToken = this.GetCancellationTokenOnDestroy();
             _transition = new Transition(fadeSpriteRenderers.material, this,1);

@@ -1,109 +1,143 @@
-﻿using UniRx;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace InGame.MyInput
 {
 	public class JoyConPlayerInput : BasePlayerInput
 	{
-		private readonly Joycon _joyconRight;
-		private readonly Joycon _joyconLeft;
+		private readonly Joycon _joycon;
 		
 		private const float OnShakeValue = 1.3f;
-		private const float SelectorCanMoveValue = 0.5f;
-		private const float SelectorNotMoveValue = 0.1f;
 		private Vector3 _accel;
 		private Vector3 _accelCache;
 		
-		public JoyConPlayerInput(Joycon joyconRight, Joycon joyconLeft)
+		private Joycon.Button _upKey;
+		private Joycon.Button _downKey;
+		private Joycon.Button _rightKey;
+		private Joycon.Button _leftKey;
+		private int _horizontalPositiveNegativeReverse;
+		private int _verticalPositiveNegativeReverse;
+		
+		public JoyConPlayerInput(Joycon joycon)
 		{
-			_joyconRight = joyconRight;
-			_joyconLeft = joyconLeft;
-			JoyconManager.Instance.RegisterDelegate(UpdateInput);
+			_joycon = joycon;
+			SetKeyConfig();
+			JoyconManager.Instance.updated += UpdatedInput;
+			rumbleEvent += Rumble;
+		}
+		
+		private void SetKeyConfig()
+		{
+			if (_joycon.isLeft)
+			{
+				_upKey = Joycon.Button.DPAD_RIGHT;
+				_downKey = Joycon.Button.DPAD_LEFT;
+				_rightKey = Joycon.Button.DPAD_DOWN;
+				_leftKey = Joycon.Button.DPAD_UP;
+				_horizontalPositiveNegativeReverse = -1;
+				_verticalPositiveNegativeReverse = 1;
+			}
+			else
+			{
+				_upKey = Joycon.Button.DPAD_LEFT;
+				_downKey = Joycon.Button.DPAD_RIGHT;
+				_rightKey = Joycon.Button.DPAD_UP;
+				_leftKey = Joycon.Button.DPAD_DOWN;
+				_horizontalPositiveNegativeReverse = 1;
+				_verticalPositiveNegativeReverse = -1;
+			}
 		}
 
-		private void UpdateInput()
+		private void UpdatedInput()
 		{
-			if (_joyconRight.GetButtonDown(Joycon.Button.DPAD_UP))
+			if (_joycon.GetButtonDown(_upKey))
 			{
-				_skill.Value = true;
+				skill.Value = true;
 			}
-			if (_joyconRight.GetButtonUp(Joycon.Button.DPAD_UP))
+			if (_joycon.GetButtonUp(_upKey))
 			{
-				_skill.Value = false;
+				skill.Value = false;
 			}
-			if (_joyconRight.GetButtonDown(Joycon.Button.DPAD_DOWN))
+			if (_joycon.GetButtonDown(_downKey))
 			{
-				_fix.Value = true;
+				fix.Value = true;
 			}
-			if (_joyconRight.GetButtonUp(Joycon.Button.DPAD_DOWN))
+			if (_joycon.GetButtonUp(_downKey))
 			{
-				_fix.Value = false;
+				fix.Value = false;
 			}
-			if (_joyconRight.GetButtonDown(Joycon.Button.DPAD_RIGHT))
+			if (_joycon.GetButtonDown(_rightKey))
 			{
-				_jump.Value = true;
+				jump.Value = true;
 			}
-			if (_joyconRight.GetButtonUp(Joycon.Button.DPAD_RIGHT))
+			if (_joycon.GetButtonUp(_rightKey))
 			{
-				_jump.Value = false;
+				jump.Value = false;
 			}
-			if (_joyconRight.GetButtonDown(Joycon.Button.DPAD_LEFT))
+			if (_joycon.GetButtonDown(_leftKey))
 			{
-				//_playerSelector.Value = true;
+				//TODO: キャラ切り替え実装後コメントアウト解除
+				//playerSelector.Value = true;
 			}
-			if (_joyconRight.GetButtonUp(Joycon.Button.DPAD_LEFT))
+			if (_joycon.GetButtonUp(_leftKey))
 			{
-				//_playerSelector.Value = false;
+				//TODO: キャラ切り替え実装後コメントアウト解除
+				//playerSelector.Value = false;
 			}
 
 			//MEMO: ↓スティック入力
 			//MEMO: GetStick()[0]はスティックの左右の入力値
-			float stickValue = _joyconLeft.GetStick()[0];
-			_move.Value = stickValue;
+			float stickValue = _horizontalPositiveNegativeReverse * _joycon.GetStick()[1];
+			move.Value = stickValue;
 			SetPlayerSelectDirection();
 			
 			//MEMO: ↓加速度入力
 			_accelCache = _accel;
-			_accel=_joyconRight.GetAccel();
+			_accel=_joycon.GetAccel();
 
-			_punch.Value = (_accel-_accelCache).magnitude>OnShakeValue;
+			punch.Value = (_accel-_accelCache).magnitude>OnShakeValue;
 		}
 
 		private void SetPlayerSelectDirection()
 		{
-			if (!_playerSelector.Value)
+			if (!playerSelector.Value)
 			{
-				_playerSelectDirection.Value = 0;
+				playerSelectDirection.Value = 0;
 				return;
 			}
 			
 			int moveDirection=1;
 			
 			//MEMO: スティックが右入力か左入力か
-			moveDirection *= (int) Mathf.Sign(_move.Value);
+			moveDirection *= (int) Mathf.Sign(move.Value);
 			
 			
 			//MEMO: スティックの押し込み具合
-			if (Mathf.Abs(_move.Value) > SelectorCanMoveValue)
+			if (Mathf.Abs(move.Value) > SelectorCanMoveValue)
 			{
 				moveDirection *= 1;
 			}
-			else if (Mathf.Abs(_move.Value) < SelectorNotMoveValue)
+			else if (Mathf.Abs(move.Value) < SelectorNotMoveValue)
 			{
 				moveDirection *= 0;
 			}
 			else
 			{
-				moveDirection *= _playerSelectDirection.Value;
+				moveDirection *= playerSelectDirection.Value;
 			}
 
-			_playerSelectDirection.Value = moveDirection;
+			playerSelectDirection.Value = moveDirection;
 		}
 
-		public override void Rumble()
+		private void Rumble()
 		{
-			// https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/rumble_data_table.md
-			_joyconRight.SetRumble(160, 320, 0.6f, 200);
+			//MEMO: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/rumble_data_table.md
+			_joycon.SetRumble(160, 320, 0.6f, 200);
+		}
+
+		public override void Dispose()
+		{
+			base.Dispose();
+			JoyconManager.Instance.updated -= UpdatedInput;
 		}
 	}
 }

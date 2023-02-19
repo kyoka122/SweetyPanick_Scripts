@@ -87,6 +87,7 @@ namespace MyApplication
         public float highJumpValue=8;
         public float toGroundDistance=1;
         public float toSweetsDistance=1;
+        public float toSlopeDistance=1;
         public float normalSweetsFixingTime=1;
         public float gimmickSweetsFixingTime=1;
         public float knockBackValue=1;
@@ -120,16 +121,22 @@ namespace MyApplication
     }
 
     [Serializable]
-    public class CameraData
+    public class ColateSprite
     {
-        public StageArea StageArea => stageArea;
-        public CameraMode CameraMode => cameraMode;
-        public Vector3 InitPosition => initPosition;
+        public ColateSpriteType Type => type;
+        public GameObject SpriteObj => spriteObj;
         
-
-        [SerializeField] private StageArea stageArea;
-        [SerializeField] private Vector3 initPosition;
-        [SerializeField] private CameraMode cameraMode;
+        [SerializeField] private ColateSpriteType type;
+        [SerializeField] private GameObject spriteObj;
     }
+    
+    [Serializable]
+    public class ControllerImage
+    {
+        public MyInputDeviceType Type=>type;
+        public GameObject ImageObj=>imageObj;
 
+        [SerializeField] private MyInputDeviceType type;
+        [SerializeField] private GameObject imageObj;
+    }
 }

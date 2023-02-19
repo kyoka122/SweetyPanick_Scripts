@@ -1,10 +1,10 @@
-﻿using UniRx;
+﻿using System;
+using UniRx;
 
 namespace OutGame.PlayerCustom.MyInput
 {
-    public class JoyConRightInputCaseUnknownController
+    public class JoyConRightInputCaseUnknownController:IDisposable
     {
-       
         public IReadOnlyReactiveProperty<bool> RightControllerSet => rightControllerSet;
         public IReadOnlyReactiveProperty<bool> Next => next;
         public IReadOnlyReactiveProperty<bool> Back => back;
@@ -21,7 +21,7 @@ namespace OutGame.PlayerCustom.MyInput
             rightControllerSet = new ReactiveProperty<bool>();
             next = new ReactiveProperty<bool>();
             back = new ReactiveProperty<bool>();
-            JoyconManager.Instance.RegisterDelegate(UpdateInput);
+            JoyconManager.Instance.updated += UpdateInput;
         }
 
         private void UpdateInput()
@@ -54,5 +54,12 @@ namespace OutGame.PlayerCustom.MyInput
 
         }
 
+        public void Dispose()
+        {
+            rightControllerSet?.Dispose();
+            next?.Dispose();
+            back?.Dispose();
+            JoyconManager.Instance.updated -= UpdateInput;
+        }
     }
 }

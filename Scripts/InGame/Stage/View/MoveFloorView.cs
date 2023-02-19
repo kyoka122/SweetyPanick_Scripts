@@ -23,6 +23,16 @@ namespace InGame.Stage.View
             InitPos = transform.position;
             _rigidbody = GetComponent<Rigidbody2D>();
         }
+
+        public void SetConstrainsFreeze()
+        {
+            _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
+
+        public void SetConstrainsFreeY()
+        {
+            _rigidbody.constraints = RigidbodyConstraints2D.FreezePositionX|RigidbodyConstraints2D.FreezeRotation;
+        }
         
         public bool HadFixedGums()
         {

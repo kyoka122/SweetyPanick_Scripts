@@ -1,49 +1,36 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using InGame.Database;
-using InGame.MyCamera.Controller;
+using InGame.MyCamera.Interface;
+using InGame.MyInput;
 using MyApplication;
 
 namespace InGame.Common.Database
 {
     public class CommonDatabase
     {
-        #region JoyconData
-
         public CommonDatabase()
         {
-            StaticDatabase._joyconNums = new List<JoyconNumData>();
+            StaticDatabase.input = new List<ControllerNumData>();
             _cameraData = new List<CameraData>();
         }
 
-        public void SetJoyconNumData(JoyconNumData data)
+
+        #region JoyconData
+
+        public void SetControllerNumData(List<ControllerNumData> data)
         {
-            var duplicationData = StaticDatabase._joyconNums.FirstOrDefault(num => num.playerNum == data.playerNum);
-            if (duplicationData == null)
-            {
-                StaticDatabase._joyconNums.Add(data);
-            }
-            else
-            {
-                StaticDatabase._joyconNums.Remove(duplicationData);
-                StaticDatabase._joyconNums.Add(data);
-            }
+            StaticDatabase.input = new List<ControllerNumData>(data);
         }
 
-
-        public void SetJoyconNumData(List<JoyconNumData> data)
+        public BasePlayerInput GetControllerNumData(int playerNum)
         {
-            StaticDatabase._joyconNums = new List<JoyconNumData>(data);
+            return StaticDatabase.input.FirstOrDefault(num => num.playerNum == playerNum)?.playerInput;
         }
 
-        public JoyconNumData GetJoyconNumData(int playerNum)
+        public IReadOnlyList<ControllerNumData> GetAllControllerNumData()
         {
-            return StaticDatabase._joyconNums.FirstOrDefault(num => num.playerNum == playerNum);
-        }
-
-        public IReadOnlyList<JoyconNumData> GetAllJoyconNumData()
-        {
-            return StaticDatabase._joyconNums;
+            return StaticDatabase.input;
         }
 
         #endregion
@@ -52,7 +39,7 @@ namespace InGame.Common.Database
 
         private IReadOnlyCameraFunction _cameraFunction;
 
-        public IReadOnlyCameraFunction GetIReadOnlyCameraController()
+        public IReadOnlyCameraFunction GetReadOnlyCameraController()
         {
             return _cameraFunction;
         }
@@ -61,7 +48,22 @@ namespace InGame.Common.Database
         {
             _cameraFunction = cameraFunction;
         }
+        
+        
+        
+        private ICameraEvent _cameraEvent;
 
+        public ICameraEvent GetCameraEvent()
+        {
+            return _cameraEvent;
+        }
+
+        public void SetCameraEvent(ICameraEvent cameraEvent)
+        {
+            _cameraEvent = cameraEvent;
+        }
+
+        
 
         private List<CameraData> _cameraData;
 
@@ -70,15 +72,9 @@ namespace InGame.Common.Database
             _cameraData = cameraData.ToList();
         }
         
-        public bool TryAddCameraData(CameraData cameraData)
+        public void AddCameraData(CameraData cameraData)
         {
-            if (_cameraData.FirstOrDefault(data => data.StageArea == cameraData.StageArea) != null)
-            {
-                return false;
-            }
-
             _cameraData.Add(cameraData);
-            return true;
         }
 
         public CameraData GetCameraSettingsData(StageArea area)
@@ -107,8 +103,9 @@ namespace InGame.Common.Database
         private static class StaticDatabase
         {
             // region PlayerInput
-            public static List<JoyconNumData> _joyconNums;
+            public static List<ControllerNumData> input;
 
         }
+
     }
 }

@@ -31,12 +31,14 @@ namespace SceneSequencer
         [SerializeField] private Camera camera;
         
         private PlayerCustomManager _manager;
+        private PlayerCustomInstaller _playerCustomInstaller;
         
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             new CameraInstaller().InstallConstCamera(inGameDatabase,commonDatabase,camera);
             var onMoveScene = new Subject<bool>();
-            _manager=new PlayerCustomInstaller().Install(playerCountView, controllersPanelView, 
+            _playerCustomInstaller = new PlayerCustomInstaller();
+            _manager=_playerCustomInstaller.Install(playerCountView, controllersPanelView, 
                 characterSelectPanelView, fromMessageWindowRecieverView, toMessageWindowSenderView,
                 outGameDatabase,commonDatabase, onMoveScene);
             
@@ -57,6 +59,7 @@ namespace SceneSequencer
             BGMManager.Instance.FadeOut(BGMPath.PLAYER_CUSTOM, 1, () => {
                 Debug.Log("BGMフェードアウト終了");
             });
+            _manager.Dispose();
             try
             {
                 await LoadManager.Instance.TryPlayLoadScreen(ToNextStageDelay,ToMoveSceneFadeOutDurationMin);
@@ -65,7 +68,6 @@ namespace SceneSequencer
             {
                 Debug.Log($"Cancel Loading");
             }
-            
             
             SceneManager.LoadScene(nextSceneName);
         }

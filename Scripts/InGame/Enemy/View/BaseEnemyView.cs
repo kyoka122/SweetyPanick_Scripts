@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Fungus;
+using InGame.Enemy.Interface;
 using InGame.Stage.View;
 using InGame.Player.View;
 using MyApplication;
@@ -15,7 +16,8 @@ using Collision2D = UnityEngine.Collision2D;
 namespace InGame.Enemy.View
 {
     [RequireComponent(typeof(Rigidbody2D),typeof(EnemyChildComponents)),]
-    public abstract class BaseEnemyView:MonoBehaviour,IEnemyDamageAble,IEnemyBindable,IEnemyDecoyAble,IEnemyPullAble,ICollideAbleToPlayer
+    public abstract class BaseEnemyView:MonoBehaviour,IEnemyDamageAble,IEnemyBindable,IEnemyDecoyAble,IEnemyPullAble,
+        ICollideAbleToPlayer,IColateOrderAble
     {
         public IObservable<Collision2D> SearchedCollisionObject => _searchedCollisionObject;
         public IObservable<Collision2D> OnHitFlyingCollider => hitFlyingCollider;
@@ -124,6 +126,11 @@ namespace InGame.Enemy.View
             return transform.position;
         }
         
+        public Vector2 GetLocalPosition()
+        {
+            return transform.localPosition;
+        }
+        
         public void SetPosition(Vector2 pos)
         {
             transform.position = pos;
@@ -176,7 +183,12 @@ namespace InGame.Enemy.View
         {
             return _rigidbody2D.velocity;
         }
-        
+
+        public void AddVelocity(Vector2 velocity)
+        {
+            _rigidbody2D.velocity += velocity;
+        }
+
         public void SetVelocity(Vector2 velocity)
         {
             _rigidbody2D.velocity = velocity;
@@ -202,16 +214,21 @@ namespace InGame.Enemy.View
             currentEatingTime = newTime;
         }
         
-        public void OnPunched(Vector2 playerPos)
+        public void OnDamaged(Struct.DamagedInfo info)
         {
-            _punchSubject.OnNext(playerPos);
+            switch (info.attacker)
+            {
+                case Attacker.Player:
+                    _punchSubject.OnNext(info.attackerPos);
+                    break;
+                case Attacker.Crepe:
+                    _rolledSubject.OnNext(true);
+                    break;
+                default:
+                    Debug.Log($"Not Found Type:{info.attacker}");
+                    break;
+            }
         }
-
-        public void OnCrepeRolled()
-        {
-            _rolledSubject.OnNext(true);
-        }
-
         public void SetInScreen(bool on)
         {
             inScreen = on;
@@ -246,6 +263,11 @@ namespace InGame.Enemy.View
             
         }
 
+        public void SetEatSweetsTokenSource(CancellationTokenSource newTokenSource)
+        {
+            _eatSweetsTokenSource = newTokenSource;
+        }
+        
         public void CancelEatSweetsTokenSource()
         {
             _eatSweetsTokenSource.Cancel();

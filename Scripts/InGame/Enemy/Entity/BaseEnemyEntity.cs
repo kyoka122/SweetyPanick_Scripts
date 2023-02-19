@@ -10,7 +10,7 @@ namespace InGame.Enemy.Entity
 {
     public abstract class BaseEnemyEntity
     {
-        public Func<Vector2, Vector2> WorldToViewPortPoint => _commonDatabase.GetIReadOnlyCameraController().WorldToViewPortPoint;
+        public Func<Vector2, Vector2> WorldToViewPortPoint => _commonDatabase.GetReadOnlyCameraController().WorldToViewPortPoint;
         public SquareRange ObjectInScreenRange => _inGameDatabase.GetStageSettings().ObjectInScreenRange;
         public float StageBottom => _inGameDatabase.GetStageSettings().StageBottom;
         

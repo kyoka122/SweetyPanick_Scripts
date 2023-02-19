@@ -2,9 +2,11 @@
 using System.Linq;
 using InGame.Common.Database;
 using InGame.Database;
+using InGame.MyInput;
 using MyApplication;
 using OutGame;
 using OutGame.Database;
+using OutGame.PlayerCustom.MyInput;
 using UniRx;
 using Unity;
 using UnityEngine;
@@ -19,8 +21,15 @@ namespace OutGame.PlayerCustom.Entity
         public PlayerCustomState finishedPopUpWindowState => _hadFinishedPopUpWindow.Value;
         public int MaxPlayerCount => _outGameDatabase.GetMaxPlayerCount();
 
-        public IReadOnlyList<Joycon> RegisteredJoycons => registeredJoycons;
-        public IReadOnlyList<JoyconNumData> RegisteredJoyconNumData => _commonDatabase.GetAllJoyconNumData();
+        /// <summary>
+        /// コントローラー登録シーンで登録中のコントローラー
+        /// </summary>
+        public IReadOnlyList<BaseCaseUnknownControllerInput> SelectedControllers => _selectedControllers;
+        
+        /// <summary>
+        /// コントローラー登録シーン終了後、データベースに保存したコントローラー
+        /// </summary>ｓ
+        public IReadOnlyList<BaseCaseUnknownControllerInput> RegisteredPlayerSelectController => _outGameDatabase.GetAllCharacterSelectController();
         
         /// <summary>
         /// 1~4まで
@@ -31,7 +40,7 @@ namespace OutGame.PlayerCustom.Entity
         public PlayerCustomState PrevPlayerCustomState { get; private set; }
         public List<UseCharacterData> useCharacterData { get; private set; }
 
-        private List<Joycon> registeredJoycons;
+        private readonly List<BaseCaseUnknownControllerInput> _selectedControllers;
 
 
         private readonly ReactiveProperty<PlayerCustomState> _settingsState;
@@ -43,7 +52,7 @@ namespace OutGame.PlayerCustom.Entity
         {
             _settingsState = new ReactiveProperty<PlayerCustomState>();
             _hadFinishedPopUpWindow = new ReactiveProperty<PlayerCustomState>();
-            registeredJoycons = new List<Joycon>();
+            _selectedControllers = new List<BaseCaseUnknownControllerInput>();
             useCharacterData = new List<UseCharacterData>();
             _outGameDatabase = outGameDatabase;
             _commonDatabase = commonDatabase;
@@ -74,34 +83,43 @@ namespace OutGame.PlayerCustom.Entity
         {
             isPlayingPopAnimation = on;
         }
+        
         public void SetMaxPlayerCount(int count)
         {
             _outGameDatabase.SetMaxPlayerCount(count);
         }
         
-        public void SetJoycon(Joycon joycon)
+        public void SetController(BaseCaseUnknownControllerInput input)
         {
-            registeredJoycons.Add(joycon);
+            _selectedControllers.Add(input);
         }
 
-        public void SetJoyconNumData()
+        public void SetControllerToDatabase()
         {
-            Debug.Log($"MaxPlayerCount:{MaxPlayerCount}");
-            
-            for (int i = 0; i < MaxPlayerCount; i++)
+            _outGameDatabase.SetCharacterSelectController(_selectedControllers);
+        }
+
+        public void SetInGameControllerToDatabase()
+        {
+            var inGameControllers =
+                _selectedControllers.Select(controller => controller.GetInGamePlayerInput()).ToList();
+
+            var controllerNumData = new List<ControllerNumData>();
+            for (int i = 0; i < inGameControllers.Count; i++)
             {
-                Debug.Log($"playerCount:{i+1}");
-                Debug.Log($"JoyconManager.Instance.j.IndexOf(registeredJoycons[i * 2]:{JoyconManager.Instance.j.IndexOf(registeredJoycons[i * 2])}");
-                Debug.Log($"JoyconManager.Instance.j.IndexOf(registeredJoycons[i * 2 + 1]):{JoyconManager.Instance.j.IndexOf(registeredJoycons[i * 2 + 1])}");
-                var data = new JoyconNumData(i + 1, JoyconManager.Instance.j.IndexOf(registeredJoycons[i * 2]),
-                    JoyconManager.Instance.j.IndexOf(registeredJoycons[i * 2 + 1]));
-                _commonDatabase.SetJoyconNumData(data);
+                controllerNumData.Add(new ControllerNumData(i + 1, inGameControllers[i]));
             }
+            _commonDatabase.SetControllerNumData(controllerNumData);
         }
 
-        public void CancelRegisteredController(Joycon joycon)
+        public void CancelRegisteredController(BaseCaseUnknownControllerInput input)
         {
-            registeredJoycons.Remove(joycon);
+            _selectedControllers.Remove(input);
+        }
+        
+        public void CancelAllRegisteredController()
+        {
+            _selectedControllers.Clear();
         }
 
         public void SetUseCharacter(int playerNum,PlayableCharacter type)

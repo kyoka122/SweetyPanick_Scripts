@@ -21,16 +21,23 @@ namespace InGame
 
         [SerializeField] private ScriptableDataInstaller scriptableDataInstaller;
                 
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
+            if (isDuplication)
+            {
+                return;
+            }
             _inGameDatabase = new InGameDatabase();
             _outGameDatabase = new OutGameDatabase();
             _commonDatabase = new CommonDatabase();
             scriptableDataInstaller.SetScriptableData(_inGameDatabase, _outGameDatabase, _commonDatabase);
             LoadManager.Instance.Init(_inGameDatabase,_commonDatabase);
             SceneManager.sceneLoaded += SceneLoaded;
-            BaseSceneSequencer currentSceneSequencer = GetCurrentSceneSequencer();
-            currentSceneSequencer.Execute(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            
+            //MEMO: 初回シーンでもコールバックは呼ばれるので↓はいらない？
+            //BaseSceneSequencer currentSceneSequencer = GetCurrentSceneSequencer();
+            //currentSceneSequencer.Execute(_inGameDatabase,_outGameDatabase,_commonDatabase);
         }
 
         private void SceneLoaded(Scene nextScene, LoadSceneMode mode)
@@ -50,13 +57,19 @@ namespace InGame
                 SceneName.PlayerCustom => PlayerCustomSceneSequencer.Instance,
                 SceneName.Prologue => PrologueSequencer.Instance,
                 SceneName.FirstStage => FirstStageSequencer.Instance,
-                //SceneName.SecondStage => ,
-                //SceneName.BossStage => ,
+                SceneName.SecondStage => SecondStageSequencer.Instance,
+                //SceneName.ColateStage => ,
                 //SceneName.Epilogue => ,
                 SceneName.DebugKyokaMoveStage => DebugMoveSceneSequencer.Instance,
                 SceneName.DebugMoveStage => DebugMoveSceneSequencer.Instance,
                 _ => throw new ArgumentOutOfRangeException()
             };
+        }
+
+        private void OnDestroy()
+        {
+            _inGameDatabase.Dispose();
+            _outGameDatabase.Dispose();
         }
     }
 }

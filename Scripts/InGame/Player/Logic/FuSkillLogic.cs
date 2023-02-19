@@ -68,7 +68,7 @@ namespace InGame.Player.Logic
                     break;
                 case GumState.Catching:
                     break;
-                case GumState.Catched:
+                case GumState.Caught:
                     BindEnemy();
                     break;
                 case GumState.Destroy:
@@ -151,7 +151,7 @@ namespace InGame.Player.Logic
             _bindGumView.MoveToEnemy(_bindingEnemy.CenterPos, _fuConstEntity.gumMoveToEnemyTime)
                 .OnComplete(() =>
                 {
-                    _bindGumView.SetState(GumState.Catched);
+                    _bindGumView.SetState(GumState.Caught);
                     TimeBindEnemy(_bindGumView, _bindGumView.thisToken).Forget();
                 });
             

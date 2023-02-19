@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace InGame.Player.Logic
 {
+    /// <summary>
+    /// プレイヤーの移動方向によってオブジェクトの向きを変更する。
+    /// 単純にrotationを反転するだけではアニメーターで不具合が起こるため、scaleを反転する。
+    /// scaleを反転するとrigidbodyも反転するため、Rigidbodyも反転する。
+    /// </summary>
     public class PlayerReShapeLogic
     {
         private readonly Quaternion _rightMoveRot = Quaternion.Euler(0, 180, 0);
@@ -24,15 +29,19 @@ namespace InGame.Player.Logic
             _playerView = playerView;
             _playerInputEntity = playerInputEntity;
             _playerCommonInStageEntity = playerCommonInStageEntity;
-            
             _defaultScale = _playerView.transform.localScale;
             _defaultModelScale =_playerView.GetModelTransform().localScale;
+            _isCurrentTowardsRight = false;
+        }
+
+        public void LateInit()
+        {
+            UpdatePlayerDirection();
         }
 
         public void UpdatePlayerDirection()
         {
             float xMoveValue=_playerCommonInStageEntity.playerDirection;
-            
             if (xMoveValue==0)
             {
                 return;

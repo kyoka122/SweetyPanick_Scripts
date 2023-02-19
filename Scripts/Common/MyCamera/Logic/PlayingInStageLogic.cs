@@ -3,7 +3,6 @@ using InGame.MyCamera.Entity;
 using InGame.MyCamera.View;
 using MyApplication;
 using UniRx;
-using UnityEngine;
 
 namespace InGame.MyCamera.Logic
 {
@@ -16,14 +15,14 @@ namespace InGame.MyCamera.Logic
         {
             _cameraEntity = cameraEntity;
             _mainCameraView = mainCameraView;
-            SetInDatabase();
+            //SetInDatabase();
             RegisterObserver();
         }
 
-        private void SetInDatabase()
-        {
-            _cameraEntity.SetCameraFunctionInDatabase(_mainCameraView);
-        }
+        // private void SetInDatabase()
+        // {
+        //     _cameraEntity.SetCameraFunctionInDatabase(_mainCameraView);
+        // }
 
         private void RegisterObserver()
         {

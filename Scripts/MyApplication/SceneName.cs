@@ -6,7 +6,7 @@
         public const string Prologue = "Prologue";
         public const string FirstStage = "FirstStage";
         public const string SecondStage = "SecondStage";
-        public const string BossStage = "BossStage";
+        public const string ColateStage = "ColateStage";
         public const string Epilogue = "Epilogue";
         public const string Title = "Title";
         //public const string FirstHiddenStage = "FirstHiddenStage";

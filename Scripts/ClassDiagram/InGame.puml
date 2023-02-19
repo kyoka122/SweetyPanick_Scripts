@@ -3,64 +3,71 @@
 
 namespace SceneSequencer{
     abstract BaseSceneSequencer
-    class DebugMoveStageSequencer
-    BaseSceneSequencer <|-- DebugMoveStageSequencer
 }
 
-namespace PlayerController{
+namespace StageManager{
+    class FirstStageManager
+}
+
+namespace Player.Controller{
     abstract BasePlayerController
-    class DebugPlayerController
-    BasePlayerController <|-- DebugPlayerController
 }
 
-namespace PlayerInstaller{
+namespace Player.Installer{
     abstract BasePlayerInstaller
-    class CandyInstaller
-    BasePlayerInstaller <|-- CandyInstaller
-}
-namespace PlayerLogicManager{
-    abstract BasePlayerLogicManager
-    class DebugPlayerLogicManager
-    BasePlayerLogicManager <|.. DebugPlayerLogicManager
 }
 
-namespace DebugInput{
-    class DebugCharacterChanger
-}
+'namespace DebugInput{
+'    class DebugCharacterChanger
+'}
 
-namespace Logic{
+namespace Player.Logic{
     class PlayerMoveLogic
-    class PlayerPunchLogic
-    class PlayerReShaperLogic
-    class PlayerUseSkillLogic
 }
 
 namespace MyInput{
     abstract BasePlayerInput
-    class DebugPlayerInput
-    BasePlayerInput <|-- DebugPlayerInput
 }
 
 namespace Database{
     class InGameDatabase
+    class UIData
+    namespace Database.ScriptableData{
+    }
 }
 
-namespace Entity{
+namespace Player.Entity{
     class PlayerStatusEntity
     class PlayerInputEntity
     
-    PlayerInputEntity -->MyInput
     PlayerStatusEntity --> Database
+    PlayerInputEntity --> MyInput
 }
 
-namespace View{
+namespace Player.View{
     abstract BasePlayerView
-    class CandyView
-    BasePlayerView <|-- CandyView
 }
     
-namespace Parameter{
-    class PlayerParameter
+namespace Stage.Manager{
+    abstract BaseGimmickManager
+}
+
+namespace Stage.Installer{
+    class MoveSceneGimmickInstaller
+}
+
+namespace Stage.Logic{
+    class DoorLogic
+}
+
+namespace Stage.Entity{
+    class DoorEntity
+    
+    DoorEntity --> Database
+}
+
+namespace Stage.View{
+    class DoorView
 }
 
 class GameManager
@@ -68,14 +75,24 @@ namespace Application{}
 namespace Utility{}
 
 GameManager --> SceneSequencer
-SceneSequencer --> PlayerController
-SceneSequencer --> Parameter
-PlayerController --> DebugInput
-PlayerController ..> PlayerInstaller
-PlayerInstaller ..> PlayerLogicManager
-PlayerController --> PlayerLogicManager
-PlayerLogicManager --> Logic
-Logic --> Entity
-Logic --> View
+GameManager ..> Database
+SceneSequencer --> StageManager
+StageManager --> Player.Controller
+SceneSequencer --> Database
+'Player.Controller --> DebugInput
+StageManager ..> Player.Installer
+Player.Installer ..> Player.Controller
+Player.Controller --> Player.Logic
+Player.Logic --> Player.Entity
+Player.Logic --> Player.View
+MyInput -->Database
+
+StageManager --> Stage.Manager
+StageManager ..> Stage.Installer
+Stage.Installer ..> Stage.Manager
+Stage.Manager --> Stage.Logic
+Stage.Logic --> Stage.Entity
+Stage.Logic --> Stage.View
+
 
 @enduml

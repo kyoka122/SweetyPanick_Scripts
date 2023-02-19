@@ -7,15 +7,15 @@ namespace InGame.Player.Controller
 {
     public class FuController:BasePlayerController
     {
-        public FuController(int playerNum,PlayerMoveLogic playerMoveLogic,PlayerJumpLogic playerJumpLogic, 
-            PlayerPunchLogic playerPunchLogic, FuSkillLogic fuSkillLogic, PlayerReShapeLogic playerReShapeLogic, 
-            PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic, 
-            PlayerFixSweetsLogic playerFixSweetsLogic,PlayerEnterDoorLogic playerEnterDoorLogic,
-            PlayableCharacterSelectLogic playableCharacterSelectLogic,List<IDisposable> disposables,
-            IObservable<bool> onDead) 
-            : base(playerNum,playerMoveLogic, playerJumpLogic,playerPunchLogic, fuSkillLogic, playerReShapeLogic,
-                playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,playerEnterDoorLogic,
-                playableCharacterSelectLogic, disposables,onDead)
+        public FuController(int playerNum, PlayerMoveLogic playerMoveLogic, PlayerJumpLogic playerJumpLogic,
+            PlayerPunchLogic playerPunchLogic, FuSkillLogic fuSkillLogic, PlayerReShapeLogic playerReShapeLogic,
+            PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic,
+            PlayerFixSweetsLogic playerFixSweetsLogic, PlayerEnterDoorLogic playerEnterDoorLogic,
+            PlayableCharacterSelectLogic playableCharacterSelectLogic, PlayerTalkLogic playerTalkLogic,
+            List<IDisposable> disposables, IObservable<bool> onDead)
+            : base(playerNum, playerMoveLogic, playerJumpLogic, playerPunchLogic, fuSkillLogic, playerReShapeLogic,
+                playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic, playerEnterDoorLogic,
+                playableCharacterSelectLogic, playerTalkLogic, disposables, onDead)
         {
         }
 

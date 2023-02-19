@@ -1,10 +1,14 @@
-﻿using InGame.Common.Database;
+﻿using System;
+using System.Collections.Generic;
+using InGame.Common.Database;
+using InGame.Player.View;
 using OutGame.Database;
 using OutGame.PlayerCustom.View;
 using OutGame.PlayerCustom.Entity;
 using OutGame.PlayerCustom.Logic;
 using OutGame.PlayerCustom.Manager;
 using UniRx;
+using UnityEngine;
 
 namespace OutGame.PlayerCustom.Installer
 {
@@ -15,9 +19,11 @@ namespace OutGame.PlayerCustom.Installer
             ToMessageWindowSenderView toMessageWindowSenderView, OutGameDatabase outGameDatabase,CommonDatabase commonDatabase,
             Subject<bool> moveNextScene)
         {
-            InputCaseUnknownControllerEntity inputCaseUnknownControllerEntity=new InputCaseUnknownControllerEntity();
-            InSceneDataEntity inSceneDataEntity = new InSceneDataEntity(outGameDatabase,commonDatabase);
-            ConstDataEntity constDataEntity = new ConstDataEntity(outGameDatabase,commonDatabase);
+            playerCountView.Init();
+            controllersPanelView.Init();
+            var inputCaseUnknownControllerEntity=new InputCaseUnknownControllerEntity();
+            var inSceneDataEntity = new InSceneDataEntity(outGameDatabase,commonDatabase);
+            var constDataEntity = new ConstDataEntity(outGameDatabase,commonDatabase);
             
             fromMessageWindowRecieverView.Init(moveNextScene);
             
@@ -30,7 +36,11 @@ namespace OutGame.PlayerCustom.Installer
             PanelLogic panelLogic = new PanelLogic(playerCountView, controllersPanelView, characterSelectPanelView,
                 inSceneDataEntity, constDataEntity);
             ConfirmLogic confirmLogic = new ConfirmLogic(inSceneDataEntity,toMessageWindowSenderView);
-            return new PlayerCustomManager(panelLogic,playerCountButtonLogic,playerControllerLogic,characterSelectLogic,confirmLogic);
+
+            var disposables=new IDisposable[]{inputCaseUnknownControllerEntity, characterSelectLogic};
+
+            return new PlayerCustomManager(panelLogic,playerCountButtonLogic,playerControllerLogic,characterSelectLogic,confirmLogic,disposables);
         }
+
     }
 }

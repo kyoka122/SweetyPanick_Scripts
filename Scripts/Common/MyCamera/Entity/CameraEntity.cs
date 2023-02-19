@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using InGame.Common.Database;
 using InGame.Database;
-using InGame.Database.ScriptableData;
-using InGame.MyCamera.Controller;
 using MyApplication;
 using UniRx;
 
@@ -14,33 +13,25 @@ namespace InGame.MyCamera.Entity
         public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> mashUpdateableInStageData;
         public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> fuUpdateableInStageData;
         public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> kureUpdateableInStageData;
-
-        public bool isCandyHadTargetGroup { get; private set; }
-        public bool isMashHadTargetGroup { get; private set; }
-        public bool isFuHadTargetGroup { get; private set; }
-        public bool isKureHadTargetGroup { get; private set; }
-
+        
+        public Dictionary<PlayableCharacter, bool> HadTargetGroup => _hadTargetGroup;
+        
         public CameraData GetCameraSettingsData(StageArea area)=>_commonDatabase.GetCameraSettingsData(area);
         
-        public bool GetHadTargetGroup(PlayableCharacter characterType)
-        {
-            return characterType switch
-            {
-                PlayableCharacter.Candy => isCandyHadTargetGroup,
-                PlayableCharacter.Mash => isMashHadTargetGroup,
-                PlayableCharacter.Fu => isFuHadTargetGroup,
-                PlayableCharacter.Kure => isKureHadTargetGroup,
-                _ => throw new ArgumentOutOfRangeException(nameof(characterType), characterType, null)
-            };
-        }
-        
+        private readonly Dictionary<PlayableCharacter, bool> _hadTargetGroup;
         private readonly InGameDatabase _inGameDatabase;
         private readonly CommonDatabase _commonDatabase;
-        
+
         public CameraEntity(InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
         {
             _inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
+            _hadTargetGroup = new Dictionary<PlayableCharacter, bool>();
+            var playableCharacterArray = Enum.GetValues(typeof(PlayableCharacter));
+            for (int i = 0; i < playableCharacterArray.Length; i++)
+            {
+                _hadTargetGroup.Add((PlayableCharacter) i, false);
+            }
             GetObserver();
         }
 
@@ -52,30 +43,25 @@ namespace InGame.MyCamera.Entity
             kureUpdateableInStageData = _inGameDatabase.GetCharacterInStageDataObserver(PlayableCharacter.Kure);
         }
 
-        public void SetCameraFunctionInDatabase(IReadOnlyCameraFunction readOnlyFunction)
+        /*public void SetCameraFunctionInDatabase(IReadOnlyCameraFunction readOnlyFunction)
         {
             _commonDatabase.SetReadOnlyCameraFunction(readOnlyFunction);
-        }
+            _commonDatabase.SetReadOnlyCameraFunction();
+        }*/
 
+        public bool GetHadTargetGroup(PlayableCharacter characterType)
+        {
+            return _hadTargetGroup[characterType];
+        }
+        
         public void SetCharacterHadTargetGroup(PlayableCharacter characterType)
         {
-            switch (characterType)
-            {
-                case PlayableCharacter.Candy:
-                    isCandyHadTargetGroup = true;
-                    break;
-                case PlayableCharacter.Mash:
-                    isMashHadTargetGroup = true;
-                    break;
-                case PlayableCharacter.Fu:
-                    isFuHadTargetGroup = true;
-                    break;
-                case PlayableCharacter.Kure:
-                    isKureHadTargetGroup = true;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(characterType), characterType, null);
-            }
+            _hadTargetGroup[characterType] = true;
+        }
+        
+        public void RemoveCharacterHadTargetGroup(PlayableCharacter characterType)
+        {
+            _hadTargetGroup[characterType] = false;
         }
         
     }

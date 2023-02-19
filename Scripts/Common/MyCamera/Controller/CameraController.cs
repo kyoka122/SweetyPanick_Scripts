@@ -1,4 +1,5 @@
-﻿using InGame.MyCamera.Logic;
+﻿using Cinemachine;
+using InGame.MyCamera.Logic;
 using MyApplication;
 
 namespace InGame.MyCamera.Controller
@@ -7,6 +8,7 @@ namespace InGame.MyCamera.Controller
     {
         private readonly PlayingInStageLogic _playingInStageLogic;
         private readonly MoveStageLogic _moveStageLogic;
+        private readonly CinemachineConfiner2D _cinemachineConfiner2D;
 
         public CameraController(PlayingInStageLogic playingInStageLogic,MoveStageLogic moveStageLogic)
         {

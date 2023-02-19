@@ -254,6 +254,45 @@ namespace MyInput
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""TalkEnter"",
+            ""id"": ""9df0b4bb-d696-40eb-950f-c58b09507372"",
+            ""actions"": [
+                {
+                    ""name"": ""Enter"",
+                    ""type"": ""Button"",
+                    ""id"": ""5df14a37-4251-48a0-9b51-4d4b168e7cfa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""2e923dea-0ba9-4c8c-a810-2b09bfd9a3ea"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Enter"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""83219e90-4350-41cd-a946-5969b246da57"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Enter"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -270,6 +309,9 @@ namespace MyInput
             m_Player_Player3 = m_Player.FindAction("Player3", throwIfNotFound: true);
             m_Player_Player4 = m_Player.FindAction("Player4", throwIfNotFound: true);
             m_Player_PlayerSelect = m_Player.FindAction("PlayerSelect", throwIfNotFound: true);
+            // TalkEnter
+            m_TalkEnter = asset.FindActionMap("TalkEnter", throwIfNotFound: true);
+            m_TalkEnter_Enter = m_TalkEnter.FindAction("Enter", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -430,6 +472,39 @@ namespace MyInput
             }
         }
         public PlayerActions @Player => new PlayerActions(this);
+
+        // TalkEnter
+        private readonly InputActionMap m_TalkEnter;
+        private ITalkEnterActions m_TalkEnterActionsCallbackInterface;
+        private readonly InputAction m_TalkEnter_Enter;
+        public struct TalkEnterActions
+        {
+            private @DebugInputMap m_Wrapper;
+            public TalkEnterActions(@DebugInputMap wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Enter => m_Wrapper.m_TalkEnter_Enter;
+            public InputActionMap Get() { return m_Wrapper.m_TalkEnter; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(TalkEnterActions set) { return set.Get(); }
+            public void SetCallbacks(ITalkEnterActions instance)
+            {
+                if (m_Wrapper.m_TalkEnterActionsCallbackInterface != null)
+                {
+                    @Enter.started -= m_Wrapper.m_TalkEnterActionsCallbackInterface.OnEnter;
+                    @Enter.performed -= m_Wrapper.m_TalkEnterActionsCallbackInterface.OnEnter;
+                    @Enter.canceled -= m_Wrapper.m_TalkEnterActionsCallbackInterface.OnEnter;
+                }
+                m_Wrapper.m_TalkEnterActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @Enter.started += instance.OnEnter;
+                    @Enter.performed += instance.OnEnter;
+                    @Enter.canceled += instance.OnEnter;
+                }
+            }
+        }
+        public TalkEnterActions @TalkEnter => new TalkEnterActions(this);
         public interface IPlayerActions
         {
             void OnMove(InputAction.CallbackContext context);
@@ -442,6 +517,10 @@ namespace MyInput
             void OnPlayer3(InputAction.CallbackContext context);
             void OnPlayer4(InputAction.CallbackContext context);
             void OnPlayerSelect(InputAction.CallbackContext context);
+        }
+        public interface ITalkEnterActions
+        {
+            void OnEnter(InputAction.CallbackContext context);
         }
     }
 }

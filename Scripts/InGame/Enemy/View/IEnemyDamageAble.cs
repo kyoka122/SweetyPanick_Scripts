@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using MyApplication;
+using UnityEngine;
 
 namespace InGame.Enemy.View
 {
     public interface IEnemyDamageAble
     {
-        public void OnPunched(Vector2 playerPos);
-        public void OnCrepeRolled();
+        public void OnDamaged(Struct.DamagedInfo info);
     }
 }

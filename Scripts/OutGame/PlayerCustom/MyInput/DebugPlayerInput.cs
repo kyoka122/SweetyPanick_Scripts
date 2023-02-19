@@ -2,12 +2,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace OutGame.MyInput
+namespace OutGame.PlayerCustom.MyInput
 {
     //MEMO: 参考：https://nekojara.city/unity-input-system-actions
     
     //TODO: 後回し
-    public class DebugPlayerInput:BasePlayerInput
+    /*public class DebugPlayerInput:BasePlayerInput
     {
         private const float SelectorCanMoveValue = 0.9f;
         private const float SelectorNotMoveValue = 0.1f;
@@ -78,7 +78,7 @@ namespace OutGame.MyInput
         private void OffPlayerSelector(InputAction.CallbackContext context)
         {
             back.Value = false;
-        }*/
+        }
         
 
         private int SetStickDirection(float stickValue)
@@ -90,10 +90,10 @@ namespace OutGame.MyInput
 
 
             //MEMO: スティックの押し込み具合
-            /*if (Mathf.Abs(horizontalCommand.Value) > SelectorCanMoveValue)
-            {
-                moveDirection *= 1;
-            }*/
+            // if (Mathf.Abs(horizontalCommand.Value) > SelectorCanMoveValue)
+            // {
+            //     moveDirection *= 1;
+            // }
             if (Mathf.Abs(stickValue) < SelectorNotMoveValue)
             {
                 moveDirection *= 0;
@@ -101,5 +101,5 @@ namespace OutGame.MyInput
 
             return moveDirection;
         }
-    }
+    }*/
 }

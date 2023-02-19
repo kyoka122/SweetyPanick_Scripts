@@ -2,6 +2,7 @@
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Enemy.Entity;
+using InGame.Enemy.Interface;
 using InGame.Enemy.Logic;
 using InGame.Enemy.View;
 using UnityEngine;
@@ -10,25 +11,54 @@ namespace InGame.Enemy.Installer
 {
     public class EnemyInstaller:MonoBehaviour
     {
-        public EnemyController Install(InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
+        [SerializeField] protected ViewGenerator viewGenerator;
+        
+        private InGameDatabase _inGameDatabase;
+        private CommonDatabase _commonDatabase;
+
+        public void Init(InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
+        {
+            _inGameDatabase = inGameDatabase;
+            _commonDatabase = commonDatabase;
+        }
+        
+        public EnemyManager Install()
+        {
+            var enemyController = new EnemyManager();
+            return enemyController;
+        }
+        
+        public EnemyManager InstallWithStageEnemies()
         {
             BaseEnemyView[] enemyViews=FindObjectsOfType<BaseEnemyView>();
             DefaultEnemyView[] defaultEnemyViews = GetDefaultEnemyViews(enemyViews);
             EternitySleepEnemyView[] eternitySleepEnemyViews = GetEternitySleepEnemyViews(enemyViews);
+            StationaryEnemyView[] stationaryEnemyViews = GetStationaryEnemyViews(enemyViews);
 
             var defaultEnemyLogics = new List<DefaultEnemyLogic>();
             var eternitySleepEnemyLogics = new List<EternitySleepEnemyLogic>();
+            var stationaryEnemyLogics = new List<StationaryEnemyLogic>();
             
             foreach (var defaultEnemyView in defaultEnemyViews)
             {
-                defaultEnemyLogics.Add(new DefaultEnemyLogic(new DefaultEnemyEntity(inGameDatabase,commonDatabase),defaultEnemyView));
+                defaultEnemyLogics.Add(new DefaultEnemyLogic(new DefaultEnemyEntity(_inGameDatabase, _commonDatabase),
+                    defaultEnemyView));
             }
-
             foreach (var eternitySleepEnemy in eternitySleepEnemyViews)
             {
-                eternitySleepEnemyLogics.Add(new EternitySleepEnemyLogic(new EternitySleepEnemyEntity(inGameDatabase,commonDatabase),eternitySleepEnemy));
+                eternitySleepEnemyLogics.Add(new EternitySleepEnemyLogic(
+                    new EternitySleepEnemyEntity(_inGameDatabase, _commonDatabase), eternitySleepEnemy));
             }
-            var enemyController = new EnemyController(defaultEnemyLogics.ToArray(),eternitySleepEnemyLogics.ToArray());
+            foreach (var stationaryEnemyView in stationaryEnemyViews)
+            {
+                stationaryEnemyLogics.Add(new StationaryEnemyLogic(new StationaryEnemyEntity(
+                    _inGameDatabase,_commonDatabase),stationaryEnemyView));
+            }
+            
+            List<BaseEnemyLogic> enemyLogics = new List<BaseEnemyLogic>(defaultEnemyLogics);
+            enemyLogics.AddRange(eternitySleepEnemyLogics);
+            enemyLogics.AddRange(stationaryEnemyLogics);
+            var enemyController = new EnemyManager(enemyLogics);
 
             return enemyController;
         }
@@ -61,6 +91,37 @@ namespace InGame.Enemy.Installer
             }
 
             return eternitySleepEnemyViewEntities.ToArray();
+        }
+        
+        public IColateOrderAble InstallDefaultEnemyByColate(EnemyManager enemyManager)
+        {
+            DefaultEnemyView defaultEnemyView=SpawnRandomDefaultEnemy();
+            defaultEnemyView.Init();
+            enemyManager.AddEnemy(new DefaultEnemyLogic(new DefaultEnemyEntity(_inGameDatabase, _commonDatabase),
+                defaultEnemyView));
+            return defaultEnemyView;
+        }
+        
+        private DefaultEnemyView SpawnRandomDefaultEnemy()
+        {
+            int prefabLength=_inGameDatabase.GetEnemyData().DefaultEnemyPrefab.Length;
+            int random = Random.Range(0, prefabLength + 1);
+            return viewGenerator.GenerateDefaultEnemyView(_inGameDatabase.GetEnemyData().DefaultEnemyPrefab[random]);
+        }
+
+        private StationaryEnemyView[] GetStationaryEnemyViews(BaseEnemyView[] enemyViews)
+        {
+            List<StationaryEnemyView> stationaryEnemyViews = new List<StationaryEnemyView>();
+            foreach (var enemyView in enemyViews)
+            {
+                if (enemyView.TryGetComponent(out StationaryEnemyView stationaryEnemyView))
+                {
+                    stationaryEnemyViews.Add(stationaryEnemyView);
+                    stationaryEnemyView.Init();
+                }
+            }
+
+            return stationaryEnemyViews.ToArray();
         }
         
     }

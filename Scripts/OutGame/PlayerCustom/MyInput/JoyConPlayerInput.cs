@@ -1,16 +1,16 @@
-﻿using UniRx;
-using UnityEngine;
+﻿/*using UnityEngine;
 
-namespace OutGame.MyInput
+namespace OutGame.PlayerCustom.MyInput
 {
+	/// <summary>
+	/// Joycon両手持ち用
+	/// </summary>
 	public class JoyConPlayerInput : BasePlayerInput
 	{
 		private readonly Joycon _joyconRight;
 		private readonly Joycon _joyconLeft;
 		
 		private const float OnShakeValue = 1.3f;
-		private const float SelectorCanMoveValue = 0.5f;
-		private const float SelectorNotMoveValue = 0.1f;
 		private Vector3 _accel;
 		private Vector3 _accelCache;
 		
@@ -18,7 +18,7 @@ namespace OutGame.MyInput
 		{
 			_joyconRight = joyconRight;
 			_joyconLeft = joyconLeft;
-			JoyconManager.Instance.RegisterDelegate(UpdateInput);
+			JoyconManager.Instance.updated += UpdateInput;
 		}
 
 		private void UpdateInput()
@@ -65,11 +65,7 @@ namespace OutGame.MyInput
 			
 			
 			//MEMO: スティックの押し込み具合
-			/*if (Mathf.Abs(horizontalCommand.Value) > SelectorCanMoveValue)
-			{
-				moveDirection *= 1;
-			}*/
-			if (Mathf.Abs(stickValue) < SelectorNotMoveValue)
+			if (Mathf.Abs(stickValue) < SelectorNotMoveStickValue)
 			{
 				moveDirection *= 0;
 			}
@@ -77,9 +73,10 @@ namespace OutGame.MyInput
 			return moveDirection;
 		}
 
-		public override BasePlayerInput Clone()
+		public override void Dispose()
 		{
-			return MemberwiseClone() as JoyConPlayerInput;
+			base.Dispose();
+			JoyconManager.Instance.updated -= UpdateInput;
 		}
 	}
-}
+}*/

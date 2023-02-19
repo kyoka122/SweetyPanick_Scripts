@@ -1,4 +1,5 @@
 ﻿using InGame.Enemy.Installer;
+using InGame.Enemy.View;
 using InGame.Player.View;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ namespace InGame.Database.ScriptableData
     [CreateAssetMenu(fileName = "EnemyScriptableData", menuName = "ScriptableObjects/EnemyScriptableData")]
     public class EnemyScriptableData:ScriptableObject
     {
+        public DefaultEnemyView[] DefaultEnemyPrefab => defaultEnemyPrefab;
         public EnemyInstaller EnemyInstaller => enemyInstaller;
         public SpriteEffectView ShockSprite => shockSprite;
         public float MoveSpeed=>moveSpeed;
@@ -22,6 +24,7 @@ namespace InGame.Database.ScriptableData
         public float GumReleaseReactionTime => gumReleaseReactionTime;
         public float ShockSpriteDuration => shockSpriteDuration;
 
+        [SerializeField] private DefaultEnemyView[] defaultEnemyPrefab;
         [SerializeField] private EnemyInstaller enemyInstaller;
         [SerializeField] private SpriteEffectView shockSprite;
         

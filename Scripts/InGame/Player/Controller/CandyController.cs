@@ -12,10 +12,11 @@ namespace InGame.Player.Controller
             PlayerReShapeLogic playerReShapeLogic, PlayerHealLogic playerHealLogic,
             PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic, 
             PlayerFixSweetsLogic playerFixSweetsLogic, PlayerEnterDoorLogic playerEnterDoorLogic,
-            PlayableCharacterSelectLogic playableCharacterSelectLogic,List<IDisposable> disposables,IObservable<bool> onDead) 
+            PlayableCharacterSelectLogic playableCharacterSelectLogic,PlayerTalkLogic playerTalkLogic,
+            List<IDisposable> disposables,IObservable<bool> onDead) 
             : base(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, playerSkillLogic, playerReShapeLogic, 
                 playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic, playerEnterDoorLogic,
-                playableCharacterSelectLogic,disposables,onDead)
+                playableCharacterSelectLogic,playerTalkLogic,disposables,onDead)
         {
         }
 

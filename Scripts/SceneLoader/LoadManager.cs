@@ -35,6 +35,7 @@ namespace InGame.SceneLoader
         
         protected override void Awake()
         {
+            base.Awake();
             if (this != Instance)
             {
                 foreach (Transform tmp in gameObject.transform)

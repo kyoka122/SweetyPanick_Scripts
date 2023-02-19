@@ -13,8 +13,8 @@ namespace OutGame.PlayerCustom.Entity
         public float PopUpDuration =>_outGameDatabase.GetPlayerCustomSceneData().PanelPopUpDuration;
         public float PopDownDuration =>_outGameDatabase.GetPlayerCustomSceneData().PanelPopDownDuration;
 
-        public CharacterSelectCursorInstanceManager CharacterSelectCursorInstanceManager =>
-            _outGameDatabase.GetPlayerCustomSceneData().CharacterSelectCursorInstanceManager;
+        public CharacterSelectCursorInstaller CharacterSelectCursorInstaller =>
+            _outGameDatabase.GetPlayerCustomSceneData().CharacterSelectCursorInstaller;
         
         public CharacterSelectCursorView CharacterSelectCursorPrefab =>
             _outGameDatabase.GetPlayerCustomSceneData().CharacterSelectCursorView;
@@ -23,7 +23,7 @@ namespace OutGame.PlayerCustom.Entity
             _outGameDatabase.GetPlayerCustomSceneData().CharacterSelectCursorRange;
         
         public Func<Vector2,Vector2> WorldToScreenPoint=>
-        _commonDatabase.GetIReadOnlyCameraController().WorldToScreenPoint;
+        _commonDatabase.GetReadOnlyCameraController().WorldToScreenPoint;
 
         private readonly OutGameDatabase _outGameDatabase;
         private readonly CommonDatabase _commonDatabase;

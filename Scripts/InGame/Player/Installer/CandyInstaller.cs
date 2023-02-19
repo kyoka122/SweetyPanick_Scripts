@@ -7,6 +7,8 @@ using InGame.Player.Logic;
 using InGame.Player.Controller;
 using InGame.Player.View;
 using MyApplication;
+using OutGame.Database;
+using OutGame.PlayerTalks;
 using UnityEngine;
 
 namespace InGame.Player.Installer
@@ -16,20 +18,7 @@ namespace InGame.Player.Installer
     /// </summary>
     public class CandyInstaller:BasePlayerInstaller
     {
-        private PlayerMoveLogic _playerMoveLogic;
-        private PlayerJumpLogic _playerJumpLogic;
-        private PlayerPunchLogic _playerPunchLogic;
-        private CandySkillLogic _candySkillLogic;
-        private PlayerReShapeLogic _playerReShapeLogic;
-        private PlayerHealLogic _playerHealLogic;
-        private PlayerDamageLogic _playerDamageLogic;
-        private PlayerStatusLogic _playerStatusLogic;
-        private PlayerParticleLogic _playerParticleLogic;
-        private PlayerFixSweetsLogic _playerFixSweetsLogic;
-        private PlayerEnterDoorLogic _playerEnterDoorLogic;
-        private PlayableCharacterSelectLogic _playableCharacterSelectLogic;
-
-        public override BasePlayerController Install(int playerNum,InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
+        public override BasePlayerController Install(int playerNum,InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             var candyStatus = inGameDatabase.GetCandyStatus();
             inGameDatabase.SetCandyStatus(candyStatus);
@@ -45,7 +34,7 @@ namespace InGame.Player.Installer
             
             
             var playerStatusView = viewGenerator.GeneratePlayerStatusView(uiData.PlayerStatusView,
-                uiData.Canvas.transform,uiData.StatusDataPos[playerNum-1]);
+                uiData.Canvas.transform,uiData.PlayerStatusDataPos[playerNum-1]);
             playerStatusView.Init(PlayableCharacterIndex.Candy,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Candy).maxHp);
             
             
@@ -54,34 +43,37 @@ namespace InGame.Player.Installer
             var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Candy);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, 
                 PlayableCharacter.Candy,playerNum,candyView.GetTransform());
+            var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
             
             
-            _playerMoveLogic = new PlayerMoveLogic(playerConstEntity, playerInputEntity, playerCommonInStageEntity,
+            var playerMoveLogic = new PlayerMoveLogic(playerConstEntity, playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity,candyView,playerAnimatorView);
-            _playerJumpLogic = new PlayerJumpLogic(playerConstEntity, playerInputEntity, playerCommonInStageEntity,
+            var playerJumpLogic = new PlayerJumpLogic(playerConstEntity, playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity,candyView,playerAnimatorView);
-            _playerPunchLogic = new PlayerPunchLogic(playerInputEntity,playerConstEntity,playerCommonInStageEntity,
+            var playerPunchLogic = new PlayerPunchLogic(playerInputEntity,playerConstEntity,playerCommonInStageEntity,
                 playerCommonUpdateableEntity, candyView,playerAnimatorView,weaponView);
-            _playerReShapeLogic = new PlayerReShapeLogic(candyView, playerInputEntity,playerCommonInStageEntity);
-            _playerHealLogic = new PlayerHealLogic(playerConstEntity,playerCommonUpdateableEntity);
-            _playerDamageLogic = new PlayerDamageLogic(candyView,playerAnimatorView,playerConstEntity,playerCommonInStageEntity,
+            var playerReShapeLogic = new PlayerReShapeLogic(candyView, playerInputEntity,playerCommonInStageEntity);
+            var playerHealLogic = new PlayerHealLogic(playerConstEntity,playerCommonUpdateableEntity);
+            var playerDamageLogic = new PlayerDamageLogic(candyView,playerAnimatorView,playerConstEntity,playerCommonInStageEntity,
                 playerCommonUpdateableEntity,playerStatusView);
-            _candySkillLogic = new CandySkillLogic(playerInputEntity,playerConstEntity,playerCommonInStageEntity,
+            var candySkillLogic = new CandySkillLogic(playerInputEntity,playerConstEntity,playerCommonInStageEntity,
                 candyView,playerAnimatorView,weaponView);
-            _playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity, candyView,
+            var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity, candyView,
                 playerAnimatorView);
-            _playerParticleLogic = new PlayerParticleLogic(playerConstEntity, candyView,playerCommonInStageEntity);
-            _playerFixSweetsLogic = new PlayerFixSweetsLogic(playerInputEntity, playerConstEntity,
+            var playerParticleLogic = new PlayerParticleLogic(playerConstEntity, candyView,playerCommonInStageEntity);
+            var playerFixSweetsLogic = new PlayerFixSweetsLogic(playerInputEntity, playerConstEntity,
                 playerCommonInStageEntity, playerCommonUpdateableEntity,candyView,playerAnimatorView,particleGeneratorView);
-            _playerEnterDoorLogic = new PlayerEnterDoorLogic(playerConstEntity, playerInputEntity,
+            var playerEnterDoorLogic = new PlayerEnterDoorLogic(playerConstEntity, playerInputEntity,
                 playerCommonInStageEntity, candyView);
-            _playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity
+            var playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity
                 , playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Candy);
+            var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, candyView);
 
             var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity};
-            return new CandyController(playerNum,_playerMoveLogic, _playerJumpLogic, _playerPunchLogic, _candySkillLogic,
-                _playerReShapeLogic, _playerHealLogic, _playerStatusLogic, _playerParticleLogic, _playerFixSweetsLogic,
-                _playerEnterDoorLogic,_playableCharacterSelectLogic,disposables,playerCommonUpdateableEntity.OnDead);
+            return new CandyController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, candySkillLogic,
+                playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
+                playerEnterDoorLogic,playableCharacterSelectLogic,playerTalkLogic,disposables,playerCommonUpdateableEntity.OnDead);
         }
+
     }
 }

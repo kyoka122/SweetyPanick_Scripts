@@ -22,6 +22,7 @@ namespace InGame.Player.Logic
             _playerAnimatorView = playerAnimatorView;
         }
 
+        //TODO: これ廃止する。Viewから直接参照させる
         public void UpdateAnimationStatus()
         {
             string animationName=_playerAnimatorView.GetCurrentAnimationName();

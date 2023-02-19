@@ -16,19 +16,14 @@ namespace InGame.Enemy.Logic
         
         public override void UpdateEnemies()
         {
-            if (_enemyView == null || _enemyView.state == EnemyState.Death)
+            if (enemyView == null || enemyView.state == EnemyState.Death)
             {
                 return;
             }
 
             CheckHadFallen();
             CheckOutOfScreen();
-       
-            if (_enemyView.state == EnemyState.Punched)
-            {
-                Fly();
-                _enemyView.SetState(EnemyState.Fly);
-            }
+            TryFly();
             if (TryUpdateFlyState())
             {
                 return;
@@ -37,18 +32,18 @@ namespace InGame.Enemy.Logic
             {
                 return;
             }
-            if (!_enemyView.inScreenX)
+            if (!enemyView.inScreenX)
             {
                 return;
             }
-            if (_enemyView.state==EnemyState.ChangeDirection)
+            if (enemyView.state==EnemyState.ChangeDirection)
             {
                 return;
             }
-
             TryUpdateEatState();
-            if (_enemyView.state==EnemyState.Eat)
+            if (enemyView.state==EnemyState.Eat)
             {
+                enemyView.SetVelocity(Vector2.zero);
                 return;
             }
 

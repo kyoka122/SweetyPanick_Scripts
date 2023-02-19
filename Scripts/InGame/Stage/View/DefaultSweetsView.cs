@@ -56,6 +56,7 @@ namespace InGame.Stage.View
             try
             {
                 _transition.FadeOut(duration);
+                
                 await UniTask.WaitWhile(() => _transition.IsActiveFadeOut(),
                     cancellationToken: token);
             }
@@ -84,12 +85,7 @@ namespace InGame.Stage.View
             {
                 return false;
             }*/
-            if (fixState != FixState.Broken&&fixState != FixState.Fixing)
-            {
-                Debug.Log($"Can`t Edit. CurrentSweetsCondition is:{fixState}");
-                return false;
-            }
-            return true;
+            return fixState == FixState.Broken;
         }
 
         public bool CanBreakSweets()
@@ -99,12 +95,7 @@ namespace InGame.Stage.View
                 Debug.LogWarning($"Had Not Instance _transition", gameObject);
                 return false;
             }
-            if (fixState != FixState.Fixed && fixState != FixState.Breaking)
-            {
-                return false;
-            }
-
-            return true;
+            return fixState == FixState.Fixed;
         }
 
         public Vector3 GetPlayParticlePos()

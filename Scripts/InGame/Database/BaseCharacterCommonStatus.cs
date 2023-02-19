@@ -18,6 +18,7 @@ namespace InGame.Database
         public float highJumpValue;
         public float toGroundDistance;
         public float toSweetsDistance;
+        public float toSlopeDistance;
         public float normalSweetsFixingTime;
         public float gimmickSweetsFixingTime;
         public float knockBackValue;
@@ -37,6 +38,7 @@ namespace InGame.Database
             highJumpValue = characterBaseParameter.highJumpValue;
             toGroundDistance = characterBaseParameter.toGroundDistance;
             toSweetsDistance = characterBaseParameter.toSweetsDistance;
+            toSlopeDistance = characterBaseParameter.toSlopeDistance;
             normalSweetsFixingTime = characterBaseParameter.normalSweetsFixingTime;
             gimmickSweetsFixingTime = characterBaseParameter.gimmickSweetsFixingTime;
             knockBackValue = characterBaseParameter.knockBackValue*10;

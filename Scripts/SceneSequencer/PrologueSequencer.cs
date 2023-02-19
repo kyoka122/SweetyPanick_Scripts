@@ -1,5 +1,6 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.SceneLoader;
@@ -9,7 +10,9 @@ using OutGame.Database;
 using OutGame.Prologue;
 using OutGame.Prologue.MyInput;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using Utility;
 
 namespace SceneSequencer
 {
@@ -17,13 +20,46 @@ namespace SceneSequencer
     {
         [SerializeField] private PrologueBehaviour prologueBehaviour;
 
-        private InputCaseUnknownController _inputCaseUnknownController;
+        private List<IButtonInput> _buttonInputs;//MEMO: コールバックでListの中身が変動する恐れあり
         
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
-            //MEMO: ↓のリストから入力情報を得られる。Joyconでストーリーを先に進めたい場合はこっち。
-            //_inputCaseUnknownController = new InputCaseUnknownController();
-            prologueBehaviour.Init(OnToNextSceneFlag);
+            _buttonInputs = new List<IButtonInput>();
+            InitControllers();
+            InputSystem.onDeviceChange += UpdateInputActionButtonInputter;
+            JoyconManager.Instance.added += AddJoycons;
+            prologueBehaviour.Init(OnToNextSceneFlag,_buttonInputs);
+        }
+
+        private void UpdateInputActionButtonInputter(InputDevice inputDevice,InputDeviceChange inputDeviceChange)
+        {
+            if (inputDeviceChange==InputDeviceChange.Added)
+            {
+                _buttonInputs.Add(new InputActionButtonInputter(inputDevice));
+            }
+        }
+        
+        private void AddJoycons(Joycon addedJoycon)
+        {
+            _buttonInputs.Add(new JoyConButtonInput(addedJoycon));
+        }
+
+        /// <summary>
+        /// 現在複数コントローラーに対応していない && Joycon以外のゲームパッドに対応していない
+        /// </summary>
+        private void InitControllers()
+        {
+            var devices = InputSystem.devices;
+            foreach (var device in devices.Where(device => !device.IsTDevice<Joystick>()))
+            {
+                _buttonInputs.Add(new InputActionButtonInputter(device));
+            }
+
+            List<Joycon> joycons = new List<Joycon>(JoyconManager.Instance.j);
+            foreach (var joycon in joycons)
+            {
+                _buttonInputs.Add(new JoyConButtonInput(joycon));
+            }
         }
 
         protected override async void ProcessInOrder()
@@ -40,6 +76,7 @@ namespace SceneSequencer
             BGMManager.Instance.Play(BGMPath.PROLOGUE);
             prologueBehaviour.CallStartNarration();
         }
+        
 
         private void OnToNextSceneFlag()
         {
@@ -61,6 +98,12 @@ namespace SceneSequencer
                 Debug.Log("BGMフェードアウト終了");
             });
             SceneManager.LoadScene(nextSceneName);
+        }
+
+        private void OnDestroy()
+        {
+            InputSystem.onDeviceChange -= UpdateInputActionButtonInputter;
+            JoyconManager.Instance.added -= AddJoycons;
         }
     }
 }

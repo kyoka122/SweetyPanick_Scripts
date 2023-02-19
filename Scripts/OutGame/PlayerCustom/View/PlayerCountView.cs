@@ -14,6 +14,12 @@ namespace OutGame.PlayerCustom.View
         [SerializeField] private Transform threeButton;
         [SerializeField] private Transform fourButton;
 
+        public void Init()
+        {
+            PanelObj.SetActive(false);
+            PanelObj.transform.localScale = Vector3.zero;
+        }
+        
         public Transform GetViewTransform(int num)
         {
             return num switch
@@ -33,5 +39,6 @@ namespace OutGame.PlayerCustom.View
             threeButton.localScale = Vector3.one;
             fourButton.localScale= Vector3.one;
         }
+
     }
 }

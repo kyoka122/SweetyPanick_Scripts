@@ -1,77 +1,59 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using MyApplication;
-using Unity.VisualScripting;
+using OutGame.PlayerTalks;
 using UnityEngine;
 
 namespace OutGame.Prologue
 {
-    public class ProloguePlayerAnimation : MonoBehaviour
+    public class ProloguePlayerAnimation:MonoBehaviour
     {
-        [SerializeField] private Transform modelTransform;
+        [SerializeField] private float outOfScreenViewX;
+        [SerializeField] private float candyExitTime=3;
+        [SerializeField] private float princessExitTime=3;
+
+        [SerializeField] private Camera camera;
+        [SerializeField] private PlayerAnimations candy;
+        [SerializeField] private PlayerAnimations mash;
+        [SerializeField] private PlayerAnimations fu;
+        [SerializeField] private PlayerAnimations kure;
+
         
-        private readonly Quaternion _rightMoveRot = Quaternion.Euler(0, 180, 0);
-        private readonly Quaternion _leftMoveRot = Quaternion.Euler(0, 0, 0);
-        private Vector3 InvertedModelScale => new(-_defaultModelScale.x, _defaultModelScale.y);
-        private Vector3 InvertedScale => new(-_defaultScale.x, _defaultScale.y);
-
-        private Vector3 _defaultModelScale;
-        private Vector3 _defaultScale;
-        private Animator _animator;
-
-        private int _currentDirection;
-
+        private Vector2 _outOfScreenView;
+        
         public void Init()
         {
-            _animator = GetComponent<Animator>();
-            _defaultScale = transform.localScale;
+            _outOfScreenView = new Vector2(outOfScreenViewX, 0);
+            candy.Init();
+            mash.Init();
+            fu.Init();
+            kure.Init();
+            candy.UpdatePlayerDirection(1);
+            mash.UpdatePlayerDirection(1);
+            kure.UpdatePlayerDirection(1);
+            fu.UpdatePlayerDirection(1);
+        }
+        
+        public async UniTask ExitCandy(CancellationToken token)
+        {
+            candy.UpdatePlayerDirection(-1);
+            candy.OnRunAnimation();
+            await candy.Move(camera, _outOfScreenView, candyExitTime,token);
         }
 
-        public void UpdatePlayerDirection(int direction)
+        public async UniTask ExitPrincess(CancellationToken token)
         {
-            _currentDirection = direction;
-
-            if (_currentDirection == 0)
-            {
-                return;
-            }
+            mash.UpdatePlayerDirection(-1);
+            fu.UpdatePlayerDirection(-1);
+            kure.UpdatePlayerDirection(-1);
             
-            InvertModel();
-        }
-
-        private void InvertModel()
-        {
-            Quaternion newRot = _currentDirection > 0 ? _rightMoveRot : _leftMoveRot;
-            Vector3 newModelScale = _currentDirection > 0 ? _defaultModelScale : InvertedModelScale;
-            SetModelRotation(newRot);
-        }
-
-        private void SetModelRotation(Quaternion newQuaternion)
-        {
-            transform.rotation = newQuaternion;
-        }
-
-        public void OnRunAnimation()
-        {
-            _animator.SetBool(PlayerAnimatorParameter.IsHorizontalMove,true);
-            _animator.SetFloat(PlayerAnimatorParameter.HorizontalMove, 1);
-        }
-
-        public async UniTask Exit(Camera camera,Vector2 outOfScreenView,float exitTime,CancellationToken token)
-        {
-            var exitWorldPoint=camera.ViewportToWorldPoint(outOfScreenView);
-            exitWorldPoint = new Vector2(exitWorldPoint.x, transform.position.y);
-
-            try
-            {
-                await DOTween.Sequence(transform.DOMove(exitWorldPoint, exitTime)).AsyncWaitForCompletion();
-
-            }
-            catch (OperatorException)
-            {
-                Debug.Log($"Canceled Move");
-            }
+            mash.OnRunAnimation();
+            fu.OnRunAnimation();
+            kure.OnRunAnimation();
+            
+            UniTask mashTask = mash.Move(camera, _outOfScreenView, princessExitTime, token);
+            UniTask fuTask = fu.Move(camera,_outOfScreenView, princessExitTime, token);
+            UniTask kureTask = kure.Move(camera, _outOfScreenView, princessExitTime, token);
+            await UniTask.WhenAll(mashTask, fuTask, kureTask);
         }
     }
 }

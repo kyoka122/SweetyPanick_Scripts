@@ -1,9 +1,10 @@
-﻿using UniRx;
+﻿using System;
+using UniRx;
 using UnityEngine;
 
 namespace OutGame.PlayerCustom.MyInput
 {
-	public class JoyConLeftInputCaseUnknownController
+	public class JoyConLeftInputCaseUnknownController:IDisposable
 	{
 		public IReadOnlyReactiveProperty<int> HorizontalCommand=>horizontalCommand;
 		public IReadOnlyReactiveProperty<int> VerticalCommand => verticalCommand;
@@ -26,7 +27,7 @@ namespace OutGame.PlayerCustom.MyInput
 			verticalCommand = new ReactiveProperty<int>();
 			leftControllerSet = new ReactiveProperty<bool>();
 			backPrevMenu = new ReactiveProperty<bool>();
-			JoyconManager.Instance.RegisterDelegate(UpdateInput);
+			JoyconManager.Instance.updated += UpdateInput;
 		}
 
 		private void UpdateInput()
@@ -75,6 +76,15 @@ namespace OutGame.PlayerCustom.MyInput
 			}
 			
 			return moveDirection;
+		}
+
+		public void Dispose()
+		{
+			horizontalCommand?.Dispose();
+			verticalCommand?.Dispose();
+			leftControllerSet?.Dispose();
+			backPrevMenu?.Dispose();
+			JoyconManager.Instance.updated -= UpdateInput;
 		}
 	}
 }

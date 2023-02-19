@@ -6,7 +6,9 @@ namespace InGame.Database.ScriptableData
     public class StageGimmickScriptableData:ScriptableObject
     {
         public float MoveFloorSpeed=>moveFloorSpeed;
+        public Vector3 CrepeCameraShakeVelocity=>crepeCameraShakeVelocity;
 
         [SerializeField] private float moveFloorSpeed;
+        [SerializeField] private Vector3 crepeCameraShakeVelocity;
     }
 }

@@ -13,7 +13,7 @@ namespace InGame.SceneLoader.Entity
         public float LoadBackgroundFadeOutDuration => _inGameDatabase.GetSceneLoadData().LoadBackgroundFadeOutDuration;
         public float BackgroundScrollSpeed => _inGameDatabase.GetSceneLoadData().BackgroundScrollSpeed;
         public float WaveScrollSpeed => _inGameDatabase.GetSceneLoadData().WaveScrollSpeed;
-        public Vector2 MainCameraPos => _commonDatabase.GetIReadOnlyCameraController().GetPosition();
+        public Vector2 MainCameraPos => _commonDatabase.GetReadOnlyCameraController().GetPosition();
         
         public float LoadBackGroundMoveDistance { get; private set; }
         public float WaveObjMoveDistance { get; private set; }

@@ -2,6 +2,7 @@
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.MyInput;
+using OutGame.Database;
 using UniRx;
 using UnityEngine;
 
@@ -16,35 +17,25 @@ namespace InGame.Player.Entity
         public bool fixFlag{ get; private set; }
         public bool enterDoorFlag{ get; private set; }
 
-        public Action rumble => _playerInput.Rumble;
+        public Action rumble => _playerInput.rumbleEvent;
 
         public bool IsOnPlayerSelector => OnPlayerSelector.Value;
         
         //MEMO: ↓UI系
         public IReadOnlyReactiveProperty<bool> OnPlayerSelector => _playerInput.PlayerSelector;
         public IReadOnlyReactiveProperty<int> PlayerSelectorMoveDirection => _playerInput.PlayerSelectDirection;
-        
 
-        
+
         private readonly BasePlayerInput _playerInput;
         
         public PlayerInputEntity(int playerNum,InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
         {
-            //MEMO: ↓はPC専用//////////////////////////////////////////////////
-            //_playerInput = new DebugPlayerInput();
-            //////////////////////////////////////////////////////////////////////
-            
-            //MEMO: ↓はJoycon専用//////////////////////////////////////////////////
-            
-            var data=commonDatabase.GetJoyconNumData(playerNum);
-            /*if (data==null)
+            var data=commonDatabase.GetControllerNumData(playerNum);
+            if (data==null)
             {
-                
-            }*/
-            Debug.Log($"playerNum:{playerNum}");
-            _playerInput = new JoyConPlayerInput(JoyconManager.Instance.j[data.rightJoyconNum],
-                JoyconManager.Instance.j[data.leftJoyconNum]);
-            ////////////////////////////////////////////////////////////////////
+                Debug.LogError($"Not Found PlayerData (playerNum:{playerNum})");
+            }
+            _playerInput = data;
             
             RegisterReactiveProperty();
         }

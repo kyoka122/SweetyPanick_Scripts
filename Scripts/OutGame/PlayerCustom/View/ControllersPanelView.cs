@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-using Unity.VisualScripting;
+﻿using System;
+using System.Linq;
+using MyApplication;
+using OutGame.PlayerCustom.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,38 +15,89 @@ namespace OutGame.PlayerCustom.View
         private Color registeredColor=>Color.HSVToRGB(0, 0, 100/100f);
         
         [SerializeField] private GameObject panelObj;
-        [SerializeField] private List<GameObject> joyconImageObjects;
+        [SerializeField] private EachPlayerControllers[] allPlayerControllers;
         
-        public void ResetControllerImages(int maxPlayerNum)
+        
+        public void Init()
         {
-            /*foreach (var joyconImageObject in joyconImageObjects)
+            PanelObj.SetActive(false);
+            PanelObj.transform.localScale = Vector3.zero;
+            foreach (var eachPlayerControllers in allPlayerControllers)
             {
-                Debug.Log($"Off!: {joyconImageObject}");
-                joyconImageObject.SetActive(false);
-            }*/
-            
-            for (int i = 0; i<joyconImageObjects.Count; i++)
-            {
-                if (i < maxPlayerNum*2)
-                {
-                    joyconImageObjects[i].SetActive(true);
-                    joyconImageObjects[i].GetComponent<Image>().color = notRegisteredColor;
-                    continue;
-                }
-                joyconImageObjects[i].SetActive(false);
+                eachPlayerControllers.ImageObjectsParent.SetActive(false);
+                eachPlayerControllers.ChangeAnimator.SetBool(UIAnimatorParameter.Change,false);
             }
         }
 
-        public void PaintImage(int joyconNum)
+        public void InitByPlayerCount(int maxPlayerNum)
         {
-            joyconImageObjects[joyconNum].GetComponent<Image>().color = registeredColor;
+            for (int i = 0; i < maxPlayerNum; i++)
+            {
+                allPlayerControllers[i].ChangeAnimator.enabled = true;
+                allPlayerControllers[i].ImageObjectsParent.SetActive(true);
+            }
         }
         
-        public void ResetPaintImage(int joyconNum)
+        public void StartUseControllersChangeAnimation(int maxPlayerNum)
         {
-            Debug.Log($"Cancel:{joyconImageObjects[joyconNum]}");
-            joyconImageObjects[joyconNum].GetComponent<Image>().color = notRegisteredColor;
+            for (int i = 0; i < maxPlayerNum; i++)
+            {
+                allPlayerControllers[i].ChangeAnimator.SetBool(UIAnimatorParameter.Change,true);
+            }
         }
+        
+        public void ResetControllerImages(int maxPlayerNum)
+        {
+            for (int i = 0; i < maxPlayerNum; i++)
+            {
+                allPlayerControllers[i].ImageObjectsParent.SetActive(true);
+                allPlayerControllers[i].ChangeAnimator.SetBool(UIAnimatorParameter.Change,false);
+                foreach (var controller in allPlayerControllers[i].ControllerImageObjects)
+                {
+                    controller.ImageObj.GetComponent<Image>().color = notRegisteredColor;
+                    controller.ImageObj.SetActive(true);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// ImageのIndexは0から始まるので注意
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="controllerIndexNum"></param>
+        public void PaintGamePadImage(MyInputDeviceType type, int controllerIndexNum)
+        {
+            var eachPlayerControllers = allPlayerControllers[controllerIndexNum];
+            var image = eachPlayerControllers.ControllerImageObjects.FirstOrDefault(data => data.Type == type)?.ImageObj;
+            if (image==null)
+            {
+                Debug.LogError($"Couldn`t Find ControllerImage");
+                return;
+            }
+
+            eachPlayerControllers.ChangeAnimator.enabled = false;
+            foreach (var controller in eachPlayerControllers.ControllerImageObjects)
+            {
+                if (controller.ImageObj==image)
+                {
+                    image.GetComponent<Image>().color = registeredColor;
+                    continue;
+                }
+                controller.ImageObj.SetActive(false);
+            }
+        }
+
+        public void ResetPaintImage(int controllerIndexNum)
+        {
+            Debug.Log($"Cancel.  playerNum:{controllerIndexNum}");
+            allPlayerControllers[controllerIndexNum].ChangeAnimator.SetBool(UIAnimatorParameter.Change,true);
+            foreach (var controller in allPlayerControllers[controllerIndexNum].ControllerImageObjects)
+            {
+                controller.ImageObj.GetComponent<Image>().color = notRegisteredColor;
+                controller.ImageObj.SetActive(true);;
+            }
+        }
+
         
     }
 }

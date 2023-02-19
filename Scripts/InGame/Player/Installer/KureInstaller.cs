@@ -8,25 +8,14 @@ using InGame.Player.Controller;
 using InGame.Player.View;
 using MyApplication;
 using InGame.Database.ScriptableData;
+using OutGame.Database;
 
 namespace InGame.Player.Installer
 {
     public class KureInstaller:BasePlayerInstaller
     {
-        private PlayerMoveLogic _playerMoveLogic;
-        private PlayerJumpLogic _playerJumpLogic;
-        private PlayerPunchLogic _playerPunchLogic;
-        private KureSkillLogic _kureSkillLogic;
-        private PlayerReShapeLogic _playerReShapeLogic;
-        private PlayerHealLogic _playerHealLogic;
-        private PlayerDamageLogic _playerDamageLogic;
-        private PlayerStatusLogic _playerStatusLogic;
-        private PlayerParticleLogic _playerParticleLogic;
-        private PlayerFixSweetsLogic _playerFixSweetsLogic;
-        private PlayerEnterDoorLogic _playerEnterDoorLogic;
-        private PlayableCharacterSelectLogic _playableCharacterSelectLogic;
-
-        public override BasePlayerController Install(int playerNum,InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
+        public override BasePlayerController Install(int playerNum,InGameDatabase inGameDatabase,
+            OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             var kureStatus = inGameDatabase.GetKureStatus();
             inGameDatabase.SetKureStatus(kureStatus);
@@ -41,42 +30,43 @@ namespace InGame.Player.Installer
             UIData uiData = inGameDatabase.GetUIData();
             
             
-            var playerStatusView = viewGenerator.GeneratePlayerStatusView(uiData.PlayerStatusView,uiData.Canvas.transform,uiData.StatusDataPos[playerNum-1]);
+            var playerStatusView = viewGenerator.GeneratePlayerStatusView(uiData.PlayerStatusView,uiData.Canvas.transform,uiData.PlayerStatusDataPos[playerNum-1]);
             playerStatusView.Init(PlayableCharacterIndex.Kure,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Kure).maxHp);
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Kure);
             var kureConstEntity = new KureConstEntity(inGameDatabase);
-            var playerInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Kure);
+            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Kure);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, 
                 PlayableCharacter.Kure,playerNum,kureView.GetTransform());
+            var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
             
-            
-            _playerMoveLogic = new PlayerMoveLogic(playerConstEntity, playerInputEntity, playerInStageEntity,
+            var playerMoveLogic = new PlayerMoveLogic(playerConstEntity, playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity, kureView, playerAnimatorView);
-            _playerJumpLogic = new PlayerJumpLogic(playerConstEntity, playerInputEntity, playerInStageEntity,
+            var playerJumpLogic = new PlayerJumpLogic(playerConstEntity, playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity, kureView,playerAnimatorView);
-            _playerPunchLogic = new PlayerPunchLogic(playerInputEntity, playerConstEntity, playerInStageEntity,
+            var playerPunchLogic = new PlayerPunchLogic(playerInputEntity, playerConstEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity, kureView,playerAnimatorView, weaponView);
-            _kureSkillLogic = new KureSkillLogic(playerInputEntity, playerConstEntity, kureConstEntity,playerInStageEntity,
+            var kureSkillLogic = new KureSkillLogic(playerInputEntity, playerConstEntity, kureConstEntity,playerCommonInStageEntity,
                 kureView,playerAnimatorView,weaponView);
-            _playerReShapeLogic = new PlayerReShapeLogic(kureView, playerInputEntity,playerInStageEntity);
-            _playerHealLogic = new PlayerHealLogic(playerConstEntity,playerCommonUpdateableEntity);
-            _playerDamageLogic = new PlayerDamageLogic(kureView,playerAnimatorView, playerConstEntity,playerInStageEntity,
+            var playerReShapeLogic = new PlayerReShapeLogic(kureView, playerInputEntity,playerCommonInStageEntity);
+            var playerHealLogic = new PlayerHealLogic(playerConstEntity,playerCommonUpdateableEntity);
+            var playerDamageLogic = new PlayerDamageLogic(kureView,playerAnimatorView, playerConstEntity,playerCommonInStageEntity,
                 playerCommonUpdateableEntity,playerStatusView);
-            _playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerInStageEntity, kureView,playerAnimatorView);
-            _playerParticleLogic = new PlayerParticleLogic(playerConstEntity, kureView,playerInStageEntity);
-            _playerFixSweetsLogic = new PlayerFixSweetsLogic(playerInputEntity, playerConstEntity,
-                playerInStageEntity,playerCommonUpdateableEntity, kureView,playerAnimatorView,particleGeneratorView);
-            _playerEnterDoorLogic = new PlayerEnterDoorLogic(playerConstEntity, playerInputEntity,
-                playerInStageEntity, kureView);
-            _playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerInStageEntity,
+            var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity, kureView,playerAnimatorView);
+            var playerParticleLogic = new PlayerParticleLogic(playerConstEntity, kureView,playerCommonInStageEntity);
+            var playerFixSweetsLogic = new PlayerFixSweetsLogic(playerInputEntity, playerConstEntity,
+                playerCommonInStageEntity,playerCommonUpdateableEntity, kureView,playerAnimatorView,particleGeneratorView);
+            var playerEnterDoorLogic = new PlayerEnterDoorLogic(playerConstEntity, playerInputEntity,
+                playerCommonInStageEntity, kureView);
+            var playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Kure);
-            
             var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity};
+            var playerLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, kureView);
             
-            return new KureController(playerNum,_playerMoveLogic, _playerJumpLogic, _playerPunchLogic, _kureSkillLogic,
-                _playerReShapeLogic, _playerHealLogic, _playerStatusLogic, _playerParticleLogic, _playerFixSweetsLogic,
-                _playerEnterDoorLogic, _playableCharacterSelectLogic,disposables,playerCommonUpdateableEntity.OnDead);
+            
+            return new KureController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, kureSkillLogic,
+                playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
+                playerEnterDoorLogic, playableCharacterSelectLogic,playerLogic,disposables,playerCommonUpdateableEntity.OnDead);
         }
     }
 }

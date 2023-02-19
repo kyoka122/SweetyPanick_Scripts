@@ -38,7 +38,12 @@ namespace InGame.Player.Logic
         {
             return _playerView.transform;
         }
-        
+
+        public void LateInit()
+        {
+            _playerCommonInStageEntity.SetPlayerDirection(1);
+        }
+
         public void UpdatePlayerMove()
         {
             if (_playerInputEntity.IsOnPlayerSelector)
@@ -59,8 +64,8 @@ namespace InGame.Player.Logic
                 return;
             }
 
-            Debug.Log($"Move!");
             XMove();
+            AddUpSlopePower();
             SetDirection();
             CheckHadFallen();
             CheckOutOfScreen();
@@ -95,6 +100,23 @@ namespace InGame.Player.Logic
             PlayMoveAnimation(_playerInputEntity.xMoveValue);
         }
 
+        private void AddUpSlopePower()
+        {
+            //MEMO: Debug中
+            var direction = new Vector2(_playerCommonInStageEntity.playerDirection, 0);
+            RaycastHit2D downRaycastHit2D = Physics2D.Raycast(_playerView.GetToSlopeRayPos(), direction,
+                _playerConstEntity.ToSlopeDistance, LayerInfo.GroundMask);
+            RaycastHit2D upRaycastHit2D = Physics2D.Raycast(_playerView.GetToSlopeRayPos()+new Vector2(0,0.3f),
+                direction, _playerConstEntity.ToSlopeDistance, LayerInfo.GroundMask);
+            
+            if (downRaycastHit2D.collider==null||upRaycastHit2D.collider==null)
+            {
+                return;
+            }
+            Vector2 slopeVec=upRaycastHit2D.point - downRaycastHit2D.point;
+            _playerView.AddYVelocity(slopeVec.y*15f);
+        }
+        
         private float AddedInputValue(float originXSpeed)
         {
             if (!(_playerCommonInStageEntity.IsUsingSkill||_playerCommonInStageEntity.IsFixing||_playerCommonUpdateableEntity.IsDead))
@@ -155,6 +177,7 @@ namespace InGame.Player.Logic
                 _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.IsHorizontalMove,false);
                 return;
             }
+
             _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.IsHorizontalMove,true);
         }
         

@@ -16,6 +16,7 @@ namespace MyApplication
         public static readonly int PlayerSkillGoodsNum = 15;
         public static readonly int TrampolineNum = 16;
         public static readonly int NotCollideEnemyPlayerNum = 17;
+        public static readonly int SideWallNum = 18;
 
         public static readonly LayerMask UIMask = 1 << UINum;
         public static readonly LayerMask GroundMask = 1 << GroundNum | 1 << TrampolineNum;

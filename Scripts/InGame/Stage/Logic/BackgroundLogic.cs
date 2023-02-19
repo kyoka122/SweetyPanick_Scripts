@@ -1,6 +1,7 @@
 ﻿using InGame.Stage.Entity;
 using InGame.Stage.View;
 using UnityEngine;
+using Utility;
 
 namespace InGame.Stage.Logic
 {
@@ -18,23 +19,31 @@ namespace InGame.Stage.Logic
         public void LateInit()
         {
             _stageBaseEntity.SetCameraInitPos(_stageBaseEntity.CameraPos);
+            _stageBaseEntity.SetPrevCameraPos(_stageBaseEntity.CameraPos);
             Debug.Log($"_stageBaseEntity.CameraPos:{_stageBaseEntity.CameraPos}");
-            LateUpdate();
+            //LateUpdate();
         }
         
         public void LateUpdate()
         {
-            float newBackGroundPosX =
-                (_stageBaseEntity.CameraPos.x - _stageBaseEntity.cameraInitPos.x) * _stageBaseEntity.BackGroundMoveRateX 
-                + _backgroundView.initPos.x;
-            //Debug.Log($"_stageBaseEntity.CameraPos.y:{_stageBaseEntity.CameraPos.y}");
-            Debug.Log($"_stageBaseEntity.cameraInitPos.y:{_stageBaseEntity.cameraInitPos.y}");
-            Debug.Log($"vec{(_stageBaseEntity.CameraPos.y - _stageBaseEntity.cameraInitPos.y) * _stageBaseEntity.BackGroundMoveRateY}");
-            //Debug.Log($"_backgroundView.initPos.y:{_backgroundView.initPos.y}");
-            float newBackGroundPosY =
-                (_stageBaseEntity.CameraPos.y - _stageBaseEntity.cameraInitPos.y) * _stageBaseEntity.BackGroundMoveRateY
-                + _backgroundView.initPos.y;
-            _backgroundView.SetPosition(new Vector2(newBackGroundPosX,newBackGroundPosY));
+            Vector2 moveVec = _stageBaseEntity.CameraPos - _stageBaseEntity.prevCameraPos;
+            
+            //Debug中…
+            float x=MyMathf.InRange(moveVec.x, -0.5f,0.5f);
+            float y = MyMathf.InRange(moveVec.y, -0.5f, 0.5f);
+            Vector2 clampedVelocity = new(x, y);
+            Debug.Log($"clampedVelocity:{clampedVelocity}");
+            _backgroundView.SetVelocity(new Vector2(clampedVelocity.x * 20f,clampedVelocity.y));
+            //Debug.Log($"moveVec:{moveVec}");
+            // float newBackGroundPosX =
+            //     (_stageBaseEntity.CameraPos.x - _stageBaseEntity.cameraInitPos.x) * _stageBaseEntity.BackGroundMoveRateX 
+            //     + _backgroundView.initPos.x;
+            // float newBackGroundPosY =
+            //     (_stageBaseEntity.CameraPos.y - _stageBaseEntity.cameraInitPos.y) * _stageBaseEntity.BackGroundMoveRateY
+            //     + _backgroundView.initPos.y;
+            // _backgroundView.SetPosition(new Vector2(newBackGroundPosX,newBackGroundPosY));
+            
+            _stageBaseEntity.SetPrevCameraPos(_stageBaseEntity.CameraPos);
         }
     }
 }

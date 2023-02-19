@@ -6,13 +6,13 @@ namespace OutGame.PlayerCustom.Data
     public class PlayerCursorData
     {
         public readonly int playerNum; 
-        public readonly PlayerInputEntity playerInputEntity; 
+        public readonly CharacterSelectInputEntity characterSelectInputEntity; 
         public readonly CharacterSelectCursorView characterSelectCursorView;
 
-        public PlayerCursorData(int playerNum,PlayerInputEntity playerInputEntity, CharacterSelectCursorView characterSelectCursorView)
+        public PlayerCursorData(int playerNum,CharacterSelectInputEntity characterSelectInputEntity, CharacterSelectCursorView characterSelectCursorView)
         {
             this.playerNum = playerNum;
-            this.playerInputEntity = playerInputEntity;
+            this.characterSelectInputEntity = characterSelectInputEntity;
             this.characterSelectCursorView = characterSelectCursorView;
         }
     }

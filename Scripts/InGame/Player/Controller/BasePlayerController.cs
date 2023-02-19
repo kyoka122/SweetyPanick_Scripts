@@ -25,6 +25,7 @@ namespace InGame.Player.Controller
         protected readonly PlayerFixSweetsLogic playerFixSweetsLogic;
         protected readonly PlayerEnterDoorLogic playerEnterDoorLogic;
         protected readonly PlayableCharacterSelectLogic playableCharacterSelectLogic;
+        protected readonly PlayerTalkLogic playerTalkLogic;
         protected readonly List<IDisposable> disposables;
         protected readonly IObservable<bool> onDead;
         
@@ -35,7 +36,7 @@ namespace InGame.Player.Controller
             PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic,
             PlayerParticleLogic playerParticleLogic, PlayerFixSweetsLogic playerFixSweetsLogic,
             PlayerEnterDoorLogic playerEnterDoorLogic, PlayableCharacterSelectLogic playableCharacterSelectLogic,
-            List<IDisposable> disposables,IObservable<bool> onDead)
+            PlayerTalkLogic playerTalkLogic, List<IDisposable> disposables,IObservable<bool> onDead)
         {
             _playerNum = playerNum;
             this.playerMoveLogic = playerMoveLogic;
@@ -49,6 +50,7 @@ namespace InGame.Player.Controller
             this.playerFixSweetsLogic = playerFixSweetsLogic;
             this.playerEnterDoorLogic = playerEnterDoorLogic;
             this.playableCharacterSelectLogic = playableCharacterSelectLogic;
+            this.playerTalkLogic = playerTalkLogic;
             this.disposables = disposables;
             this.onDead = onDead;
             RegisterObserver();
@@ -68,9 +70,14 @@ namespace InGame.Player.Controller
 
         protected abstract void FixedUpdateEachPlayer();
 
+        public void LateInit()
+        {
+            playerMoveLogic.LateInit();
+            playerReShapeLogic.LateInit();
+        }
+        
         public void FixedUpdateMoving()
         {
-            Debug.Log($"FixedUpdate!");
             playerMoveLogic.UpdatePlayerMove();
             playerJumpLogic.UpdatePlayerJump();
             playerReShapeLogic.UpdatePlayerDirection();
@@ -122,6 +129,16 @@ namespace InGame.Player.Controller
         {
             return _playerNum;
         }
+        
+        public void StartTalk()
+        {
+            playerTalkLogic.StartTalk();
+        }
+
+        public void FinishTalk()
+        {
+            playerTalkLogic.FinishTalk();
+        }
 
         public abstract void RegisterPlayerEvent(Action<FromPlayerEvent> playerEvent);
         
@@ -140,8 +157,7 @@ namespace InGame.Player.Controller
         protected virtual void TryConsumeHealPower()
         {
             //MEMO: クレー以外何もしない
-            return;
         }
-
+        
     }
 }

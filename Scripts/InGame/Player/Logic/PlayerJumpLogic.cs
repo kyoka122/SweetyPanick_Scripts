@@ -63,6 +63,7 @@ namespace InGame.Player.Logic
                 DrawGroundRay(rayDistance);
             }
 #endif
+            //TODO: トランポリン修正
             if (IsTriggerGroundHit(upRaycastHit2D,downRaycastHit2D))
             {
                 _playerCommonInStageEntity.SetPrevStandPos(downRaycastHit2D.point);

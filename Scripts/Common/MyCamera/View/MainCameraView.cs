@@ -1,22 +1,24 @@
 ﻿using System;
 using Cinemachine;
-using InGame.MyCamera.Controller;
+using InGame.MyCamera.Interface;
 using UnityEngine;
 
 namespace InGame.MyCamera.View
 {
-    public class MainCameraView:MonoBehaviour,IReadOnlyCameraFunction
+    public class MainCameraView:MonoBehaviour,IReadOnlyCameraFunction,ICameraEvent
     {
         private CinemachineTargetGroup _targetGroup;
+        private CinemachineImpulseSource _cinemachineImpulseSource;
         private Camera _camera;
         private Transform _cameraTransform;
         
         [SerializeField] private int cinemaChineWeight = 1;
         [SerializeField] private int cinemaChineRadius = 1;
         
-        public void Init(CinemachineTargetGroup targetGroup,Camera camera)
+        public void Init(CinemachineTargetGroup targetGroup,CinemachineImpulseSource cinemachineImpulseSource,Camera camera)
         {
             _targetGroup = targetGroup;
+            _cinemachineImpulseSource = cinemachineImpulseSource;
             Init(camera);
         }
         
@@ -43,6 +45,10 @@ namespace InGame.MyCamera.View
 
         public bool TryAddTargetGroup(Transform characterTransform)
         {
+            if (_targetGroup==null)
+            {
+                return false;
+            }
             if (_targetGroup.FindMember(characterTransform)==-1)
             {
                 Debug.Log($"AddTargetGroup");
@@ -51,6 +57,22 @@ namespace InGame.MyCamera.View
             }
 
             return false;
+        }
+
+        public void Shake()
+        {
+            if (_cinemachineImpulseSource!=null)
+            {
+                _cinemachineImpulseSource.GenerateImpulse();
+            }
+        }
+        
+        public void ShakeWithVelocity(Vector3 velocity)
+        {
+            if (_cinemachineImpulseSource!=null)
+            {
+                _cinemachineImpulseSource.GenerateImpulseWithVelocity(velocity);
+            }
         }
 
         public void ChangeWeight(Transform characterTransform,float weight)

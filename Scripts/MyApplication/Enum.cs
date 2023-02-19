@@ -38,8 +38,6 @@
     public enum StageEvent
     {
         None,
-        EnterFirstStageMiddleDoor,
-        EnterFirstHiddenStageDoor,
         EnterFirstStageGoalDoor,
         EnterSecondStageMiddleDoor,
         EnterSecondHiddenStageDoor,
@@ -66,8 +64,6 @@
     public enum DoorType
     {
         None,
-        FirstStageMiddle,
-        FirstHiddenStage,
         FirstStageGoal,
         SecondStageMiddle,
         SecondHiddenStage,
@@ -78,12 +74,12 @@
     {
         None,
         FirstStageFirst,
-        FirstStageMiddle,
-        FirstHiddenStage,
         SecondStageFirst,
         SecondStageMiddle,
         SecondHiddenStage,
-        SecondStageGoal
+        SecondStageGoal,
+        ColateStageFirst,
+        ColateStageFinish
     }
 
     public enum EnemyState
@@ -105,7 +101,7 @@
         Inflating,
         Move,
         Catching,
-        Catched,
+        Caught,
         Destroy
     }
 
@@ -131,6 +127,49 @@
         Chase,
         Freeze
     }
+    
+    public enum ColateState
+    {
+        None,
+        Talking,//会話シーン
+        Surface,//空中に向かって浮上している時
+        Dropping,//地面に落下している時（空中）
+        IsGround,//地面に落下した時
+        ThrowEnemies,//ステージに敵を投げ入れているとき
+        Drift,//空中を左右に漂っているとき
+        Dead,//HPが0のとき
+    }
 
+    public enum ColateSpriteType
+    {
+        Stand,
+        RideChocolate,
+        Falling,
+        Confuse,
+    }
+
+    /// <summary>
+    /// ダメージを与えた者の種類
+    /// </summary>
+    public enum Attacker
+    {
+        Player,
+        Crepe
+    }
+
+    public enum MyInputDeviceType
+    {
+        None,
+        Keyboard,
+        Procon,
+        GamePad,
+        JoyconLeft,
+        JoyconRight
+    }
+
+    public enum TalkPartActionType
+    {
+        EnterBossStage,
+    }
 
 }

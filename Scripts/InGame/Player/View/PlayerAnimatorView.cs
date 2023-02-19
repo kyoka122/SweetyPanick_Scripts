@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using InGame.Common.Interface;
 using UniRx;
 using UnityEngine;
 
@@ -59,6 +60,11 @@ namespace InGame.Player.View
         public void CallbackAnimation(string animationClipName)
         {
             _animationEventSubject.OnNext(animationClipName);
+        }
+        
+        public void SetAnimatorSpeed(float speed)
+        {
+            _animator.speed = speed;
         }
     }
 }

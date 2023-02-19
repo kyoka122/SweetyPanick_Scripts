@@ -9,7 +9,6 @@ namespace InGame.Database.ScriptableData
     [CreateAssetMenu(fileName = "StageSettingsScriptableData", menuName = "ScriptableObjects/StageSettingsScriptableData")]
     public class StageSettingsScriptableData:ScriptableObject
     {
-        
         public SquareRange ObjectInScreenRange => objectInScreenRange;
         public SquareRange InPlayerGroupRange => inPlayerGroupRange;
         public float StageBottom => stageBottom;

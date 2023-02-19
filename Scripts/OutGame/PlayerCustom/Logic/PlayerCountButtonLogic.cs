@@ -15,7 +15,8 @@ namespace OutGame.PlayerCustom.Logic
         private readonly ToMessageWindowSenderView _toMessageWindowSenderView;
 
         public PlayerCountButtonLogic(InputCaseUnknownControllerEntity inputCaseUnknownControllerEntity,
-            InSceneDataEntity inSceneDataEntity, PlayerCountView playerCountView,ToMessageWindowSenderView toMessageWindowSenderView)
+            InSceneDataEntity inSceneDataEntity, PlayerCountView playerCountView,
+            ToMessageWindowSenderView toMessageWindowSenderView)
         {
             _inputCaseUnknownControllerEntity = inputCaseUnknownControllerEntity;
             _inSceneDataEntity = inSceneDataEntity;
@@ -31,27 +32,27 @@ namespace OutGame.PlayerCustom.Logic
 
         private void RegisterObserver()
         {
-            foreach (var leftInput in _inputCaseUnknownControllerEntity.joyconLeftInputs)
+            foreach (var input in _inputCaseUnknownControllerEntity.CustomInputs)
             {
-                leftInput.HorizontalCommand
+                input.HorizontalDigitalMoveValue
                     .Where(direction=>direction!=0)
                     .Where(_=>_inSceneDataEntity.finishedPopUpWindowState==PlayerCustomState.PlayerCount)
                     .Subscribe(value=>ChangeSelectingPlayerCountView(new Vector2(value,0)))
                     .AddTo(_playerCountView);
 
-                leftInput.VerticalCommand
+                input.VerticalDigitalMoveValue
                     .Where(direction=>direction!=0)
                     .Where(_=>_inSceneDataEntity.finishedPopUpWindowState==PlayerCustomState.PlayerCount)
                     .Subscribe(value=>ChangeSelectingPlayerCountView(new Vector2(0,value)))
                     .AddTo(_playerCountView);
-            }
-            
-            foreach (var rightInput in _inputCaseUnknownControllerEntity.joyconRightInputs)
-            {
-                rightInput.Next
+                
+                input.Next
                     .Where(on=>on)
                     .Where(_=>_inSceneDataEntity.finishedPopUpWindowState==PlayerCustomState.PlayerCount)
-                    .Subscribe(_=>SelectPlayerCount())
+                    .Subscribe(_=>
+                    {
+                        SelectPlayerCount();
+                    })
                     .AddTo(_playerCountView);
             }
 
@@ -115,12 +116,12 @@ namespace OutGame.PlayerCustom.Logic
 
         private void PopUp(Transform popUpTarget)
         {
-            popUpTarget.localScale *= 1.2f;
+            popUpTarget.localScale *= 1.2f;//TODO: ScriptableObjectに移動
         }
 
         private void PopDown(Transform popDownTarget)
         {
-            popDownTarget.localScale = Vector2.one;
+            popDownTarget.localScale = Vector2.one;//TODO: ScriptableObjectに移動
         }
     }
 }
