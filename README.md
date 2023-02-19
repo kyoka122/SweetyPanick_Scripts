@@ -3,7 +3,7 @@
 ## 概要
 [ゲームデモ動画](https://drive.google.com/file/d/1BUUsG9WJ-KwrxOUsV7dV4FUNgMCwDDQC/view?usp=share_link) (制作途中のため、動画ではリポジトリ内のコードの内容と合わない挙動をする場合があります。)
 
-[クラス図](https://github.com/kyoka122/SweetyPanick_Scripts/tree/main/Scripts/ClassDiagram)
+[クラス図](https://github.com/kyoka122/SweetyPanick_Scripts/tree/main/Scripts/ClassDiagram)  (数字は 年_月_日_時_分 を表します)
 
 
 ## 使用ライブラリ（ライブラリは同封しておりません）
