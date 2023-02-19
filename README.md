@@ -3,8 +3,6 @@
 ## 概要
 [ゲームデモ動画](https://drive.google.com/file/d/1BUUsG9WJ-KwrxOUsV7dV4FUNgMCwDDQC/view?usp=share_link) (制作途中のため、動画ではリポジトリ内のコードの内容と合わない挙動をする場合があります。)
 
-[クラス図](https://github.com/kyoka122/SweetyPanick_Scripts/tree/main/Scripts/ClassDiagram)  (数字は 年_月_日_時_分 を表します)
-
 
 ## 使用ライブラリ（ライブラリは同封しておりません）
 * [UniTask (ver.2.3.3)](https://github.com/Cysharp/UniTask)
@@ -14,3 +12,8 @@
 * [JoyconLib_plugins](https://github.com/Looking-Glass/JoyconLib)
 * Cinemachine (ver.2.8.9) (UnityRegistry)
 * InputSystem (ver.1.3.0) (UnityRegistry)
+
+
+## クラス図
+
+![クラス図](Scripts/ClassDiagram/InGame_2023_02_07_06_39.png "InGame_2023_02_07_06_39")
