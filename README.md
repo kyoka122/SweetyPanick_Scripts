@@ -16,4 +16,6 @@
 
 ## クラス図
 
+[pumlファイル](https://github.com/kyoka122/SweetyPanick_Scripts/blob/main/Scripts/ClassDiagram/InGame.puml)
+
 ![クラス図](Scripts/ClassDiagram/InGame_2023_02_07_06_39.png "InGame_2023_02_07_06_39")
