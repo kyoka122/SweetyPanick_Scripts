@@ -51,11 +51,11 @@ namespace InGame.MyInput
 		{
 			if (_joycon.GetButtonDown(_upKey))
 			{
-				skill.Value = true;
+				//skill.Value = true;
 			}
 			if (_joycon.GetButtonUp(_upKey))
 			{
-				skill.Value = false;
+				//skill.Value = false;
 			}
 			if (_joycon.GetButtonDown(_downKey))
 			{

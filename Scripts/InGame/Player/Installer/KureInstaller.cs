@@ -14,14 +14,14 @@ namespace InGame.Player.Installer
 {
     public class KureInstaller:BasePlayerInstaller
     {
-        public override BasePlayerController Install(int playerNum,InGameDatabase inGameDatabase,
+        public override BasePlayerController Install(int playerNum,StageArea stageArea,InGameDatabase inGameDatabase,
             OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             var kureStatus = inGameDatabase.GetKureStatus();
             inGameDatabase.SetKureStatus(kureStatus);
             var kureView = viewGenerator.GenerateKure(inGameDatabase.GetKureConstData().Prefab);
             kureView.Init();
-            kureView.transform.position = inGameDatabase.GetPlayerInstancePositions(StageArea.FirstStageFirst)
+            kureView.transform.position = inGameDatabase.GetPlayerInstancePositions(stageArea)
                 .KureInstancePos;
             var weaponView = kureView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
@@ -35,7 +35,7 @@ namespace InGame.Player.Installer
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Kure);
             var kureConstEntity = new KureConstEntity(inGameDatabase);
-            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Kure);
+            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Kure,inGameDatabase);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, 
                 PlayableCharacter.Kure,playerNum,kureView.GetTransform());
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
@@ -60,9 +60,9 @@ namespace InGame.Player.Installer
                 playerCommonInStageEntity, kureView);
             var playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Kure);
-            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity};
             var playerLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, kureView);
             
+            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity};
             
             return new KureController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, kureSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,

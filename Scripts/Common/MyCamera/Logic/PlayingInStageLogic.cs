@@ -3,6 +3,8 @@ using InGame.MyCamera.Entity;
 using InGame.MyCamera.View;
 using MyApplication;
 using UniRx;
+using UnityEngine;
+using UnityEngine.InputSystem.Utilities;
 
 namespace InGame.MyCamera.Logic
 {
@@ -15,16 +17,11 @@ namespace InGame.MyCamera.Logic
         {
             _cameraEntity = cameraEntity;
             _mainCameraView = mainCameraView;
-            //SetInDatabase();
-            RegisterObserver();
+            RegisterTargetAddObserver();
+            RegisterTargetRemoveObserver();
         }
 
-        // private void SetInDatabase()
-        // {
-        //     _cameraEntity.SetCameraFunctionInDatabase(_mainCameraView);
-        // }
-
-        private void RegisterObserver()
+        private void RegisterTargetAddObserver()
         {
             _cameraEntity.candyUpdateableInStageData
                 .Subscribe(property=>TrySetTargetGroup(property,PlayableCharacter.Candy))
@@ -41,6 +38,44 @@ namespace InGame.MyCamera.Logic
             _cameraEntity.kureUpdateableInStageData
                 .Subscribe(property=>TrySetTargetGroup(property,PlayableCharacter.Kure))
                 .AddTo(_mainCameraView);
+        }
+
+        private void RegisterTargetRemoveObserver()
+        {
+            _cameraEntity.candyUpdateableData
+                .Subscribe(data =>
+                {
+                    Debug.Log($"data:{data?.isDead}");
+                    if (data is {isDead: true})
+                    {
+                        TryRemoveTargetGroup(_cameraEntity.GetCharacterTransform(PlayableCharacter.Candy));
+                    }
+                });
+            
+            _cameraEntity.mashUpdateableData
+                .Subscribe(data =>
+                {
+                    if (data is {isDead: true})
+                    {
+                        TryRemoveTargetGroup(_cameraEntity.GetCharacterTransform(PlayableCharacter.Mash));
+                    }
+                });
+            _cameraEntity.fuUpdateableData
+                .Subscribe(data =>
+                {
+                    if (data is {isDead: true})
+                    {
+                        TryRemoveTargetGroup(_cameraEntity.GetCharacterTransform(PlayableCharacter.Fu));
+                    }
+                });
+            _cameraEntity.kureUpdateableData
+                .Subscribe(data =>
+                {
+                    if (data is {isDead: true})
+                    {
+                        TryRemoveTargetGroup(_cameraEntity.GetCharacterTransform(PlayableCharacter.Kure));
+                    }
+                });
         }
 
         private void TrySetTargetGroup(CharacterUpdateableInStageData property,PlayableCharacter characterType)
@@ -64,6 +99,11 @@ namespace InGame.MyCamera.Logic
                 _cameraEntity.SetCharacterHadTargetGroup(characterType);
             }
             
+        }
+
+        private void TryRemoveTargetGroup(Transform characterTransform)
+        {
+            _mainCameraView.TryRemoveTargetGroup(characterTransform);
         }
 
     }

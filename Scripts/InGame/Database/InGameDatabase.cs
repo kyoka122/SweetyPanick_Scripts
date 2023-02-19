@@ -38,11 +38,13 @@ namespace InGame.Database
 
         public void AddPlayerInstancePositions(StageArea type,PlayerInstancePositions instancePositions)
         {
+            Debug.Log($"AddType:{type}",instancePositions);
             _playerInstancePositions.Add(type,instancePositions);
         }
 
         public PlayerInstancePositions GetPlayerInstancePositions(StageArea type)
         {
+            Debug.Log($"GetType:{type}");
             return _playerInstancePositions
                 .FirstOrDefault(data=>data.Key==type).Value;
         }
@@ -170,6 +172,7 @@ namespace InGame.Database
 
         public void SetPlayerUpdateableData(PlayableCharacter type,PlayerUpdateableData playerUpdateableData)
         {
+            Debug.Log($"SetPlayerUpdateableData: {type}");
             switch (type)
             {
                 case PlayableCharacter.Candy:
@@ -443,7 +446,36 @@ namespace InGame.Database
             _fixedSweets.Add(gimmickSweets);
             _fixedSweetsSubject.OnNext(gimmickSweets);
         }
+        
+        
+        
+        private StageGimmickScriptableData _stageGimmickScriptableData;
 
+        public StageGimmickScriptableData GetStageGimmickData()
+        {
+            return _stageGimmickScriptableData;
+        }
+
+        public void SetStageGimmickData(StageGimmickScriptableData stageGimmickScriptableData)
+        {
+            _stageGimmickScriptableData = stageGimmickScriptableData;
+        }
+
+        
+
+        private InStageData _inStageData;
+        
+        public InStageData GetInStageData()
+        {
+            return _inStageData.Clone();
+        }
+
+        public void SetInStageData(InStageData inStageData)
+        {
+            _inStageData = inStageData;
+        }
+
+        
         #endregion
 
         #region UIData
@@ -478,24 +510,8 @@ namespace InGame.Database
 
         #endregion
 
-        #region StageGimmicks
-
-        private StageGimmickScriptableData _stageGimmickScriptableData;
-
-        public StageGimmickScriptableData GetStageGimmickData()
-        {
-            return _stageGimmickScriptableData;
-        }
-
-        public void SetStageGimmickData(StageGimmickScriptableData stageGimmickScriptableData)
-        {
-            _stageGimmickScriptableData = stageGimmickScriptableData;
-        }
         
-
-        #endregion
         
-
         #region Load
 
         private SceneLoadData _sceneLoadData;

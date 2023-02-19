@@ -8,18 +8,20 @@ using InGame.Player.Controller;
 using InGame.Player.View;
 using MyApplication;
 using OutGame.Database;
+using UnityEngine;
 
 namespace InGame.Player.Installer
 {
     public class MashInstaller:BasePlayerInstaller
     {
-        public override BasePlayerController Install(int playerNum, InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
+        public override BasePlayerController Install(int playerNum,StageArea stageArea, InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             var mashStatus = inGameDatabase.GetMashStatus();
             inGameDatabase.SetMashStatus(mashStatus);
             var mashView = viewGenerator.GenerateMash(inGameDatabase.GetMashConstData().Prefab);
             mashView.Init();
-            mashView.transform.position = inGameDatabase.GetPlayerInstancePositions(StageArea.FirstStageFirst)
+            Debug.Log($"stageArea:{stageArea}");
+            mashView.transform.position = inGameDatabase.GetPlayerInstancePositions(stageArea)
                 .MashInstancePos;
             var weaponView = mashView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
@@ -35,7 +37,7 @@ namespace InGame.Player.Installer
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Mash);
             var mashConstEntity = new MashConstEntity(inGameDatabase);
-            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Mash);
+            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Mash,inGameDatabase);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, 
                 PlayableCharacter.Mash,playerNum,mashView.GetTransform());
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
@@ -63,7 +65,7 @@ namespace InGame.Player.Installer
                 playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Mash);
             var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, mashView);
             
-            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity};
+            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity};
             
             return new MashController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, mashSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,

@@ -178,6 +178,7 @@ namespace StageManager
         public void Dispose()
         {
             _fadeOutTokenSource.Dispose();
+            _stageGimmickManager.Dispose();
         }
     }
 }

@@ -777,6 +777,34 @@ namespace MyInput
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""AnyPress"",
+            ""id"": ""15d43d69-4a38-4c0e-82c3-b99389b86a6b"",
+            ""actions"": [
+                {
+                    ""name"": ""AnyKey"",
+                    ""type"": ""Button"",
+                    ""id"": ""d21cd9a6-37d5-4f58-a0c5-5317a9fde74b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""bbf43bd8-7759-408c-a4a7-1da6172b2f4d"",
+                    ""path"": ""<Keyboard>/anyKey"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AnyKey"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -802,6 +830,9 @@ namespace MyInput
             m_PlayerCustom_VerticalMove = m_PlayerCustom.FindAction("VerticalMove", throwIfNotFound: true);
             m_PlayerCustom_Next = m_PlayerCustom.FindAction("Next", throwIfNotFound: true);
             m_PlayerCustom_Back = m_PlayerCustom.FindAction("Back", throwIfNotFound: true);
+            // AnyPress
+            m_AnyPress = asset.FindActionMap("AnyPress", throwIfNotFound: true);
+            m_AnyPress_AnyKey = m_AnyPress.FindAction("AnyKey", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -1052,6 +1083,39 @@ namespace MyInput
             }
         }
         public PlayerCustomActions @PlayerCustom => new PlayerCustomActions(this);
+
+        // AnyPress
+        private readonly InputActionMap m_AnyPress;
+        private IAnyPressActions m_AnyPressActionsCallbackInterface;
+        private readonly InputAction m_AnyPress_AnyKey;
+        public struct AnyPressActions
+        {
+            private @InputMap m_Wrapper;
+            public AnyPressActions(@InputMap wrapper) { m_Wrapper = wrapper; }
+            public InputAction @AnyKey => m_Wrapper.m_AnyPress_AnyKey;
+            public InputActionMap Get() { return m_Wrapper.m_AnyPress; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(AnyPressActions set) { return set.Get(); }
+            public void SetCallbacks(IAnyPressActions instance)
+            {
+                if (m_Wrapper.m_AnyPressActionsCallbackInterface != null)
+                {
+                    @AnyKey.started -= m_Wrapper.m_AnyPressActionsCallbackInterface.OnAnyKey;
+                    @AnyKey.performed -= m_Wrapper.m_AnyPressActionsCallbackInterface.OnAnyKey;
+                    @AnyKey.canceled -= m_Wrapper.m_AnyPressActionsCallbackInterface.OnAnyKey;
+                }
+                m_Wrapper.m_AnyPressActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @AnyKey.started += instance.OnAnyKey;
+                    @AnyKey.performed += instance.OnAnyKey;
+                    @AnyKey.canceled += instance.OnAnyKey;
+                }
+            }
+        }
+        public AnyPressActions @AnyPress => new AnyPressActions(this);
         public interface IPlayerActions
         {
             void OnMove(InputAction.CallbackContext context);
@@ -1075,6 +1139,10 @@ namespace MyInput
             void OnVerticalMove(InputAction.CallbackContext context);
             void OnNext(InputAction.CallbackContext context);
             void OnBack(InputAction.CallbackContext context);
+        }
+        public interface IAnyPressActions
+        {
+            void OnAnyKey(InputAction.CallbackContext context);
         }
     }
 }

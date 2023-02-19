@@ -9,7 +9,7 @@ using UnityEngine;
 namespace InGame.Player.Entity
 {
     //TODO: アニメーション監視から変える
-    public class PlayerCommonInStageEntity
+    public class PlayerCommonInStageEntity:IDisposable
     {
         public readonly PlayableCharacter CharacterType;
         
@@ -36,6 +36,7 @@ namespace InGame.Player.Entity
         public GroundType playerOnGroundType { get; private set; }
         public IHighJumpAbleStand highJumpAbleStand { get; private set; }
         public CancellationTokenSource fixingSweetsTokenSource { get; private set; }
+        public bool HavingKey => _inGameDatabase.GetInStageData().havingKey;
         
         private readonly ReactiveProperty<bool> _isRunning;
         private readonly ReactiveProperty<bool> _isJumping;
@@ -46,7 +47,7 @@ namespace InGame.Player.Entity
         private readonly InGameDatabase _inGameDatabase;
         
         
-        public PlayerCommonInStageEntity(PlayableCharacter characterType)
+        public PlayerCommonInStageEntity(PlayableCharacter characterType,InGameDatabase inGameDatabase)
         {
             CharacterType = characterType;
             _isRunning = new ReactiveProperty<bool>();
@@ -55,6 +56,8 @@ namespace InGame.Player.Entity
             _onPunch = new Subject<bool>();
             _onSkill = new Subject<bool>();
             _onFall = new Subject<bool>();
+            _inGameDatabase = inGameDatabase;
+            _inGameDatabase.SetInStageData(new InStageData());
         }
         
         
@@ -168,6 +171,34 @@ namespace InGame.Player.Entity
         public void SetGroundType(GroundType groundType)
         {
             playerOnGroundType = groundType;
+        }
+
+
+        
+        public void AddScore(int score)
+        {
+            InStageData data = _inGameDatabase.GetInStageData();
+            data.score += score;
+            _inGameDatabase.SetInStageData(data);
+        }
+
+        public void SetHavingKey(bool havingKey)
+        {
+            InStageData data = _inGameDatabase.GetInStageData();
+            data.havingKey = havingKey;
+            _inGameDatabase.SetInStageData(data);
+        }
+
+        public void Dispose()
+        {
+            _isRunning?.Dispose();
+            _isJumping?.Dispose();
+            _onJump?.Dispose();
+            _onPunch?.Dispose();
+            _onSkill?.Dispose();
+            _onFall?.Dispose();
+            _inGameDatabase?.Dispose();
+            fixingSweetsTokenSource?.Dispose();
         }
     }
 }

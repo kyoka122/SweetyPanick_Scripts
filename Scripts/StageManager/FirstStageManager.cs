@@ -156,12 +156,9 @@ namespace StageManager
             {
                 Debug.Log($"Cancel Loading");
             }
+
+            InitAtStageMove(nextStageArea);
             
-            _cameraController.SetCameraMoveState(nextStageArea);
-            foreach (var controller in _controllers)
-            {
-                controller.MoveStage(nextStageArea);
-            }
             try
             {
                 await LoadManager.Instance.TryPlayFadeOut();
@@ -172,6 +169,16 @@ namespace StageManager
             }
             
             SetAllPlayerReStart();
+        }
+
+        private void InitAtStageMove(StageArea nextStageArea)
+        {
+            _cameraController.SetCameraMoveState(nextStageArea);
+            foreach (var controller in _controllers)
+            {
+                controller.MoveStage(nextStageArea);
+            }
+            _stageGimmickManager.InitAtStageMove();
         }
 
         private void SetAllPlayerStop()
@@ -206,6 +213,7 @@ namespace StageManager
         public void Dispose()
         {
             _blackFadeInTokenSource?.Dispose();
+            _stageGimmickManager.Dispose();
         }
     }
 }

@@ -13,14 +13,14 @@ namespace InGame.Player.Installer
 {
     public class FuInstaller : BasePlayerInstaller
     {
-        public override BasePlayerController Install(int playerNum, InGameDatabase inGameDatabase,
+        public override BasePlayerController Install(int playerNum, StageArea stageArea,InGameDatabase inGameDatabase,
             OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             var fuStatus = inGameDatabase.GetFuStatus();
             inGameDatabase.SetFuStatus(fuStatus);//TODO: FuConstEntityへ移動
             var fuView = viewGenerator.GenerateFu(inGameDatabase.GetFuConstData().Prefab);
             fuView.Init();
-            fuView.transform.position = inGameDatabase.GetPlayerInstancePositions(StageArea.FirstStageFirst)
+            fuView.transform.position = inGameDatabase.GetPlayerInstancePositions(stageArea)
                 .FuInstancePos;
             var weaponView = fuView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
@@ -35,7 +35,7 @@ namespace InGame.Player.Installer
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Fu);
             var fuConstEntity = new FuConstEntity(inGameDatabase);
-            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Fu);
+            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Fu,inGameDatabase);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, 
                 PlayableCharacter.Fu,playerNum,fuView.GetTransform());
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
@@ -63,7 +63,7 @@ namespace InGame.Player.Installer
                 playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Fu);
             var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, fuView);
             
-            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity};
+            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity};
 
             return new FuController(playerNum, playerMoveLogic, playerJumpLogic, playerPunchLogic, fuSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,

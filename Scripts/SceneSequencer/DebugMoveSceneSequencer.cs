@@ -147,7 +147,8 @@ namespace SceneSequencer
             {
                 CharacterCommonConstData[] allCharacterConstData = _inGameDatabase.GetAllCharacterConstData();
                 int characterIndex = _debugStageManager.Controllers.Count % allCharacterConstData.Length;
-                var controller = allCharacterConstData[characterIndex].Installer.Install(currentMovePlayer,_inGameDatabase,
+                var controller = allCharacterConstData[characterIndex].Installer.Install(currentMovePlayer,
+                    StageArea.FirstStageFirst,_inGameDatabase,
                     _outGameDatabase,_commonDatabase);
                 _debugStageManager.AddController(controller);
                 //targetGroup.AddMember(controller.GetPlayerPrefabTransform(),cinemaChineWeight,cinemaChineRadius);

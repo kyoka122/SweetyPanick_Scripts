@@ -26,7 +26,7 @@ namespace OutGame.PlayerCustom.Logic
         //private List<CharacterSelectCursorView> _characterSelectCursorViews; //MEMO: キャラクターチェンジの度にリセット
         private List<PlayerCursorData> _playerCursorData; //MEMO: キャラクターチェンジの度にリセット
         private readonly List<IDisposable> _disposables;
-        
+        private readonly List<IDisposable> _onCancelControllerDisposables;
         public CharacterSelectLogic(InSceneDataEntity inSceneDataEntity, ConstDataEntity constDataEntity,
             ToMessageWindowSenderView toMessageWindowSenderView, CharacterSelectPanelView characterSelectPanelView)
         {
@@ -35,6 +35,7 @@ namespace OutGame.PlayerCustom.Logic
             _toMessageWindowSenderView = toMessageWindowSenderView;
             _characterSelectPanelView = characterSelectPanelView;
             _disposables = new List<IDisposable>();
+            _onCancelControllerDisposables = new List<IDisposable>();
             RegisterObserver();
         }
 
@@ -80,64 +81,74 @@ namespace OutGame.PlayerCustom.Logic
         {
             foreach (var playerCursorData in _playerCursorData)
             {
-                playerCursorData.characterSelectInputEntity.next
-                    .Where(on=>on)
+                _onCancelControllerDisposables.Add(
+                    playerCursorData.characterSelectInputEntity.next
+                    .Where(on => on)
                     .Where(_ => _inSceneDataEntity.finishedPopUpWindowState == PlayerCustomState.Character)
                     .Subscribe(_ =>
                     {
-                        Vector2 clickPos = _constDataEntity.WorldToScreenPoint(playerCursorData.characterSelectCursorView.
-                            GetRectPos());
-                        var icon=GetClickIcon(clickPos);
-                        if (icon==null)
+                        Vector2 clickPos =
+                            _constDataEntity.WorldToScreenPoint(playerCursorData.characterSelectCursorView
+                                .GetRectPos());
+                        var icon = GetClickIcon(clickPos);
+                        if (icon == null)
                         {
                             return;
                         }
-                        if (_inSceneDataEntity.useCharacterData.Any(data => data.playerNum==playerCursorData.playerNum))
-                        {
-                            return;
-                        }
-                        SetCharacter(playerCursorData,icon);
-                        
-                    })
-                    .AddTo(_characterSelectPanelView);
-                
-                playerCursorData.characterSelectInputEntity.back
-                    .Where(on=>on)
-                    .Where(_ => _inSceneDataEntity.finishedPopUpWindowState == PlayerCustomState.Character)
-                    .Subscribe(_ =>
-                    {
-                        if (_inSceneDataEntity.useCharacterData
-                            .Select(data=>data.playerNum)
-                            .Any(num=>num==playerCursorData.playerNum))
-                        {
-                            return;
-                        }
-                        playerCursorData.characterSelectCursorView.OnSelectableIcon();
-                        _inSceneDataEntity.CancelUseCharacter(playerCursorData.playerNum);
-                    })
-                    .AddTo(_characterSelectPanelView);
 
-                playerCursorData.characterSelectCursorView.FixedUpdateAsObservable()
-                    .Where(_ => _inSceneDataEntity.finishedPopUpWindowState == PlayerCustomState.Character)
-                    .Subscribe(_ =>
-                    {
-                        TryMoveCursor(playerCursorData,
-                            new Vector2(playerCursorData.characterSelectInputEntity.horizontalValue.Value, 
-                                playerCursorData.characterSelectInputEntity.verticalValue.Value));
+                        if (_inSceneDataEntity.useCharacterData.Any(
+                            data => data.playerNum == playerCursorData.playerNum))
+                        {
+                            return;
+                        }
+
+                        SetCharacter(playerCursorData, icon);
+
                     })
-                    .AddTo(playerCursorData.characterSelectCursorView);
+                    .AddTo(_characterSelectPanelView));
+
+                _onCancelControllerDisposables.Add(
+                    playerCursorData.characterSelectInputEntity.back
+                        .Where(on => on)
+                        .Where(_ => _inSceneDataEntity.finishedPopUpWindowState == PlayerCustomState.Character)
+                        .Subscribe(_ =>
+                        {
+                            if (_inSceneDataEntity.useCharacterData
+                                .Select(data => data.playerNum)
+                                .Any(num => num == playerCursorData.playerNum))
+                            {
+                                return;
+                            }
+
+                            playerCursorData.characterSelectCursorView.OnSelectableIcon();
+                            _inSceneDataEntity.CancelUseCharacter(playerCursorData.playerNum);
+                        })
+                        .AddTo(_characterSelectPanelView));
+
+                _onCancelControllerDisposables.Add(
+                    playerCursorData.characterSelectCursorView.FixedUpdateAsObservable()
+                        .Where(_ => _inSceneDataEntity.finishedPopUpWindowState == PlayerCustomState.Character)
+                        .Subscribe(_ =>
+                        {
+                            TryMoveCursor(playerCursorData,
+                                new Vector2(playerCursorData.characterSelectInputEntity.horizontalValue.Value,
+                                    playerCursorData.characterSelectInputEntity.verticalValue.Value));
+                        })
+                        .AddTo(playerCursorData.characterSelectCursorView));
 
                 //TODO: 長時間Backボタンを押したら戻る処理に変更
-                playerCursorData.characterSelectInputEntity.back
-                    .Where(on=>on)
-                    .Where(_ => _inSceneDataEntity.finishedPopUpWindowState == PlayerCustomState.Character)
-                    .Where(_ => _inSceneDataEntity.useCharacterData.Count==0)
-                    .Subscribe(_=>
-                    {
-                        DestroyCursor();
-                        _inSceneDataEntity.SetSettingsState(PlayerCustomState.Controller);
-                    })
-                    .AddTo(playerCursorData.characterSelectCursorView);
+                _onCancelControllerDisposables.Add(
+                    playerCursorData.characterSelectInputEntity.back
+                        .Where(on => on)
+                        .Where(_ => _inSceneDataEntity.finishedPopUpWindowState == PlayerCustomState.Character)
+                        .Where(_ => _inSceneDataEntity.useCharacterData.Count == 0)
+                        .Subscribe(_ =>
+                        {
+                            DestroyCursor();
+                            DisposeOnCancelController();
+                            _inSceneDataEntity.SetSettingsState(PlayerCustomState.Controller);
+                        })
+                        .AddTo(playerCursorData.characterSelectCursorView));
             }
         }
 
@@ -184,8 +195,17 @@ namespace OutGame.PlayerCustom.Logic
         {
             foreach (var data in _playerCursorData)
             {
-                _constDataEntity.CharacterSelectCursorInstaller.DestroyCursor(data.characterSelectCursorView);
+                data.characterSelectCursorView.DestroyObj();
             }
+        }
+        
+        private void DisposeOnCancelController()
+        {
+            foreach (var disposable in _onCancelControllerDisposables)
+            {
+                disposable.Dispose();
+            }
+            _disposables.Clear();
         }
 
         public void Dispose()

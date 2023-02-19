@@ -14,8 +14,8 @@ namespace InGame.Player.Entity
 
         public bool canAttackedByEnemy { get; private set; } = true;
         public int PlayerNum => _inGameDatabase.GetPlayerUpdatedData(_type).playerNum;
-        public int CurrentHp => _inGameDatabase.GetPlayerUpdatedData(_type).currentHp;
-        
+        public int CurrentHp=> _inGameDatabase.GetPlayerUpdatedData(_type).currentHp;
+
         public float NearnessFromTargetView => _inGameDatabase.GetCharacterInStageData(_type).nearnessFromTargetView;
         public bool IsWarping => _inGameDatabase.GetCharacterInStageData(_type).isWarping;
             
@@ -41,7 +41,7 @@ namespace InGame.Player.Entity
         {
             _inGameDatabase.SetCharacterInStageData(_type,new CharacterUpdateableInStageData(playerTransform));
 
-            var data = new PlayerUpdateableData(playerNum,_inGameDatabase.GetCharacterCommonStatus(_type).maxHp);
+            var data = new PlayerUpdateableData(playerNum,_inGameDatabase.GetCharacterCommonStatus(_type).maxHp,false);
             _inGameDatabase.SetPlayerUpdateableData(_type, data);
 
         }
@@ -73,7 +73,11 @@ namespace InGame.Player.Entity
             if (updateableData.currentHp<=0)
             {
                 onDeadSubject.Value = true;
+                Debug.Log($"Dead!!!!!");
             }
+
+            Debug.Log($"IsDead: {IsDead}");
+            updateableData.isDead = IsDead;
             _inGameDatabase.SetPlayerUpdateableData(_type,updateableData);
         }
 

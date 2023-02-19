@@ -20,8 +20,6 @@ namespace InGame.Stage.Logic
         {
             _stageBaseEntity.SetCameraInitPos(_stageBaseEntity.CameraPos);
             _stageBaseEntity.SetPrevCameraPos(_stageBaseEntity.CameraPos);
-            Debug.Log($"_stageBaseEntity.CameraPos:{_stageBaseEntity.CameraPos}");
-            //LateUpdate();
         }
         
         public void LateUpdate()
@@ -29,20 +27,13 @@ namespace InGame.Stage.Logic
             Vector2 moveVec = _stageBaseEntity.CameraPos - _stageBaseEntity.prevCameraPos;
             
             //Debug中…
-            float x=MyMathf.InRange(moveVec.x, -0.5f,0.5f);
-            float y = MyMathf.InRange(moveVec.y, -0.5f, 0.5f);
-            Vector2 clampedVelocity = new(x, y);
-            Debug.Log($"clampedVelocity:{clampedVelocity}");
-            _backgroundView.SetVelocity(new Vector2(clampedVelocity.x * 20f,clampedVelocity.y));
-            //Debug.Log($"moveVec:{moveVec}");
-            // float newBackGroundPosX =
-            //     (_stageBaseEntity.CameraPos.x - _stageBaseEntity.cameraInitPos.x) * _stageBaseEntity.BackGroundMoveRateX 
-            //     + _backgroundView.initPos.x;
-            // float newBackGroundPosY =
-            //     (_stageBaseEntity.CameraPos.y - _stageBaseEntity.cameraInitPos.y) * _stageBaseEntity.BackGroundMoveRateY
-            //     + _backgroundView.initPos.y;
-            // _backgroundView.SetPosition(new Vector2(newBackGroundPosX,newBackGroundPosY));
+            float x=MyMathf.InRange(moveVec.x, -0.3f,0.3f);
+            float y = MyMathf.InRange(moveVec.y, -0.4f, 0.4f);
             
+            Vector2 clampedVelocity = new(x, y);
+            Vector2 backGroundVelocity =
+                new Vector2(clampedVelocity.x * 20f, clampedVelocity.y)*2f * Time.deltaTime;
+            _backgroundView.SetVelocity(backGroundVelocity);
             _stageBaseEntity.SetPrevCameraPos(_stageBaseEntity.CameraPos);
         }
     }

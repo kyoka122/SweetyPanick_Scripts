@@ -52,7 +52,7 @@ namespace InGame.Stage.View
 
         private void OnDestroy()
         {
-            _animationEventSubject.Dispose();
+            _animationEventSubject?.Dispose();
         }
     }
 }

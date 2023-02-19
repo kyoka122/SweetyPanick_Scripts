@@ -20,6 +20,7 @@ namespace OutGame.PlayerCustom.View
         public void Init()
         {
             _rectTransform = GetComponent<RectTransform>();
+            Debug.Log($"GetRectTransform");
         }
         
         public void ChangePlayerNumText(int playerNum)
@@ -55,6 +56,11 @@ namespace OutGame.PlayerCustom.View
         public void OnSelectableIcon()
         {
             image.color = selectingColor;
+        }
+
+        public void DestroyObj()
+        {
+            Destroy(gameObject);
         }
     }
 }

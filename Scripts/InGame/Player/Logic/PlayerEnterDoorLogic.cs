@@ -23,7 +23,7 @@ namespace InGame.Player.Logic
             _playerCommonInStageEntity = playerCommonInStageEntity;
             _playerView = playerView;
         }
-        
+
         public void UpdatePlayerEnterDoor()
         {
             if (!_playerInputEntity.enterDoorFlag)
@@ -38,7 +38,10 @@ namespace InGame.Player.Logic
             DoorView door = GetFacedDoor();
             if (door!=null)
             {
-                door.EnterDoor();
+                if (CanEnterDoorByKeyCheck(door.NeedToKey))
+                {
+                    door.TryEnterDoor();
+                }
             }
         }
 
@@ -55,7 +58,11 @@ namespace InGame.Player.Logic
             
             RaycastHit2D raycastHit2D = Physics2D.Raycast(_playerView.GetToSweetsRayPos(), direction,
                 rayDistance, LayerInfo.DoorMask);
-            var door = raycastHit2D.collider?.gameObject.GetComponent<DoorView>();
+            if (raycastHit2D.collider==null)
+            {
+                return null;
+            }
+            var door = raycastHit2D.collider.gameObject.GetComponent<DoorView>();
             
 #if UNITY_EDITOR
             if (_playerView.OnDrawRay)
@@ -64,6 +71,16 @@ namespace InGame.Player.Logic
             }
 #endif
             return door;
+        }
+
+        private bool CanEnterDoorByKeyCheck(bool needToKey)
+        {
+            if (!needToKey)
+            {
+                return true;
+            }
+
+            return _playerCommonInStageEntity.HavingKey;
         }
 
         private bool CanEnterDoor()

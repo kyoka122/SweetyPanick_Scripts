@@ -7,9 +7,10 @@ namespace OutGame.Prologue.MyInput
 {
     public class InputActionButtonInputter:IButtonInput
     {
-        public IObservable<bool> OnButton { get; }
+        public IObservable<bool> OnButton => _onButton;
 
         private Subject<bool> _onButton;
+        private InputMap _inputMap;
 
         public InputActionButtonInputter(InputDevice newDevice)
         {
@@ -25,16 +26,22 @@ namespace OutGame.Prologue.MyInput
         private void Init(InputDevice[] newDevices)
         {
             _onButton = new Subject<bool>();
-            var gameInputMap = new InputMap{devices = newDevices};
+            _inputMap = new InputMap{devices = newDevices};
             
-            gameInputMap.TalkEnter.Enter.started += OnEnter;
+            _inputMap.TalkEnter.Enter.started += OnEnter;
             
-            gameInputMap.Enable();
+            _inputMap.Enable();
         }
         
         private void OnEnter(InputAction.CallbackContext context)
         {
             _onButton.OnNext(true);
+        }
+
+        public void Dispose()
+        {
+            _inputMap.TalkEnter.Enter.started -= OnEnter;
+            _onButton?.Dispose();
         }
     }
 }

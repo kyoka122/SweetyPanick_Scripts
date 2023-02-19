@@ -137,7 +137,7 @@ namespace StageManager
                     break;
                 case StageEvent.EnterSecondStageGoalDoor:
                     SetAllPlayerStop();
-                    _moveNextSceneEvent.Invoke(SceneName.ColateStage);
+                    _moveNextSceneEvent.Invoke(SceneName.PlayerCustom);
                     break;
                 default:
                     Debug.LogError($"Could Not Found stageEvent: {stageEvent}");
@@ -206,6 +206,7 @@ namespace StageManager
         public void Dispose()
         {
             _blackFadeInTokenSource?.Dispose();
+            _stageGimmickManager.Dispose();
         }
     }
 }

@@ -64,8 +64,9 @@ namespace InGame.Stage.Installer
             var backgroundLogic = new BackgroundLogic(stageBaseEntity,backgroundView);
             var animationEventLogic =
                 new AnimationEventLogic(GameObjectExtensions.FindObjectsOfInterface<IAnimationCallbackSender>(),stageGimmickEntity);
-            
-            return new MoveStageGimmickManager(healAnimationLogic, doorLogic,moveFloorLogics.ToArray(),backgroundLogic,animationEventLogic);
+
+            List<IDisposable> disposables = new List<IDisposable>();
+            return new MoveStageGimmickManager(healAnimationLogic, doorLogic,moveFloorLogics.ToArray(),backgroundLogic,animationEventLogic,disposables);
         }
     }
 }

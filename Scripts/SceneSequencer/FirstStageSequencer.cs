@@ -196,7 +196,7 @@ namespace SceneSequencer
                 {
                     continue;
                 }
-                var playerController = installer.Install(i, _inGameDatabase,_outGameDatabase, _commonDatabase);
+                var playerController = installer.Install(i,StageArea.FirstStageFirst, _inGameDatabase,_outGameDatabase, _commonDatabase);
                 _firstStageManager.AddController(playerController);
                 //targetGroup.AddMember(controller.GetPlayerPrefabTransform(),cinemaChineWeight,cinemaChineRadius);
                 _firstStageManager.RegisterPlayerEvent(playerController);

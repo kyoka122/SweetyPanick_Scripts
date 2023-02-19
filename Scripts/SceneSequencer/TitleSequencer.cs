@@ -7,6 +7,8 @@ using InGame.SceneLoader;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.Database;
+using UniRx;
+using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,14 +26,24 @@ namespace SceneSequencer
 
         protected override void ProcessInOrder()
         {
-            foreach (var joycon in JoyconManager.Instance.j)
+            this.UpdateAsObservable()
+                .Subscribe(_ =>
+                {
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        toNextSceneFlag.OnNext(SceneName.Prologue);
+                    }
+                }).AddTo(this);
+                
+            /*foreach (var joycon in JoyconManager.Instance.j)
             {
                 if (joycon.GetButtonDown(Joycon.Button.DPAD_RIGHT)&&!joycon.isLeft)
                 {
                     toNextSceneFlag.OnNext(SceneName.Prologue);
                 }
-            }
+            }*/
         }
+        
 
         protected override async void Finish(string nextSceneName)
         {
@@ -44,6 +56,7 @@ namespace SceneSequencer
                 Debug.Log($"Cancel Loading");
             }
             
+            await UniTask.Delay(TimeSpan.FromSeconds(1f),cancellationToken:this.GetCancellationTokenOnDestroy());
             BGMManager.Instance.FadeOut(BGMPath.PROLOGUE, 2, () => {
                 Debug.Log("BGMフェードアウト終了");
             });

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.SceneLoader;
@@ -27,10 +28,13 @@ namespace SceneSequencer
             _buttonInputs = new List<IButtonInput>();
             InitControllers();
             InputSystem.onDeviceChange += UpdateInputActionButtonInputter;
-            JoyconManager.Instance.added += AddJoycons;
+            JoyconManager.Instance.added += UpdateJoycons;
+            Debug.Log($"Init Input.Count:{_buttonInputs.Count}");
             prologueBehaviour.Init(OnToNextSceneFlag,_buttonInputs);
         }
 
+        //TODO: 別クラスにまとめる //////////////////////////////////////////////////////////////////////////////////
+        
         private void UpdateInputActionButtonInputter(InputDevice inputDevice,InputDeviceChange inputDeviceChange)
         {
             if (inputDeviceChange==InputDeviceChange.Added)
@@ -38,8 +42,8 @@ namespace SceneSequencer
                 _buttonInputs.Add(new InputActionButtonInputter(inputDevice));
             }
         }
-        
-        private void AddJoycons(Joycon addedJoycon)
+
+        private void UpdateJoycons(Joycon addedJoycon)
         {
             _buttonInputs.Add(new JoyConButtonInput(addedJoycon));
         }
@@ -52,6 +56,7 @@ namespace SceneSequencer
             var devices = InputSystem.devices;
             foreach (var device in devices.Where(device => !device.IsTDevice<Joystick>()))
             {
+                Debug.Log($"Set {device.name}.");
                 _buttonInputs.Add(new InputActionButtonInputter(device));
             }
 
@@ -59,8 +64,11 @@ namespace SceneSequencer
             foreach (var joycon in joycons)
             {
                 _buttonInputs.Add(new JoyConButtonInput(joycon));
+                Debug.Log($"Set Joycon. isLeft{joycon.isLeft}");
             }
         }
+        
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         protected override async void ProcessInOrder()
         {
@@ -93,8 +101,8 @@ namespace SceneSequencer
             {
                 Debug.Log($"Cancel Loading");
             }
-            
-            BGMManager.Instance.FadeOut(BGMPath.PROLOGUE, 2, () => {
+            await UniTask.Delay(TimeSpan.FromSeconds(2f),cancellationToken:this.GetCancellationTokenOnDestroy());
+            BGMManager.Instance.FadeOut(BGMPath.PROLOGUE, 3f, () => {
                 Debug.Log("BGMフェードアウト終了");
             });
             SceneManager.LoadScene(nextSceneName);
@@ -103,7 +111,8 @@ namespace SceneSequencer
         private void OnDestroy()
         {
             InputSystem.onDeviceChange -= UpdateInputActionButtonInputter;
-            JoyconManager.Instance.added -= AddJoycons;
+            JoyconManager.Instance.added -= UpdateJoycons;
+            prologueBehaviour.Dispose();
         }
     }
 }

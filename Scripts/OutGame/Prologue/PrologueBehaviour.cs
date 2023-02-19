@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace OutGame.Prologue
 {
-    public class PrologueBehaviour:MonoBehaviour
+    public class PrologueBehaviour:MonoBehaviour,IDisposable
     {
         [SerializeField] Fungus.Flowchart flowchart;
         [SerializeField] private ProloguePlayerAnimation prologuePlayerAnimation;
@@ -132,6 +132,14 @@ namespace OutGame.Prologue
             worldMapObj.SetActive(false);
             castleObj.SetActive(true);
             backGroundFilter.enabled = false;
+        }
+
+        public void Dispose()
+        {
+            foreach (var buttonInput in _buttonInputs)
+            {
+                buttonInput.Dispose();
+            }
         }
     }
 }

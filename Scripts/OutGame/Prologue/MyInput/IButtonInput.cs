@@ -3,7 +3,7 @@ using UniRx;
 
 namespace OutGame.Prologue.MyInput
 {
-    public interface IButtonInput
+    public interface IButtonInput:IDisposable
     {
         public IObservable<bool> OnButton { get; }
     }

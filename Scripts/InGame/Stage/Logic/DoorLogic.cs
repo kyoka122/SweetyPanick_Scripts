@@ -20,6 +20,14 @@ namespace InGame.Stage.Logic
             RegisterDoorEvent();
         }
 
+        public void InitAtStageMove()
+        {
+            foreach (var doorData in _stageObjectsView.GetDoorData())
+            {
+                doorData.DoorView.InitAtStageMove();
+            }
+        }
+
         private void RegisterDoorEvent()
         {
             foreach (var doorData in _stageObjectsView.GetDoorData())

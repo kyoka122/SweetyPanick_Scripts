@@ -134,7 +134,7 @@ namespace SceneSequencer
                 {
                     continue;
                 }
-                var playerController = installer.Install(i, _inGameDatabase,_outGameDatabase, _commonDatabase);
+                var playerController = installer.Install(i,StageArea.ColateStageFirst, _inGameDatabase,_outGameDatabase, _commonDatabase);
                 _colateStageManager.AddController(playerController);
                 _colateStageManager.RegisterPlayerEvent(playerController);
             }

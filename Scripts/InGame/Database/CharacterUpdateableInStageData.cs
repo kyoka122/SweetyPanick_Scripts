@@ -2,6 +2,7 @@
 
 namespace InGame.Database
 {
+    //TODO: PlayerUpdateableDataにまとめる
     public class CharacterUpdateableInStageData
     {
         public bool isWarping;

@@ -47,6 +47,7 @@ namespace SceneSequencer
 
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
+            Debug.Log($"Init SecondStage!!!!!!!!!!!!!!!!!!!!!!!!!",gameObject);
             _inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
             _outGameDatabase = outGameDatabase;
@@ -126,10 +127,15 @@ namespace SceneSequencer
 
             for (int i = 1; i <= characterData.Count; i++)
             {
-                PlayableCharacter character =
-                    characterData.FirstOrDefault(data => data.playerNum == i).playableCharacter;
-                var playerController = allCharacterConstData.FirstOrDefault(data => data.CharacterType == character)
-                    ?.Installer.Install(i, _inGameDatabase,_outGameDatabase, _commonDatabase);
+                UseCharacterData useCharacterData = characterData.FirstOrDefault(data => data.playerNum == i);
+                if (useCharacterData==null)
+                {
+                    Debug.LogError($"Coldn`t Find UseCharacterData");
+                    return;
+                }
+                var playerController = allCharacterConstData
+                        .FirstOrDefault(data => data.CharacterType == useCharacterData.playableCharacter)?
+                        .Installer.Install(i,StageArea.SecondStageFirst, _inGameDatabase,_outGameDatabase, _commonDatabase);
                
                 _secondStageManager.AddController(playerController);
                 //targetGroup.AddMember(controller.GetPlayerPrefabTransform(),cinemaChineWeight,cinemaChineRadius);

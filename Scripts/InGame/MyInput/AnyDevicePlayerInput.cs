@@ -47,9 +47,6 @@ namespace InGame.MyInput
             gameInputMap.Player.Skill.started += OnSkill;
             gameInputMap.Player.Skill.canceled += OffSkill;
 
-            gameInputMap.Player.Fix.started += OnSkill;
-            gameInputMap.Player.Skill.canceled += OffSkill;
-
             gameInputMap.Player.Fix.started += OnFix;
             gameInputMap.Player.Fix.canceled += OffFix;
             
@@ -86,12 +83,12 @@ namespace InGame.MyInput
         
         private void OnSkill(InputAction.CallbackContext context)
         {
-            skill.Value = true;
+            //skill.Value = true;
         }
         
         private void OffSkill(InputAction.CallbackContext context)
         {
-            skill.Value = false;
+            //skill.Value = false;
         }
         
         private void OnFix(InputAction.CallbackContext context)

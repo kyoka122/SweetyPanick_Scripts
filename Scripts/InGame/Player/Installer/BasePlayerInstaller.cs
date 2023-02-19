@@ -14,7 +14,7 @@ namespace InGame.Player.Installer
         [SerializeField] protected ParticleGeneratorView particleGeneratorView;
         
         
-        public abstract BasePlayerController Install(int playerNum, InGameDatabase inGameDatabase
+        public abstract BasePlayerController Install(int playerNum, StageArea stageArea,InGameDatabase inGameDatabase
             ,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase);
     }
 }

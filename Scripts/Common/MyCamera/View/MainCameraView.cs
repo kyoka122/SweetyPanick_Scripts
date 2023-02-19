@@ -58,6 +58,18 @@ namespace InGame.MyCamera.View
 
             return false;
         }
+        
+        public bool TryRemoveTargetGroup(Transform characterTransform)
+        {
+            if (_targetGroup.FindMember(characterTransform)!=-1)
+            {
+                Debug.Log($"RemoveTargetGroup");
+                _targetGroup.RemoveMember(characterTransform);
+                return true;
+            }
+
+            return false;
+        }
 
         public void Shake()
         {

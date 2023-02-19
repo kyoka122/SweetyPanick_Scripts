@@ -85,7 +85,7 @@ namespace InGame.Player.Logic
                 if (collider.TryGetComponent(out IEnemyDamageAble damageable))
                 {
                     damageable.OnDamaged(new Struct.DamagedInfo(Attacker.Player,_playerView.transform.position));
-                    _playerInputEntity.rumble.Invoke();
+                    _playerInputEntity.rumble?.Invoke();
                     SEManager.Instance.Play(AudioName.GetAttackPath(_playerView.type));
                 }
             }

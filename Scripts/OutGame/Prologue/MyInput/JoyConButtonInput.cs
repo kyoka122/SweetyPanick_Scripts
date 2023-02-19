@@ -6,9 +6,9 @@ namespace OutGame.Prologue.MyInput
 	/// <summary>
 	/// 会話シーン用コントローラー入力
 	/// </summary>
-	public class JoyConButtonInput:IButtonInput,IDisposable
+	public class JoyConButtonInput:IButtonInput
 	{
-		public IObservable<bool> OnButton { get; }
+		public IObservable<bool> OnButton => _onButton;
 		private readonly Joycon _joycon;
 		
 		//MEMO: Joyconの左右どちらでも取得可能
@@ -20,7 +20,6 @@ namespace OutGame.Prologue.MyInput
 			_joycon = joycon;
 			_onButton = new Subject<bool>();
 			_onButtonType = joycon.isLeft ? Joycon.Button.DPAD_DOWN : Joycon.Button.DPAD_UP;
-			OnButton = _onButton;
 			JoyconManager.Instance.updated += UpdateInput;
 		}
 

@@ -18,13 +18,14 @@ namespace InGame.Player.Installer
     /// </summary>
     public class CandyInstaller:BasePlayerInstaller
     {
-        public override BasePlayerController Install(int playerNum,InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
+        public override BasePlayerController Install(int playerNum,StageArea stageArea,InGameDatabase inGameDatabase,
+            OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             var candyStatus = inGameDatabase.GetCandyStatus();
             inGameDatabase.SetCandyStatus(candyStatus);
             var candyView = viewGenerator.GenerateCandy(inGameDatabase.GetCandyConstData().Prefab);
             candyView.Init();
-            candyView.transform.position = inGameDatabase.GetPlayerInstancePositions(StageArea.FirstStageFirst)
+            candyView.transform.position = inGameDatabase.GetPlayerInstancePositions(stageArea)
                 .CandyInstancePos;
             var weaponView = candyView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
@@ -40,7 +41,7 @@ namespace InGame.Player.Installer
             
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Candy);
-            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Candy);
+            var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Candy,inGameDatabase);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, 
                 PlayableCharacter.Candy,playerNum,candyView.GetTransform());
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
@@ -69,7 +70,8 @@ namespace InGame.Player.Installer
                 , playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Candy);
             var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, candyView);
 
-            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity};
+            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity};
+            
             return new CandyController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, candySkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
                 playerEnterDoorLogic,playableCharacterSelectLogic,playerTalkLogic,disposables,playerCommonUpdateableEntity.OnDead);
