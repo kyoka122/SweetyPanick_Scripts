@@ -16,10 +16,12 @@ namespace InGame.Database.ScriptableData
         public float ThrowEnemyInterval => throwEnemyInterval;
         public float SurfaceSpeed => surfaceSpeed;
         public float ToSideWallDistance => toSideWallDistance;
+        public float ToSideWallDistanceAtThrowEnemy => toSideWallDistanceAtThrowEnemy;
         public float ToGroundDistance => toGroundDistance;
         public float ColateFlyHeight => colateFlyHeight;
 
         public Vector2 ThrowEnemyPower => throwEnemyPower;
+        public Vector2 ThrowEnemyPivot => throwEnemyPivot;
         public Vector2 NockBackPower => nockBackPower;
         
 
@@ -34,10 +36,12 @@ namespace InGame.Database.ScriptableData
         [SerializeField] private float surfaceSpeed=2f;
         
         [SerializeField] private float toSideWallDistance=3f;
+        [SerializeField] private float toSideWallDistanceAtThrowEnemy = 1f;
         [SerializeField] private float toGroundDistance=1f;
         [SerializeField] private float colateFlyHeight = 10f;
 
         [SerializeField] private Vector2 throwEnemyPower = new(1,1);
+        [SerializeField] private Vector2 throwEnemyPivot = new(2,1);
         [SerializeField] private Vector2 nockBackPower = new(1,0);
     }
 }

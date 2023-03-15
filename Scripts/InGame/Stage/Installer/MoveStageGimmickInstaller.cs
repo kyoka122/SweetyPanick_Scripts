@@ -8,7 +8,6 @@ using InGame.Stage.Manager;
 using InGame.Stage.View;
 using InGame.Player.View;
 using InGame.Stage.Entity;
-using InGame.Stage.Manager;
 using MyApplication;
 using UnityEngine;
 using Utility;
@@ -19,15 +18,20 @@ namespace InGame.Stage.Installer
     {
         [SerializeField] private HealAnimationView healAnimationView;
         [SerializeField] private StageObjectsView stageObjectsView;
-        [SerializeField] private BackgroundView backgroundView;
-        
+
         public MoveStageGimmickManager Install(Action<StageEvent> stageEvent,InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
         {
             var healAnimationLogic = new HealAnimationLogic(healAnimationView);
             var doorLogic = new DoorLogic(stageObjectsView,stageEvent);
             var stageGimmickEntity = new StageGimmickEntity(inGameDatabase,commonDatabase);
             var stageBaseEntity = new StageBaseEntity(inGameDatabase,commonDatabase);
-            backgroundView.Init();
+            var scoreEntity = new ScoreEntity(inGameDatabase);
+
+            var scoreView = FindObjectOfType<ScoreView>();
+            foreach (var backgroundView in FindObjectsOfType<BackgroundView>())
+            {
+                backgroundView.Init();
+            }
             
             var defaultSweetsView = FindObjectsOfType<DefaultSweetsView>();
             foreach (var sweetsView in defaultSweetsView)
@@ -61,11 +65,19 @@ namespace InGame.Stage.Installer
                 moveFloorLogics.Add(new MoveFloorLogic(moveFloorView,stageGimmickEntity));
             }
 
-            var backgroundLogic = new BackgroundLogic(stageBaseEntity,backgroundView);
-            var animationEventLogic =
-                new AnimationEventLogic(GameObjectExtensions.FindObjectsOfInterface<IAnimationCallbackSender>(),stageGimmickEntity);
+            var backgroundLogic = new BackgroundLogic(stageBaseEntity);
+            var animationEventLogic = new AnimationEventLogic(GameObjectExtensions
+                .FindObjectsOfInterface<IAnimationCallbackSender>(),stageGimmickEntity);
 
-            List<IDisposable> disposables = new List<IDisposable>();
+            List<ISweets> sweets = new List<ISweets>();
+            sweets.AddRange(defaultSweetsView);
+            sweets.AddRange(gumViews);
+            sweets.AddRange(defaultGimmickSweetsViews);
+            sweets.AddRange(gumGimmickViews);
+            SweetsScoreLogic scoreLogic = new SweetsScoreLogic(scoreEntity,sweets.ToArray(),scoreView);
+            
+            List<IDisposable> disposables = new List<IDisposable>{scoreLogic};
+            
             return new MoveStageGimmickManager(healAnimationLogic, doorLogic,moveFloorLogics.ToArray(),backgroundLogic,animationEventLogic,disposables);
         }
     }

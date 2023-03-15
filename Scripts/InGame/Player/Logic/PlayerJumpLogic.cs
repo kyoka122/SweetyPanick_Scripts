@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using InGame.Database;
 using InGame.Player.Entity;
 using InGame.Stage.View;
 using InGame.Player.View;
@@ -11,7 +12,7 @@ namespace InGame.Player.Logic
 {
     public class PlayerJumpLogic
     {
-         private readonly PlayerConstEntity _playerConstEntity;
+        private readonly PlayerConstEntity _playerConstEntity;
         private readonly PlayerInputEntity _playerInputEntity;
         private readonly PlayerCommonInStageEntity _playerCommonInStageEntity;
         private readonly PlayerCommonUpdateableEntity _playerCommonUpdateableEntity;
@@ -41,6 +42,7 @@ namespace InGame.Player.Logic
             SetGroundType();
             SetIsJumping();
             TryOnJump();
+            TryOnMarshmallowBound();
             float ySpeed = _playerView.GetVelocity().y;
             UpdateJumpAnimation(ySpeed);
         }
@@ -63,10 +65,11 @@ namespace InGame.Player.Logic
                 DrawGroundRay(rayDistance);
             }
 #endif
-            //TODO: トランポリン修正
-            if (IsTriggerGroundHit(upRaycastHit2D,downRaycastHit2D))
+            if (TryGetTrampolineHit(upRaycastHit2D,downRaycastHit2D,out IBoundAble highJumpAbleStand))
             {
                 _playerCommonInStageEntity.SetPrevStandPos(downRaycastHit2D.point);
+                _playerCommonInStageEntity.SetHighJumpAbleStand(highJumpAbleStand);
+                
                 _playerCommonInStageEntity.SetGroundType(GroundType.Trampoline);
                 return;
             }
@@ -81,15 +84,14 @@ namespace InGame.Player.Logic
 #if UNITY_EDITOR 
             if (IsIgnoreCheckGround())
             {
-                Debug.Log($"IsIgnoreCheckGround");
                 _playerCommonInStageEntity.SetGroundType(GroundType.Default);
                 return;
             }
 #endif
             _playerCommonInStageEntity.SetGroundType(GroundType.None);
         }
-
-        private bool IsTriggerGroundHit(RaycastHit2D upRaycastHit2D,RaycastHit2D downRaycastHit2D)
+        
+        private bool TryGetTrampolineHit(RaycastHit2D upRaycastHit2D,RaycastHit2D downRaycastHit2D,out IBoundAble boundAble)
         {
             GameObject groundObj = null;
             if (upRaycastHit2D.collider != null)
@@ -103,12 +105,15 @@ namespace InGame.Player.Logic
             
             if (groundObj!=null)
             {
-                _playerCommonInStageEntity.SetHighJumpAbleStand(groundObj.GetComponent<IHighJumpAbleStand>());
-                if (_playerCommonInStageEntity.highJumpAbleStand != null && _playerCommonInStageEntity.highJumpAbleStand.HighJumpAble)
+                var stand = groundObj.GetComponent<IBoundAble>();
+                if (stand is {BoundAble: true})
                 {
+                    boundAble = stand;
                     return true;
                 }
             }
+
+            boundAble = null;
             return false;
         }
         
@@ -117,6 +122,9 @@ namespace InGame.Player.Logic
             return upRaycastHit2D.collider == null && downRaycastHit2D.collider != null;
         }
 
+        /// <summary>
+        /// 着地した際にジャンプを解除する
+        /// </summary>
         private void SetIsJumping()
         {
             if (_playerCommonInStageEntity.IsGround)
@@ -130,42 +138,93 @@ namespace InGame.Player.Logic
             }
             _playerCommonInStageEntity.SetIsJumping(true);
         }
-        
+
         private void TryOnJump()
         {
-            if (!_playerInputEntity.jumpFlag)
-            {
-                return;
-            }
             if (!_playerCommonInStageEntity.IsGround||_playerView.GetVelocity().y>0)
             {
                 _playerInputEntity.OffJumpFlag();
                 return;
             }
+            if (_playerInputEntity.jumpFlag)
+            {
+                if (TryJumpTrampoline())
+                {
+                    _playerCommonInStageEntity.ClearCurrentDelayCount();
+                    return;
+                }
+                if (TryJumpNormal())
+                {
+                    _playerCommonInStageEntity.ClearCurrentDelayCount();
+                    return;
+                }
+            }
+            TryBound();
+        }
 
-            float ySpeed=0;
-            if (_playerCommonInStageEntity.playerOnGroundType==GroundType.Trampoline)
-            {
-                ySpeed = _playerConstEntity.HighJumpValue * DefaultJumpValue;
-                SEManager.Instance.Play(SEPath.TRAMPOLINE);
-            }
-            else if(_playerCommonInStageEntity.playerOnGroundType==GroundType.Default)
-            {
-                ySpeed = _playerConstEntity.JumpValue * DefaultJumpValue;
-                SEManager.Instance.Play(SEPath.JUMP);
-            }
+        private bool TryBound()
+        {
+            _playerCommonInStageEntity.AddCurrentBoundDelayCount();
+            bool isMaxDelayCount = _playerCommonInStageEntity.currentBoundDelayCount >_playerConstEntity.BoundDelayCount;
             
+            if (_playerCommonInStageEntity.onGroundType==GroundType.Trampoline&&isMaxDelayCount)
+            {
+                float ySpeed = _playerConstEntity.BoundValue * DefaultJumpValue;
+                //_playerCommonInStageEntity.highJumpAbleStand?.PlayPressAnimation(); //MEMO: バウンド時はアニメーションしないように変更
+                SEManager.Instance.Play(SEPath.TRAMPOLINE);
+                SetJumpCommonData(ySpeed);
+                _playerCommonInStageEntity.ClearCurrentDelayCount();
+                return true;
+            }
+            return false;
+        }
+
+        private bool TryJumpTrampoline()
+        {
+            if (_playerCommonInStageEntity.onGroundType==GroundType.Trampoline)
+            {
+                float ySpeed = _playerConstEntity.HighJumpValue * DefaultJumpValue;
+                _playerCommonInStageEntity.BoundAble?.PlayPressAnimation();
+                SEManager.Instance.Play(SEPath.TRAMPOLINE);
+                SetJumpCommonData(ySpeed);
+                return true;
+            }
+            return false;
+        }
+        
+        private bool TryJumpNormal()
+        {
+            if(_playerCommonInStageEntity.onGroundType==GroundType.Default)
+            {
+                float ySpeed = _playerConstEntity.JumpValue * DefaultJumpValue;
+                SEManager.Instance.Play(SEPath.JUMP);
+                SetJumpCommonData(ySpeed);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// ジャンプ全種共通処理
+        /// </summary>
+        /// <param name="ySpeed"></param>
+        private void SetJumpCommonData(float ySpeed)
+        {
             _playerView.AddYVelocity(ySpeed);
             PlayOnJumpAnimation(ySpeed);
-            if (_playerCommonInStageEntity.highJumpAbleStand!=null)
-            {
-                _playerCommonInStageEntity.highJumpAbleStand.PlayPressAnimation();
-            }
-            
             _playerCommonInStageEntity.OnJumpTrigger();
             _playerInputEntity.OffJumpFlag();
         }
 
+        
+        private void TryOnMarshmallowBound()
+        {
+            if (_playerView.GetVelocity().y>0)
+            {
+                return;
+            }
+            
+        }
         private void UpdateJumpAnimation(float yParamValue)
         {
             _playerAnimatorView.PlayFloatAnimation(PlayerAnimatorParameter.VerticalMove,Mathf.Abs(yParamValue));

@@ -9,6 +9,7 @@ namespace InGame.Database
     public class UIData
     {
         public Canvas Canvas { get; }
+        public float ScoreCountUpDuration { get; }
         public PlayerStatusView PlayerStatusView { get; }
         public Vector2[] PlayerStatusDataPos { get; }
         public ColateStatusView ColateStatusView { get; }
@@ -18,12 +19,13 @@ namespace InGame.Database
         public UIData(StageUIScriptableData stageUIScriptableData, Canvas canvas)
         {
             PlayerStatusView = stageUIScriptableData.PlayerStatusView;
+            ScoreCountUpDuration = stageUIScriptableData.ScoreCountUpDuration;
             ColateStatusView = stageUIScriptableData.ColateStatusView;
             Canvas = canvas;
-            PlayerStatusDataPos = stageUIScriptableData.StatusDataPositions
+            PlayerStatusDataPos = stageUIScriptableData.PlayerStatusDataPositions
                 .OrderBy(position => position.x)
                 .ToArray();
-            ColateStatusDataPos = ColateStatusDataPos;
+            ColateStatusDataPos = stageUIScriptableData.ColateStatusDataPosition;
         }
 
         public UIData Clone()

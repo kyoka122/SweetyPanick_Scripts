@@ -1,5 +1,4 @@
-﻿using InGame.Colate.View;
-using InGame.Enemy.View;
+﻿using InGame.Enemy.View;
 using UnityEngine;
 
 namespace InGame.Enemy.Installer
@@ -7,9 +6,9 @@ namespace InGame.Enemy.Installer
     public class ViewGenerator:MonoBehaviour
     {
         
-        public DefaultEnemyView GenerateDefaultEnemyView(DefaultEnemyView defaultEnemyPrefab)
+        public DefaultEnemyView GenerateDefaultEnemyView(DefaultEnemyView defaultEnemyPrefab,Vector2 spawnPos)
         {
-            return Instantiate(defaultEnemyPrefab);
+            return Instantiate(defaultEnemyPrefab,spawnPos,Quaternion.identity);
         }
     }
 }

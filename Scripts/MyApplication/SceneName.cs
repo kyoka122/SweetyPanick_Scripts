@@ -11,11 +11,12 @@
         public const string Title = "Title";
         //public const string FirstHiddenStage = "FirstHiddenStage";
         //public const string SecondHiddenStage = "SecondHiddenStage";
-        public const string Score = "Score";
+        public const string Score = "ScoreScene";
         
         //MEMO: Debug用
         public const string DebugKyokaMoveStage = "kyoka_MoveTest";
         public const string DebugMoveStage = "MoveTest";
+        public const string DebugPrologue = "Prologue 1";
         
     }
 }

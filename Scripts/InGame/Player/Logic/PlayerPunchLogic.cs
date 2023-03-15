@@ -59,10 +59,10 @@ namespace InGame.Player.Logic
             {
                 return;
             }
-            if (_playerCommonInStageEntity.IsPunching)
+            if (_playerCommonInStageEntity.IsPunching)//MEMO: Punchアニメーション中
             {
-                _playerView.SetLayer(LayerInfo.NotCollideEnemyPlayerNum);
-                _playerInputEntity.OffPunchFlag();
+                _playerView.SetLayer(LayerInfo.NotCollideEnemyPlayerNum);//MEMO: 敵との当たり判定を無視
+                _playerInputEntity.OffPunchFlag();//MEMO:PunchキーのInputを無視
                 return;
             }
             

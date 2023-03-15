@@ -1,21 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Cinemachine;
+using Common.MyInput.Player;
 using InGame.Common.Database;
+using InGame.Common.Database.ScriptableData;
 using InGame.Database;
 using InGame.Database.ScriptableData;
-using InGame.MyCamera.Installer;
+using InGame.Player.Installer;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.ColateStage;
 using OutGame.Database;
-using OutGame.Prologue.MyInput;
 using StageManager;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 namespace SceneSequencer
@@ -24,17 +26,12 @@ namespace SceneSequencer
     {
         [SerializeField] private ColateStageTalkPartBehaviour colateStageTalkPartBehaviour;
         [SerializeField] private ColateStageGimmickInstaller colateStageGimmickInstaller;
-        [SerializeField] private PlayerScriptableData playerScriptableData;
-        [SerializeField] private EnemyScriptableData enemyScriptableData;
         [SerializeField] private StageUIScriptableData stageUiScriptableData;
-        [SerializeField] private StageGimmickScriptableData stageGimmickScriptableData;
-        [SerializeField] private StageSettingsScriptableData stageSettingsScriptableData;
+        [SerializeField] private EnemyScriptableData enemyScriptableData;
         [SerializeField] private PlayerInstancePositions playerInstancePositions;
-
-        [SerializeField] private CinemachineImpulseSource cinemachineImpulseSource;
-        [SerializeField] private CinemachineConfiner2D cinemachineConfiner2D;
+        [SerializeField] private StageSettingsScriptableData stageSettingsScriptableData;
+        [SerializeField] private CameraData battleCameraData;
         
-        [SerializeField] private CinemachineTargetGroup targetGroup;
         [SerializeField] private Canvas canvas;
         [SerializeField] private Camera camera;
         
@@ -47,20 +44,15 @@ namespace SceneSequencer
         
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
-            BGMManager.Instance.Stop();
-            BGMManager.Instance.Play(BGMPath.PROLOGUE);
-            //MEMO: ↓のリストから入力情報を得られる。Joyconでストーリーを先に進めたい場合はこっち。
-            //_inputCaseUnknownController = new InputCaseUnknownController();
-            
             _inGameDatabase = inGameDatabase;
             _outGameDatabase = outGameDatabase;
             _commonDatabase = commonDatabase;
 
             SetInGameDatabase();
-            var cameraController = new CameraInstaller().InstallMoveAndMultiStageCamera(inGameDatabase, commonDatabase, targetGroup,
-                cinemachineImpulseSource, camera,cinemachineConfiner2D);
+            var cameraController = inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveCamera(inGameDatabase, 
+                commonDatabase,camera);
             
-            _colateStageManager=new ColateStageManager(colateStageGimmickInstaller,cameraController,_inGameDatabase,_commonDatabase,
+            _colateStageManager=new ColateStageManager(colateStageGimmickInstaller,cameraController,battleCameraData,_inGameDatabase,_commonDatabase,
                 MoveNextScene);
             
             //MEMO: Playerのインスタンス
@@ -71,7 +63,6 @@ namespace SceneSequencer
 
         protected override async void ProcessInOrder()
         {
-            BGMManager.Instance.Stop();
             try
             {
                 await LoadManager.Instance.TryPlayFadeOut();
@@ -80,13 +71,15 @@ namespace SceneSequencer
             {
                 Debug.Log($"Cancel Loading");
             }
-            BGMManager.Instance.Play(BGMPath.STAGE_BGM);
             _colateStageManager.StartTalk();
             colateStageTalkPartBehaviour.StartTalkScene();
         }
 
         private void StartBattle()
         {
+            colateStageTalkPartBehaviour.Dispose();
+            BGMManager.Instance.Stop();
+            BGMManager.Instance.Play(BGMPath.STAGE_BGM);
             _colateStageManager.StartBattle();
             
             this.FixedUpdateAsObservable()
@@ -110,6 +103,8 @@ namespace SceneSequencer
         {
             _inGameDatabase.AddPlayerInstancePositions(StageArea.ColateStageFirst,playerInstancePositions);
             _inGameDatabase.SetUIData(new UIData(stageUiScriptableData,canvas));
+            _inGameDatabase.SetStageSettings(stageSettingsScriptableData);
+            _inGameDatabase.SetEnemyData(enemyScriptableData);
         }
 
        
@@ -118,6 +113,13 @@ namespace SceneSequencer
             CharacterCommonConstData[] allCharacterConstData = _inGameDatabase.GetAllCharacterConstData();
             var characterData=_commonDatabase.GetUseCharacterData();
 
+            //MEMO: Player設定シーンを飛ばした場合、仮でキーボード、Candyのデータを追加する
+            if (characterData == null)
+            {
+                new DebugInputInstaller().Install(_commonDatabase);
+            }
+            characterData=_commonDatabase.GetUseCharacterData();
+            
             for (int i = 1; i <= characterData.Count; i++)
             {
                 var oneCharacterData = characterData.FirstOrDefault(data => data.playerNum == i);
@@ -145,18 +147,37 @@ namespace SceneSequencer
             _startSceneChange = true;
             toNextSceneFlag.OnNext(sceneName);
         }
-        
-        protected override void Finish(string nextSceneName)
+
+        private void DisposeInGameController()
         {
+            IReadOnlyList<ControllerNumData> controllerData = _commonDatabase.GetAllControllerData();
+            foreach (var numData in controllerData)
+            {
+                numData.playerInput.Dispose();
+            }
+        }
+        
+        protected override async void Finish(string nextSceneName)
+        {
+            DisposeInGameController();
             BGMManager.Instance.FadeOut(BGMPath.PROLOGUE, 2, () => {
                 Debug.Log("BGMフェードアウト終了");
             });
+            
+            try
+            {
+                await LoadManager.Instance.TryPlayBlackFadeIn();
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log($"Cancel Loading");
+            }
             SceneManager.LoadScene(nextSceneName);
         }
 
         private void OnDestroy()
         {
-            _colateStageManager.Dispose();
+            _colateStageManager?.Dispose();
         }
     }
 }

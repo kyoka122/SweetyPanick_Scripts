@@ -21,24 +21,27 @@ namespace InGame.Player.Entity
         public ParticleSystem OffJumpParticle => GetCommonCharacterConstData().OffJumpParticle;
         public ParticleSystem RunParticle => GetCommonCharacterConstData().RunParticle;
 
-        public float MaxSpeed => GetCharacterCommonStatus().maxSpeed;
-        public float AccelerateRateX => GetCharacterCommonStatus().accelerateRateX;
-        public float DecelerateRateXOnPunching => GetCharacterCommonStatus().decelerateRateXOnPunching;
-        public float DecelerateRateX => GetCharacterCommonStatus().decelerateRateX;
-        public float JumpValue => GetCharacterCommonStatus().jumpValue;
-        public float HighJumpValue => GetCharacterCommonStatus().highJumpValue;
-        public float ToGroundDistance => GetCharacterCommonStatus().toGroundDistance;
-        public float ToSweetsDistance => GetCharacterCommonStatus().toSweetsDistance;
-        public float ToSlopeDistance => GetCharacterCommonStatus().toSlopeDistance;
-        public float GimmickSweetsFixingTime => GetCharacterCommonStatus().gimmickSweetsFixingTime;
-        public float NormalSweetsFixingTime => GetCharacterCommonStatus().normalSweetsFixingTime;
-        public float KnockBackValue => GetCharacterCommonStatus().knockBackValue;
-        public float WarpDuration => GetCharacterCommonStatus().warpDuration;
-        public float WarpPosOffsetY => GetCharacterCommonStatus().warpPosOffsetY;
-        public float MaxColliderSizeX => GetCharacterCommonStatus().maxColliderSizeX;
+        public float MaxSpeed => GetCharacterCommonStatus().MaxSpeed;
+        public float AccelerateRateX => GetCharacterCommonStatus().AccelerateRateX;
+        public float DecelerateRateXOnPunching => GetCharacterCommonStatus().DecelerateRateXOnPunching;
+        public float DecelerateRateX => GetCharacterCommonStatus().DecelerateRateX;
+        public float JumpValue => GetCharacterCommonStatus().JumpValue;
+        public float HighJumpValue => GetCharacterCommonStatus().HighJumpValue;
+        public float BoundValue => GetCharacterCommonStatus().BoundValue;
+        public float ToGroundDistance => GetCharacterCommonStatus().ToGroundDistance;
+        public float ToSweetsDistance => GetCharacterCommonStatus().ToSweetsDistance;
+        public float ToSlopeDistance => GetCharacterCommonStatus().ToSlopeDistance;
+        public float GimmickSweetsFixingTime => GetCharacterCommonStatus().GimmickSweetsFixingTime;
+        public float NormalSweetsFixingTime => GetCharacterCommonStatus().NormalSweetsFixingTime;
+        public float KnockBackValue => GetCharacterCommonStatus().KnockBackValue;
+        public float WarpDuration => GetCharacterCommonStatus().WarpDuration;
+        public float WarpPosOffsetY => GetCharacterCommonStatus().WarpPosOffsetY;
+        public float MaxColliderSizeX => GetCharacterCommonStatus().MaxColliderSizeX;
+        public int BoundDelayCount => GetCharacterCommonStatus().BoundDelayCount;
         public int HealValue => _inGameDatabase.GetKureStatus().healValue;
         public float StageBottom => _inGameDatabase.GetStageSettings().StageBottom;
-        
+
+
         public Vector2 FixSweetsParticleSize(SweetsType type)
         {
             return type==SweetsType.Sweets ? _inGameDatabase.GetStageSettings().FixNormalSweetsParticleSize : 

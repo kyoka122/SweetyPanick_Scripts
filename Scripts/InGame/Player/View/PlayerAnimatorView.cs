@@ -8,7 +8,8 @@ using UnityEngine;
 
 namespace InGame.Player.View
 {
-    public class PlayerAnimatorView:MonoBehaviour,IAnimationCallback
+    [RequireComponent(typeof(Animator))]
+    public class PlayerAnimatorView:MonoBehaviour,IAnimationCallback,IDisposable
     {
         public IObservable<string> OnAnimationEvent=>_animationEventSubject;
         
@@ -35,6 +36,11 @@ namespace InGame.Player.View
             }
 
             return firstClip.name;
+        }
+
+        public AnimatorStateInfo GetCurrentAnimationStateInfo()
+        {
+            return _animator.GetCurrentAnimatorStateInfo(0);
         }
         
         public void PlayFloatAnimation(string animationName, float value)
@@ -65,6 +71,12 @@ namespace InGame.Player.View
         public void SetAnimatorSpeed(float speed)
         {
             _animator.speed = speed;
+        }
+        
+
+        public void Dispose()
+        {
+            _animationEventSubject?.Dispose();
         }
     }
 }

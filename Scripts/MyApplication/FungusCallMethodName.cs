@@ -11,5 +11,7 @@
         public static string CharacterSettings = "CharacterSettings";
         public static string ConfirmSettings = "ConfirmSettings";
         public static string CheerMessage = "CheerMessage";
+        public static string StartTalkThankYouForPlaying = "StartTalkThankYouForPlaying";
+        public static string StartTalkingShowScore = "StartTalkingShowScore";
     }
 }

@@ -1,36 +1,65 @@
-﻿using Fungus;
-using MyApplication;
+﻿using TalkSystem;
 using UnityEngine;
 
 namespace OutGame.PlayerCustom.View
 {
     public class ToMessageWindowSenderView:MonoBehaviour
     {
-        [SerializeField] private Flowchart flowchart;
+        private Dialogs _playerCountDialog;
+        private Dialogs _controllerDialog;
+        private Dialogs _characterDialog;
+        private Dialogs _cheerDialog;
+        private BaseTalkKeyObserver _talkKeyObserver;
+
+        private Dialogs _prevPlayedDialog;
+
+        public void Init(Dialogs playerCountDialog,Dialogs controllerDialog,Dialogs characterDialog,Dialogs cheerDialog)
+        {
+            _playerCountDialog = playerCountDialog;
+            _controllerDialog = controllerDialog;
+            _characterDialog = characterDialog;
+            _cheerDialog = cheerDialog;
+        }
         
         public void SendPlayerCountSettingsEvent()
         {
-            flowchart.SendFungusMessage(FungusCallMethodName.PlayerNumSettings);
+            ExitPrevDialog();
+            _playerCountDialog.PlayFirstDialog();
+            _prevPlayedDialog = _playerCountDialog;
         }
         
         public void SendControllerSettingsEvent()
         {
-            flowchart.SendFungusMessage(FungusCallMethodName.ControllerSettings);
+            ExitPrevDialog();
+            _controllerDialog.PlayFirstDialog();
+            _prevPlayedDialog = _controllerDialog;
         }
         
         public void SendCharacterSettingsEvent()
         {
-            flowchart.SendFungusMessage(FungusCallMethodName.CharacterSettings);
+            ExitPrevDialog();
+            _characterDialog.PlayFirstDialog();
+            _prevPlayedDialog = _characterDialog;
+        }
+
+        private void ExitPrevDialog()
+        {
+            if (_prevPlayedDialog!=null)
+            {
+                _prevPlayedDialog.ExitDialog();
+            }
         }
         
-        /*public void SendConfirmSettingsEvent()
+        public void SetTalkKeyObserver(BaseTalkKeyObserver talkKeyObserver)
         {
-            flowchart.SendFungusMessage(FungusCallMethodName.ConfirmSettings);
-        }*/
+            _talkKeyObserver = talkKeyObserver;
+        }
         
         public void SendCheerMessageEvent()
         {
-            flowchart.SendFungusMessage(FungusCallMethodName.CheerMessage);
+            ExitPrevDialog();
+            _cheerDialog.SetTalkKeyObserver(_talkKeyObserver);
+            _cheerDialog.StartDialogs();
         }
     }
 }

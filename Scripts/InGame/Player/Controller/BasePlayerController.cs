@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using InGame.Database;
-using InGame.Player.Installer;
 using InGame.Player.Logic;
 using MyApplication;
 using UniRx;
@@ -9,10 +7,10 @@ using UnityEngine;
 
 namespace InGame.Player.Controller
 {
-    public abstract class BasePlayerController
+    public abstract class BasePlayerController:IDisposable
     {
         public bool isMoving { get; private set; } = true;
-        private int _playerNum = -1;
+        public bool isUsed { get; private set; } = true;
         
         protected readonly PlayerMoveLogic playerMoveLogic;
         protected readonly PlayerJumpLogic playerJumpLogic;
@@ -27,8 +25,12 @@ namespace InGame.Player.Controller
         protected readonly PlayableCharacterSelectLogic playableCharacterSelectLogic;
         protected readonly PlayerTalkLogic playerTalkLogic;
         protected readonly List<IDisposable> disposables;
-        protected readonly IObservable<bool> onDead;
+        private readonly ReactiveProperty<bool> _moveStateChanged;
         
+        /// <summary>
+        /// Logicから使用中かのデータを受け取る
+        /// </summary>
+        public readonly IObservable<bool> onChangedUseDataUse;
 
         protected BasePlayerController(int playerNum,PlayerMoveLogic playerMoveLogic, PlayerJumpLogic playerJumpLogic,
             PlayerPunchLogic playerPunchLogic,
@@ -36,9 +38,8 @@ namespace InGame.Player.Controller
             PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic,
             PlayerParticleLogic playerParticleLogic, PlayerFixSweetsLogic playerFixSweetsLogic,
             PlayerEnterDoorLogic playerEnterDoorLogic, PlayableCharacterSelectLogic playableCharacterSelectLogic,
-            PlayerTalkLogic playerTalkLogic, List<IDisposable> disposables,IObservable<bool> onDead)
+            PlayerTalkLogic playerTalkLogic, List<IDisposable> disposables,IObservable<bool> onChangedUseDataUse)
         {
-            _playerNum = playerNum;
             this.playerMoveLogic = playerMoveLogic;
             this.playerJumpLogic = playerJumpLogic;
             this.playerPunchLogic = playerPunchLogic;
@@ -52,19 +53,23 @@ namespace InGame.Player.Controller
             this.playableCharacterSelectLogic = playableCharacterSelectLogic;
             this.playerTalkLogic = playerTalkLogic;
             this.disposables = disposables;
-            this.onDead = onDead;
+            this.onChangedUseDataUse = onChangedUseDataUse;
             RegisterObserver();
+            playerStatusLogic.SetInstalled();
         }
 
         private void RegisterObserver()
         {
-            onDead.Where(dead => dead)
-                .Subscribe(_ =>
+            onChangedUseDataUse.Subscribe(used =>
                 {
-                    foreach (var disposable in disposables)
+                    if (used)
                     {
-                        disposable.Dispose();
+                        ReStartPlayer();
+                        isUsed = true;
+                        return;
                     }
+                    StopPlayer();
+                    isUsed = false;
                 });
         }
 
@@ -76,40 +81,42 @@ namespace InGame.Player.Controller
             playerReShapeLogic.LateInit();
         }
         
-        public void FixedUpdateMoving()
+        public void FixedUpdate()
         {
-            playerMoveLogic.UpdatePlayerMove();
-            playerJumpLogic.UpdatePlayerJump();
-            playerReShapeLogic.UpdatePlayerDirection();
-            playerPunchLogic.UpdatePlayerPunch();
-            playerSkillLogic.UpdatePlayerSkill();
-            playerStatusLogic.UpdateAnimationStatus();
-            playerFixSweetsLogic.UpdatePlayerFixSweets();
-            playerEnterDoorLogic.UpdatePlayerEnterDoor();//MEMO: UpdatePlayerFixSweetsより前に実行しない
-            FixedUpdateEachPlayer();
-        }
-
-        public void StopPlayer()
-        {
-            isMoving = false;
-            playerFixSweetsLogic.Stop();
-            playerEnterDoorLogic.Stop();
-        }
-
-        public void ReStartPlayer()
-        {
-            isMoving = true;
-        }
-
-        public void FixedUpdateStopping()
-        {
+            if (isMoving)
+            {
+                playerMoveLogic.UpdatePlayerMove();
+                playerJumpLogic.UpdatePlayerJump();
+                playerReShapeLogic.UpdatePlayerDirection();
+                playerPunchLogic.UpdatePlayerPunch();
+                playerSkillLogic.UpdatePlayerSkill();
+                playerStatusLogic.UpdateAnimationStatus();
+                playerFixSweetsLogic.UpdatePlayerFixSweets();
+                playerEnterDoorLogic.UpdatePlayerEnterDoor();//MEMO: UpdatePlayerFixSweetsより前に実行しない
+                FixedUpdateEachPlayer();
+                return;
+            }
             playerMoveLogic.UpdateStopping();
             playerJumpLogic.UpdateStopping();
             playerPunchLogic.UpdateStopping();
             playerFixSweetsLogic.UpdateStopping();
             playerSkillLogic.UpdateStopping();
         }
-        
+
+        public void StopPlayer()
+        {
+            Debug.Log($"PlayerStop!");
+            playerFixSweetsLogic.Stop();
+            playerEnterDoorLogic.Stop();
+            isMoving = false;
+        }
+
+        public void ReStartPlayer()
+        {
+            Debug.Log($"PlayerReStart!");
+            isMoving = true;
+        }
+
         public PlayableCharacter GetCharacterType()
         {
             return playerStatusLogic.GetCharacterType();
@@ -127,7 +134,7 @@ namespace InGame.Player.Controller
         
         public int GetPlayerNum()
         {
-            return _playerNum;
+            return playerStatusLogic.GetPlayerNum();
         }
         
         public void StartTalk()
@@ -150,7 +157,8 @@ namespace InGame.Player.Controller
                     TryConsumeHealPower();
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(toPlayerEvent), toPlayerEvent, null);
+                    Debug.LogError($"ArgumentOutOfRangeException:{toPlayerEvent}");
+                    return;
             }
         }
 
@@ -158,6 +166,14 @@ namespace InGame.Player.Controller
         {
             //MEMO: クレー以外何もしない
         }
-        
+
+        public void Dispose()
+        {
+            _moveStateChanged?.Dispose();
+            foreach (var disposable in disposables)
+            {
+                disposable?.Dispose();
+            }
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace InGame.Colate.Logic
         {
             colateView.SetSprite(ColateSpriteType.RideChocolate);
             colateView.SetVelocity(new Vector2(0,colateEntity.SurfaceSpeed));
+            colateView.SetActiveGravity(false);
             base.Enter();
         }
 
@@ -34,6 +35,7 @@ namespace InGame.Colate.Logic
                 colateView.SetVelocity(Vector2.zero);
                 nextStateInstance=GetRandomColateState();
                 stage = Event.Exit;
+                return;
             }
             base.Update();
         }
@@ -43,7 +45,8 @@ namespace InGame.Colate.Logic
             int randomIndex=Random.Range(0, 2);
             if (randomIndex==0)
             {
-                return new DriftState(colateEntity, colateView,colateStatusView,spawnEnemyEvent);
+                //TODO: Driftを実装したらコメントアウト解除
+                //return new DriftState(colateEntity, colateView,colateStatusView,spawnEnemyEvent);
             }
 
             return new ThrowEnemiesState(colateEntity, colateView,colateStatusView,spawnEnemyEvent);

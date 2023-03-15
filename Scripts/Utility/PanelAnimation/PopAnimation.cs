@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -32,7 +31,7 @@ namespace Utility.PanelAnimation
                 {
                     _target.SetActive(true);
                 })
-                .AsyncWaitForCompletion();
+                .ToUniTask(cancellationToken:token);
         }
         
         /// <summary>
@@ -46,7 +45,7 @@ namespace Utility.PanelAnimation
                 {
                     _target.SetActive(false);
                 })
-                .AsyncWaitForCompletion();
+                .ToUniTask(cancellationToken:token);
         }
         
     }

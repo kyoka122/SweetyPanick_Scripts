@@ -125,7 +125,7 @@ namespace InGame.Enemy.Logic
             }
         }
 
-        private async UniTask ChangeDirectionTaskAsync(CancellationToken token)
+        protected async UniTask ChangeDirectionTaskAsync(CancellationToken token)
         {
             enemyView.PlayBoolAnimation(EnemyAnimatorStateName.Idle,true);
             float waitTime = enemyEntity.changeDirectionTime / 2;
@@ -215,11 +215,11 @@ namespace InGame.Enemy.Logic
             return sweets;
         }
         
-        private bool IsFacedWall()
+        protected bool IsFacedWall()
         {
             var direction = new Vector2(enemyView.enemyDirectionX, 0);
             RaycastHit2D raycastHit2D = Physics2D.Raycast(enemyView.CenterPos, direction,
-                enemyEntity.toWallDistance, LayerInfo.GroundMask);
+                enemyEntity.toWallDistance, LayerInfo.SideWallMask);
 
 #if UNITY_EDITOR
             if (enemyView.OnDrawRay)
@@ -438,7 +438,7 @@ namespace InGame.Enemy.Logic
             enemyView.Destroy();
         }
         
-        private void ChangeState(EnemyState state)
+        protected void ChangeState(EnemyState state)
         {
             enemyView.CancelChangeDirectionTokenSource();
             enemyView.CancelEatSweetsTokenSource();

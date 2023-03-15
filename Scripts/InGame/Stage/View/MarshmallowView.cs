@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace InGame.Stage.View
 {
-    public class MarshmallowView:DefaultGimmickSweetsView,IHighJumpAbleStand
+    public class MarshmallowView:DefaultGimmickSweetsView,IBoundAble
     {
         [SerializeField] private Animator animator;
         
-        public bool HighJumpAble => fixState==FixState.Fixed;
+        public bool BoundAble => fixState==FixState.Fixed;
         
         public void PlayPressAnimation()
         {
@@ -21,7 +21,7 @@ namespace InGame.Stage.View
 
         protected override void EachSweetsEvent()
         {
-            
+            gameObject.layer = LayerInfo.MarshmallowTrampoline;
         }
         
         public async virtual UniTask BreakSweets(float duration, CancellationToken token)

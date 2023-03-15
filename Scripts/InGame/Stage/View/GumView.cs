@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using MyApplication;
+using UniRx;
 using UnityEngine;
 using Utility.TransitionFade;
 
@@ -11,15 +12,16 @@ namespace InGame.Stage.View
     public class GumView : MonoBehaviour, ISweets
     {
         public CancellationToken cancellationToken { get; private set; }
-        public SweetsType type { get; } = SweetsType.Sweets;
+        public SweetsType type => SweetsType.Sweets;
         public FixState fixState { get; private set; }
-        
+        public ReactiveProperty<bool> onFix { get; private set; }
+
         private const PlayableCharacter EditableCharacterType = PlayableCharacter.Fu;
         
         [SerializeField] private SpriteRenderer fadeInSpriteRenderersAtFix;
         [SerializeField] private SpriteRenderer fadeOutSpriteRenderersAtFix;
         [SerializeField] private Transform particleInstanceTransform;
-        
+
         private bool Fading => _fadeInTransitionAtFix.IsActiveFadeIn() || _fadeInTransitionAtFix.IsActiveFadeOut() ||
                                _fadeOutTransitionAtFix.IsActiveFadeIn() || _fadeOutTransitionAtFix.IsActiveFadeOut();
         
@@ -32,6 +34,7 @@ namespace InGame.Stage.View
             _fadeInTransitionAtFix = new Transition(fadeInSpriteRenderersAtFix.material, this,1);
             _fadeOutTransitionAtFix = new Transition(fadeOutSpriteRenderersAtFix.material, this,0);
             fixState = FixState.Broken;
+            onFix = new ReactiveProperty<bool>();
         }
 
         public async UniTask FixSweets(float duration,CancellationToken token)
@@ -41,7 +44,7 @@ namespace InGame.Stage.View
             {
                 _fadeOutTransitionAtFix.FadeOut(duration);
                 _fadeInTransitionAtFix.FadeIn(duration);
-                await CheckFinishFixed(token);
+                await WaitFinishFixed(token);
             }
             catch (OperationCanceledException)
             {
@@ -53,6 +56,8 @@ namespace InGame.Stage.View
                 fixState = FixState.Broken;
                 return;
             }
+            fixState = FixState.Fixed;
+            onFix.Value = true;
             Debug.Log($"FixedSweets!");
         }
 
@@ -63,7 +68,7 @@ namespace InGame.Stage.View
             {
                 _fadeOutTransitionAtFix.FadeIn(duration);
                 _fadeInTransitionAtFix.FadeOut(duration);
-                await CheckFinishBroken(token);
+                await WaitFinishBroken(token);
             }
             catch (OperationCanceledException)
             {
@@ -75,6 +80,8 @@ namespace InGame.Stage.View
                 fixState = FixState.Fixed;
                 return;
             }
+            fixState = FixState.Broken;
+            onFix.Value = true;
             Debug.Log($"BrokenSweets!");
         }
 
@@ -108,27 +115,34 @@ namespace InGame.Stage.View
             return particleInstanceTransform.position;
         }
 
-        private async UniTask CheckFinishFixed(CancellationToken token)
+        private async UniTask WaitFinishFixed(CancellationToken token)
         {
             var fadeInTask = UniTask.WaitWhile(() => _fadeInTransitionAtFix.IsActiveFadeIn(),
                 cancellationToken: token);
             var fadeOutTask = UniTask.WaitWhile(() => _fadeOutTransitionAtFix.IsActiveFadeOut(),
                 cancellationToken: token);
             await UniTask.WhenAll(fadeInTask,fadeOutTask);
-            fixState = FixState.Fixed;
         }
         
-        private async UniTask CheckFinishBroken(CancellationToken token)
+        private async UniTask WaitFinishBroken(CancellationToken token)
         {
-            Debug.Log($"UniTask.WhenAll");
             var fadeInTask= UniTask.WaitWhile(() => _fadeInTransitionAtFix.IsActiveFadeOut(),
                 cancellationToken: token);
             var fadeOutTask= UniTask.WaitWhile(() => _fadeOutTransitionAtFix.IsActiveFadeIn(),
                 cancellationToken: token);
-            Debug.Log($"WaitStart!");
             await UniTask.WhenAll(fadeInTask,fadeOutTask);
-            Debug.Log($"TaskFinished!");
-            fixState = FixState.Broken;
+        }
+        
+        public void OnDestroy()
+        {
+            if (_fadeInTransitionAtFix.GetDisposeMaterial()!=null)
+            {
+                Destroy(_fadeInTransitionAtFix.GetDisposeMaterial());
+            }
+            if (_fadeOutTransitionAtFix.GetDisposeMaterial()!=null)
+            {
+                Destroy(_fadeOutTransitionAtFix.GetDisposeMaterial());
+            }
         }
     }
 }

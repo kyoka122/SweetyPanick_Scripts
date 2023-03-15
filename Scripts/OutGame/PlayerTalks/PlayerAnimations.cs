@@ -69,15 +69,8 @@ namespace OutGame.PlayerTalks
             var exitWorldPoint=camera.ViewportToWorldPoint(outOfScreenViewPos);
             exitWorldPoint = new Vector2(exitWorldPoint.x, transform.position.y);
 
-            try
-            {
-                await DOTween.Sequence(transform.DOMove(exitWorldPoint, exitTime)).AsyncWaitForCompletion();
-
-            }
-            catch (OperatorException)
-            {
-                Debug.Log($"Canceled Move");
-            }
+            await transform.DOMove(exitWorldPoint, exitTime)
+                .ToUniTask(cancellationToken: token);
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using InGame.Common.Database;
+﻿using System;
+using InGame.Common.Database;
 using InGame.Database;
+using InGame.SceneLoader;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.Database;
@@ -11,19 +13,29 @@ namespace SceneSequencer
 {
     public class EpilogueSequencer:BaseSceneSequencer
     {
+        private const float ToNextStageDelay = 1.0f;
+        private const float ToMoveSceneFadeOutDurationMin = 5.0f;
+        
         [SerializeField] private EpilogueBehaviour epilogueBehaviour;
 
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
             BGMManager.Instance.Stop();
             BGMManager.Instance.Play(BGMPath.PROLOGUE);
-            //MEMO: ↓のリストから入力情報を得られる。Joyconでストーリーを先に進めたい場合はこっち。
-            //_inputCaseUnknownController = new InputCaseUnknownController();
-            epilogueBehaviour.Init(MoveToNextScene);
+            epilogueBehaviour.Init(MoveToNextScene,outGameDatabase);
         }
 
-        protected override void ProcessInOrder()
+        protected override async void ProcessInOrder()
         {
+            try
+            {
+                await LoadManager.Instance.TryPlayFadeOut();
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log($"Cancel Loading");
+            }
+            epilogueBehaviour.CallStartTalk();
         }
 
         private void MoveToNextScene()
@@ -31,12 +43,25 @@ namespace SceneSequencer
             toNextSceneFlag.OnNext(SceneName.Score);
         }
 
-        protected override void Finish(string nextSceneName)
+        protected override async void Finish(string nextSceneName)
         {
             BGMManager.Instance.FadeOut(BGMPath.PROLOGUE, 2, () => {
                 Debug.Log("BGMフェードアウト終了");
             });
+            try
+            {
+                await LoadManager.Instance.TryPlayLoadScreen(ToNextStageDelay,ToMoveSceneFadeOutDurationMin);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log($"Cancel Loading");
+            }
             SceneManager.LoadScene(nextSceneName);
+        }
+        
+        private void OnDestroy()
+        {
+            epilogueBehaviour.Dispose();
         }
     }
 }

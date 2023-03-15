@@ -5,9 +5,9 @@ using InGame.Database;
 using InGame.Enemy;
 using InGame.Colate.Manager;
 using InGame.Common.Database;
+using InGame.Common.Database.ScriptableData;
 using InGame.Enemy.Installer;
 using InGame.Enemy.Interface;
-using InGame.Enemy.Logic;
 using InGame.MyCamera.Controller;
 using InGame.Player.Controller;
 using InGame.Stage.Installer;
@@ -26,16 +26,18 @@ namespace StageManager
         private readonly ColateController _colateController;
         private readonly ColateStageGimmickManager _stageGimmickManager;
         private readonly EnemyInstaller _enemyInstaller;
+        private readonly CameraData _battleCameraData;
         private readonly ColateInstaller _colateInstaller;
         private readonly CameraController _cameraController;
         private readonly Action<string> _moveNextSceneEvent;
 
         public ColateStageManager(ColateStageGimmickInstaller colateStageGimmickInstaller,CameraController cameraController,
-            InGameDatabase inGameDatabase, CommonDatabase commonDatabase,Action<string> moveNextSceneEvent)
+            CameraData battleCameraData, InGameDatabase inGameDatabase, CommonDatabase commonDatabase,Action<string> moveNextSceneEvent)
         {
             _stageGimmickManager = colateStageGimmickInstaller.Install(inGameDatabase);
             _cameraController = cameraController;
             _moveNextSceneEvent = moveNextSceneEvent;
+            _battleCameraData = battleCameraData;
             _controllers = new List<BasePlayerController>();
             _enemyInstaller = inGameDatabase.GetEnemyData().EnemyInstaller;
             _enemyManager = _enemyInstaller.Install();
@@ -68,7 +70,6 @@ namespace StageManager
 
         public void StartTalk()
         {
-            //TODO: Cameraのズーム
             foreach (var playerController in _controllers)
             {
                 playerController.StartTalk();
@@ -79,7 +80,7 @@ namespace StageManager
         
         public void StartBattle()
         {
-            //TODO: Cameraのズームアウト
+            _cameraController.SetCameraData(_battleCameraData);
             foreach (var playerController in _controllers)
             {
                 playerController.FinishTalk();
@@ -93,7 +94,7 @@ namespace StageManager
             {
                 if (controller.GetPlayerNum()==currentMovePlayer)
                 {
-                    controller.FixedUpdateMoving();
+                    controller.FixedUpdate();
                     break;
                 }
             }
@@ -109,6 +110,11 @@ namespace StageManager
             _stageGimmickManager.FixedUpdate();
         }
 
+        public void FixedUpdateCamera()
+        {
+            _cameraController.FixedUpdate();
+        }
+        
         public void FixedUpdateColate()
         {
             _colateController.FixedUpdate();
@@ -163,7 +169,7 @@ namespace StageManager
         private IColateOrderAble SpawnEnemyEvent(Vector2 spawnPos)
         {
             //MEMO: 今はとりあえずdefaultのエネミーのみ生成できる。
-            return _enemyInstaller.InstallDefaultEnemyByColate(_enemyManager);
+            return _enemyInstaller.InstallDefaultEnemyByColate(_enemyManager,spawnPos);
         }
         
 

@@ -41,7 +41,7 @@ namespace OutGame.PlayerCustom.Logic
 
         private void RegisterObserver()
         {
-            _inSceneDataEntity.hadFinishedPopUpWindow
+            _inSceneDataEntity.HadFinishedPopUpWindow
                 .Where(state => state == PlayerCustomState.Character)
                 .Subscribe(_ =>
                 {
@@ -49,7 +49,7 @@ namespace OutGame.PlayerCustom.Logic
                 })
                 .AddTo(_characterSelectPanelView);
             
-            _inSceneDataEntity.changedSettingsState
+            _inSceneDataEntity.ChangedSettingsState
                 .Where(state => state == PlayerCustomState.Character)
                 .Subscribe(_ =>
                 {

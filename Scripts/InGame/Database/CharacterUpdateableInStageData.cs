@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using MyApplication;
+using UnityEngine;
 
 namespace InGame.Database
 {
     //TODO: PlayerUpdateableDataにまとめる
-    public class CharacterUpdateableInStageData
+    public struct CharacterUpdateableInStageData
     {
         public bool isWarping;
+        public bool canTargetCamera;
         
         /// <summary>
         /// 0~1まで
@@ -16,13 +18,9 @@ namespace InGame.Database
         public CharacterUpdateableInStageData(Transform characterTransform)
         {
             isWarping = false;
+            canTargetCamera = false;
             nearnessFromTargetView = 1;
             transform = characterTransform;
-        }
-
-        public CharacterUpdateableInStageData Clone()
-        {
-            return MemberwiseClone() as CharacterUpdateableInStageData;
         }
     }
 }

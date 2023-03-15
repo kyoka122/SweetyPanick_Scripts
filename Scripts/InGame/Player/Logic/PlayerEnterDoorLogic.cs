@@ -26,11 +26,11 @@ namespace InGame.Player.Logic
 
         public void UpdatePlayerEnterDoor()
         {
+            _playerInputEntity.OffEnterDoorFlag();
             if (!_playerInputEntity.enterDoorFlag)
             {
                 return;
             }
-            _playerInputEntity.OffEnterDoorFlag();
             if (!CanEnterDoor())
             {
                 return;
@@ -38,7 +38,14 @@ namespace InGame.Player.Logic
             DoorView door = GetFacedDoor();
             if (door!=null)
             {
-                if (CanEnterDoorByKeyCheck(door.NeedToKey))
+#if UNITY_EDITOR
+                if (door.IsIgnoreKeyCheck)
+                {
+                    door.TryEnterDoor();
+                    return;
+                }
+#endif
+                if (CanEnterDoorByKeyCheck(door.IsKeyDoor))
                 {
                     door.TryEnterDoor();
                 }
@@ -73,9 +80,9 @@ namespace InGame.Player.Logic
             return door;
         }
 
-        private bool CanEnterDoorByKeyCheck(bool needToKey)
+        private bool CanEnterDoorByKeyCheck(bool isKeyDoor)
         {
-            if (!needToKey)
+            if (!isKeyDoor)
             {
                 return true;
             }

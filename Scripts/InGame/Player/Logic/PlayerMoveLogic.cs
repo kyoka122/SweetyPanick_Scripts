@@ -194,9 +194,9 @@ namespace InGame.Player.Logic
         private void WarpLastStandPos()
         {
             int fallDirection = (_playerView.GetPosition().x - _playerCommonInStageEntity.prevStandPos.x)>0 ? 1 : -1;
-                              var warpPos = new Vector2(_playerCommonInStageEntity.prevStandPos.x - 
-                                                        fallDirection * _playerConstEntity.WarpPosOffsetY,
-                                  _playerCommonInStageEntity.prevStandPos.y);
+            var warpPos = new Vector2(_playerCommonInStageEntity.prevStandPos.x - fallDirection * 
+                _playerConstEntity.WarpPosOffsetY, _playerCommonInStageEntity.prevStandPos.y);
+            Debug.Log($"prevStandPos: {_playerCommonInStageEntity.prevStandPos}");
             Warp(warpPos,_playerConstEntity.WarpDuration);
         }
         
@@ -220,7 +220,7 @@ namespace InGame.Player.Logic
         
         private async void Warp(Vector2 endPos,float duration)
         {
-            Debug.Log($"Warp endPos:{GetNearestPlayerPosition()}");
+            Debug.Log($"Warp! endPos:{GetNearestPlayerPosition()}");
             _playerCommonUpdateableEntity.SetWarping(true);
             _playerView.OffCollider();
             _playerView.OffSprite();

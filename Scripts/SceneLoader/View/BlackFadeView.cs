@@ -25,5 +25,15 @@ namespace InGame.SceneLoader.View
         {
             BlackScreenFader.SetFadeOutCondition();
         }
+        
+        public void OnDestroy()
+        {
+            if (BlackScreenFader?.GetDisposeMaterial()!=null)
+            {
+                Destroy(BlackScreenFader.GetDisposeMaterial());
+            }
+            InitOnFadeIn();
+        }
+
     }
 }

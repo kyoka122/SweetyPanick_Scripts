@@ -16,8 +16,7 @@ namespace InGame.Database.ScriptableData
         public Vector2 FixGimmickSweetsParticleSize => fixGimmickSweetsParticleSize;
         public float BackGroundMoveRateX => backGroundMoveRateX;
         public float BackGroundMoveRateY => backGroundMoveRateY;
-        public MainCameraView MainCameraViewPrefab => mainCameraViewPrefab;
-        public ViewGenerator ViewGenerator => viewGenerator;
+        public CameraInstaller CameraInstallerPrefab => cameraInstallerPrefab;
 
         [SerializeField] private SquareRange objectInScreenRange;
         [SerializeField] private SquareRange inPlayerGroupRange;
@@ -26,7 +25,7 @@ namespace InGame.Database.ScriptableData
         [SerializeField] private Vector2 fixGimmickSweetsParticleSize=new(2,2);
         [SerializeField] private float backGroundMoveRateX=0.9f;
         [SerializeField] private float backGroundMoveRateY=0.95f;
-        [SerializeField] private MainCameraView mainCameraViewPrefab;
-        [SerializeField] private ViewGenerator viewGenerator;
+        [SerializeField] private CameraInstaller cameraInstallerPrefab;
+        
     }
 }

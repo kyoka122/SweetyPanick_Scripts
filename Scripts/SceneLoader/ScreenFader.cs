@@ -84,5 +84,14 @@ namespace InGame.SceneLoader
         {
             _transition.TransitionFadeOutCondition();
         }
+        
+        /// <summary>
+        /// オブジェクトの破棄と同時にこのマテリアルも破棄する
+        /// </summary>
+        /// <returns></returns>
+        public Material GetDisposeMaterial()
+        {
+            return _transition.GetDisposeMaterial();
+        }
     }
 }

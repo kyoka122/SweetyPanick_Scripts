@@ -49,7 +49,6 @@ namespace StageManager
         
         public void LateInit()
         {
-            _stageGimmickManager.LateInit();
             foreach (var playerController in _controllers)
             {
                 playerController.LateInit();
@@ -62,7 +61,7 @@ namespace StageManager
             {
                 if (controller.GetPlayerNum()==currentMovePlayer)
                 {
-                    controller.FixedUpdateMoving();
+                    controller.FixedUpdate();
                     break;
                 }
 
@@ -74,6 +73,11 @@ namespace StageManager
         public void FixedUpdateStage()
         {
             _stageGimmickManager.FixedUpdate();
+        }
+        
+        public void FixedUpdateCamera()
+        {
+            _cameraController.FixedUpdate();
         }
 
         #region PlayerEvent

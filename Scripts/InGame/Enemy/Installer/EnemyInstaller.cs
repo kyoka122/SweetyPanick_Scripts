@@ -93,20 +93,20 @@ namespace InGame.Enemy.Installer
             return eternitySleepEnemyViewEntities.ToArray();
         }
         
-        public IColateOrderAble InstallDefaultEnemyByColate(EnemyManager enemyManager)
+        public IColateOrderAble InstallDefaultEnemyByColate(EnemyManager enemyManager,Vector2 spawnPos)
         {
-            DefaultEnemyView defaultEnemyView=SpawnRandomDefaultEnemy();
+            DefaultEnemyView defaultEnemyView=SpawnRandomDefaultEnemy(spawnPos);
             defaultEnemyView.Init();
-            enemyManager.AddEnemy(new DefaultEnemyLogic(new DefaultEnemyEntity(_inGameDatabase, _commonDatabase),
+            enemyManager.AddEnemy(new NotMoveLimitEnemyLogic(new DefaultEnemyEntity(_inGameDatabase, _commonDatabase),
                 defaultEnemyView));
             return defaultEnemyView;
         }
         
-        private DefaultEnemyView SpawnRandomDefaultEnemy()
+        private DefaultEnemyView SpawnRandomDefaultEnemy(Vector2 spawnPos)
         {
             int prefabLength=_inGameDatabase.GetEnemyData().DefaultEnemyPrefab.Length;
-            int random = Random.Range(0, prefabLength + 1);
-            return viewGenerator.GenerateDefaultEnemyView(_inGameDatabase.GetEnemyData().DefaultEnemyPrefab[random]);
+            int random = Random.Range(0, prefabLength);
+            return viewGenerator.GenerateDefaultEnemyView(_inGameDatabase.GetEnemyData().DefaultEnemyPrefab[random],spawnPos);
         }
 
         private StationaryEnemyView[] GetStationaryEnemyViews(BaseEnemyView[] enemyViews)

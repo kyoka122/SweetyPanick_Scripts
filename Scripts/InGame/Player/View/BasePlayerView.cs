@@ -214,16 +214,9 @@ namespace InGame.Player.View
 
         public async UniTask Warp(Vector2 endPos,float duration,CancellationToken token)
         {
-            try
-            {
-                await transform.DOMove(endPos, duration)
-                    .SetEase(Ease.InOutQuart)
-                    .AsyncWaitForCompletion();
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.Log($"WarpCanceled");
-            }
+            await transform.DOMove(endPos, duration)
+                .SetEase(Ease.InOutQuart)
+                .ToUniTask(cancellationToken: token);
         }
 
         public void Destroy()

@@ -20,7 +20,6 @@ namespace InGame.Player.Installer
             inGameDatabase.SetMashStatus(mashStatus);
             var mashView = viewGenerator.GenerateMash(inGameDatabase.GetMashConstData().Prefab);
             mashView.Init();
-            Debug.Log($"stageArea:{stageArea}");
             mashView.transform.position = inGameDatabase.GetPlayerInstancePositions(stageArea)
                 .MashInstancePos;
             var weaponView = mashView.GetWeaponObject().GetComponent<WeaponView>();
@@ -31,14 +30,14 @@ namespace InGame.Player.Installer
             
             var playerStatusView =
                 viewGenerator.GeneratePlayerStatusView(uiData.PlayerStatusView, uiData.Canvas.transform,uiData.PlayerStatusDataPos[playerNum-1]);
-            playerStatusView.Init(PlayableCharacterIndex.Mash,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Mash).maxHp);
+            playerStatusView.Init(PlayableCharacterIndex.Mash,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Mash).MaxHp);
             
             
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Mash);
             var mashConstEntity = new MashConstEntity(inGameDatabase);
             var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Mash,inGameDatabase);
-            var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, 
+            var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, commonDatabase,
                 PlayableCharacter.Mash,playerNum,mashView.GetTransform());
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
             
@@ -55,7 +54,8 @@ namespace InGame.Player.Installer
             var playerHealLogic = new PlayerHealLogic(playerConstEntity,playerCommonUpdateableEntity);
             var playerDamageLogic = new PlayerDamageLogic(mashView,playerAnimatorView, playerConstEntity,playerCommonInStageEntity,
                 playerCommonUpdateableEntity,playerStatusView);
-            var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity, mashView,playerAnimatorView);
+            var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity, 
+                playerCommonUpdateableEntity,mashView,playerAnimatorView);
             var playerParticleLogic = new PlayerParticleLogic(playerConstEntity, mashView, playerCommonInStageEntity);
             var playerFixSweetsLogic = new PlayerFixSweetsLogic(playerInputEntity, playerConstEntity,
                 playerCommonInStageEntity,playerCommonUpdateableEntity,  mashView,playerAnimatorView,particleGeneratorView);
@@ -63,13 +63,16 @@ namespace InGame.Player.Installer
                 playerCommonInStageEntity, mashView);
             var playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Mash);
-            var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, mashView);
+            var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, mashView,playerStatusView);
             
-            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity};
+            var disposables = new List<IDisposable>
+            {
+                playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity,playerAnimatorView
+            };
             
             return new MashController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, mashSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
-                playerEnterDoorLogic, playableCharacterSelectLogic,playerTalkLogic,disposables,playerCommonUpdateableEntity.OnDead);
+                playerEnterDoorLogic, playableCharacterSelectLogic,playerTalkLogic,disposables,playerCommonUpdateableEntity.OnUse);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace InGame.Player.Entity
         public IObservable<bool> OnPunch => _onPunch;
         public IObservable<bool> OnSkill => _onSkill;
         public IObservable<bool> OnFall => _onFall;
-        public bool IsGround => playerOnGroundType != GroundType.None;
+        public bool IsGround => onGroundType != GroundType.None;
         
         public ParticleSystem runningParticle{ get; private set; }
         public ParticleSystem onJumpParticle{ get; private set; }
@@ -33,10 +33,12 @@ namespace InGame.Player.Entity
         public ISweets currentFixingSweets { get; private set; }
         public Vector2 prevStandPos { get; private set; }
         public bool isOpeningMenu { get; private set; }
-        public GroundType playerOnGroundType { get; private set; }
-        public IHighJumpAbleStand highJumpAbleStand { get; private set; }
+        public GroundType onGroundType { get; private set; }
+        public IBoundAble BoundAble { get; private set; }
         public CancellationTokenSource fixingSweetsTokenSource { get; private set; }
-        public bool HavingKey => _inGameDatabase.GetInStageData().havingKey;
+        public float currentBoundDelayCount { get; private set; }
+        
+        public bool HavingKey => _inGameDatabase.GetAllStageData().havingKey;
         
         private readonly ReactiveProperty<bool> _isRunning;
         private readonly ReactiveProperty<bool> _isJumping;
@@ -57,7 +59,6 @@ namespace InGame.Player.Entity
             _onSkill = new Subject<bool>();
             _onFall = new Subject<bool>();
             _inGameDatabase = inGameDatabase;
-            _inGameDatabase.SetInStageData(new InStageData());
         }
         
         
@@ -163,30 +164,39 @@ namespace InGame.Player.Entity
 
         }
 
-        public void SetHighJumpAbleStand(IHighJumpAbleStand newStand)
+        public void SetHighJumpAbleStand(IBoundAble @new)
         {
-            highJumpAbleStand = newStand;
+            BoundAble = @new;
         }
         
         public void SetGroundType(GroundType groundType)
         {
-            playerOnGroundType = groundType;
+            onGroundType = groundType;
         }
 
+        public void AddCurrentBoundDelayCount()
+        {
+            currentBoundDelayCount++;
+        }
+        
+        public void ClearCurrentDelayCount()
+        {
+            currentBoundDelayCount = 0;
+        }
 
         
         public void AddScore(int score)
         {
-            InStageData data = _inGameDatabase.GetInStageData();
+            AllStageData data = _inGameDatabase.GetAllStageData();
             data.score += score;
-            _inGameDatabase.SetInStageData(data);
+            _inGameDatabase.SetAllStageData(data);
         }
 
         public void SetHavingKey(bool havingKey)
         {
-            InStageData data = _inGameDatabase.GetInStageData();
+            AllStageData data = _inGameDatabase.GetAllStageData();
             data.havingKey = havingKey;
-            _inGameDatabase.SetInStageData(data);
+            _inGameDatabase.SetAllStageData(data);
         }
 
         public void Dispose()
@@ -197,7 +207,6 @@ namespace InGame.Player.Entity
             _onPunch?.Dispose();
             _onSkill?.Dispose();
             _onFall?.Dispose();
-            _inGameDatabase?.Dispose();
             fixingSweetsTokenSource?.Dispose();
         }
     }

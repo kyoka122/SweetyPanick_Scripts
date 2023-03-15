@@ -12,11 +12,19 @@
     public static class StageAnimationClipName
     {
         public const string DoorAnimation = "DoorAnimation";
+        public const string KeyDoorAnimation = "KeyDoorAnimation";
         public static readonly string Heal = "HealAnimation";
     }
 
     public static class StageAnimationCallbackName
     {
-        public const string OnCrepeCameraShake = "OnCrepeCameraShake";
+        public const string OnCrepeImpact = "OnCrepeImpact";
+        public const string OnCrepeSoundLoop = "OnCrepeSoundLoop";
+        public const string OffCrepeSoundLoop = "OffCrepeSoundLoop";
+    }
+    
+    public static class ColateAnimatorParameter
+    {
+        public const string OnEffect = "OnEffect";//MEMO: 敵出現時のエフェクト
     }
 }

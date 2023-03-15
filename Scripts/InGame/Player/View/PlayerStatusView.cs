@@ -19,6 +19,11 @@ namespace InGame.Player.View
             hpSlider.maxValue = maxHp;
         }
         
+        public void SetActive(bool active)
+        {
+            gameObject.SetActive(active);
+        }
+        
         public bool IsActiveSelectPanel => characterSelectPanel.activeSelf;
         public void SetCharacterSelectPanel(bool active)
         {

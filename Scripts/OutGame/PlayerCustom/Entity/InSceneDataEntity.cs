@@ -2,11 +2,11 @@
 using System.Linq;
 using InGame.Common.Database;
 using InGame.Database;
-using InGame.MyInput;
+using Common.MyInput.Player;
 using MyApplication;
 using OutGame;
 using OutGame.Database;
-using OutGame.PlayerCustom.MyInput;
+using Common.MyInput.PlayerCustom;
 using UniRx;
 using Unity;
 using UnityEngine;
@@ -15,21 +15,21 @@ namespace OutGame.PlayerCustom.Entity
 {
     public class InSceneDataEntity
     {
-        public IReadOnlyReactiveProperty<PlayerCustomState> changedSettingsState => _settingsState;
-        public IReadOnlyReactiveProperty<PlayerCustomState> hadFinishedPopUpWindow => _hadFinishedPopUpWindow;
+        public IReadOnlyReactiveProperty<PlayerCustomState> ChangedSettingsState => _settingsState;
+        public IReadOnlyReactiveProperty<PlayerCustomState> HadFinishedPopUpWindow => _hadFinishedPopUpWindow;
         public PlayerCustomState PlayerCustomState => _settingsState.Value;
         public PlayerCustomState finishedPopUpWindowState => _hadFinishedPopUpWindow.Value;
-        public int MaxPlayerCount => _outGameDatabase.GetMaxPlayerCount();
+        public int MaxPlayerCount => _commonDatabase.GetMaxPlayerCount();
 
         /// <summary>
         /// コントローラー登録シーンで登録中のコントローラー
         /// </summary>
-        public IReadOnlyList<BaseCaseUnknownControllerInput> SelectedControllers => _selectedControllers;
+        public IReadOnlyList<BasePlayerCustomInput> SelectedControllers => _selectedControllers;
         
         /// <summary>
         /// コントローラー登録シーン終了後、データベースに保存したコントローラー
         /// </summary>ｓ
-        public IReadOnlyList<BaseCaseUnknownControllerInput> RegisteredPlayerSelectController => _outGameDatabase.GetAllCharacterSelectController();
+        public IReadOnlyList<BasePlayerCustomInput> RegisteredPlayerSelectController => _outGameDatabase.GetAllCharacterSelectController();
         
         /// <summary>
         /// 1~4まで
@@ -40,7 +40,7 @@ namespace OutGame.PlayerCustom.Entity
         public PlayerCustomState PrevPlayerCustomState { get; private set; }
         public List<UseCharacterData> useCharacterData { get; private set; }
 
-        private readonly List<BaseCaseUnknownControllerInput> _selectedControllers;
+        private readonly List<BasePlayerCustomInput> _selectedControllers;
 
 
         private readonly ReactiveProperty<PlayerCustomState> _settingsState;
@@ -52,7 +52,7 @@ namespace OutGame.PlayerCustom.Entity
         {
             _settingsState = new ReactiveProperty<PlayerCustomState>();
             _hadFinishedPopUpWindow = new ReactiveProperty<PlayerCustomState>();
-            _selectedControllers = new List<BaseCaseUnknownControllerInput>();
+            _selectedControllers = new List<BasePlayerCustomInput>();
             useCharacterData = new List<UseCharacterData>();
             _outGameDatabase = outGameDatabase;
             _commonDatabase = commonDatabase;
@@ -86,10 +86,10 @@ namespace OutGame.PlayerCustom.Entity
         
         public void SetMaxPlayerCount(int count)
         {
-            _outGameDatabase.SetMaxPlayerCount(count);
+            _commonDatabase.SetMaxPlayerCount(count);
         }
         
-        public void SetController(BaseCaseUnknownControllerInput input)
+        public void SetController(BasePlayerCustomInput input)
         {
             _selectedControllers.Add(input);
         }
@@ -101,18 +101,20 @@ namespace OutGame.PlayerCustom.Entity
 
         public void SetInGameControllerToDatabase()
         {
-            var inGameControllers =
-                _selectedControllers.Select(controller => controller.GetInGamePlayerInput()).ToList();
-
+            var inGameControllers = _selectedControllers
+                    .Select(controller => 
+                        InputMakeHelper.GeneratePlayerCustomInput(controller.DeviceType,controller.DeviceId))
+                    .ToList();
+            
             var controllerNumData = new List<ControllerNumData>();
             for (int i = 0; i < inGameControllers.Count; i++)
             {
                 controllerNumData.Add(new ControllerNumData(i + 1, inGameControllers[i]));
             }
-            _commonDatabase.SetControllerNumData(controllerNumData);
+            _commonDatabase.SetAllControllerData(controllerNumData);
         }
 
-        public void CancelRegisteredController(BaseCaseUnknownControllerInput input)
+        public void CancelRegisteredController(BasePlayerCustomInput input)
         {
             _selectedControllers.Remove(input);
         }

@@ -118,11 +118,29 @@ namespace MyInput
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PlayerSelectMove"",
+                    ""type"": ""Button"",
+                    ""id"": ""30a37dca-9032-4c9a-914e-119f8002e54e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Next"",
+                    ""type"": ""Button"",
+                    ""id"": ""098bc8b0-5c85-424a-a244-8d4756c25cf4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
                 {
-                    ""name"": ""1D Axis"",
+                    ""name"": ""Keyboard"",
                     ""id"": ""0346b61c-035a-497e-a0db-448e97b0979c"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -155,7 +173,7 @@ namespace MyInput
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""1D Axis"",
+                    ""name"": ""ProCon"",
                     ""id"": ""2ab29cf3-977a-419e-84a9-02b199553747"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -188,7 +206,7 @@ namespace MyInput
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""1D Axis"",
+                    ""name"": ""Xbox"",
                     ""id"": ""7c8f9573-5433-4d78-a7e5-ece6a0f528fc"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -256,7 +274,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""87617b60-de4a-4c41-b9c8-ba5ce1599e9d"",
-                    ""path"": ""<Keyboard>/#(E)"",
+                    ""path"": ""<Keyboard>/k"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -267,7 +285,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""acd09e95-fc85-41d6-9c03-7e5429866dff"",
-                    ""path"": ""<XInputController>/buttonNorth"",
+                    ""path"": ""<XInputController>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -278,7 +296,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""e948b5d1-a998-4abf-9fd3-8a31f4916b61"",
-                    ""path"": ""<SwitchProControllerHID>/buttonNorth"",
+                    ""path"": ""<SwitchProControllerHID>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -289,7 +307,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""a2851fa8-5b52-485d-b2c8-b1f0d274e71f"",
-                    ""path"": ""<Keyboard>/#(Q)"",
+                    ""path"": ""<Keyboard>/i"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -366,7 +384,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""7dac8ae5-06f5-4dd7-9d4b-1904753d3132"",
-                    ""path"": ""<Keyboard>/#(W)"",
+                    ""path"": ""<Keyboard>/l"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -377,7 +395,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""174fcd28-e13f-4ffe-8c4a-19d677dc921e"",
-                    ""path"": ""<XInputController>/buttonSouth"",
+                    ""path"": ""<XInputController>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -388,7 +406,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""2232c1a9-2126-438a-8bc4-692739975607"",
-                    ""path"": ""<SwitchProControllerHID>/buttonSouth"",
+                    ""path"": ""<SwitchProControllerHID>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -399,7 +417,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""0be6af19-e2cd-425b-9d7d-a45acdda3c96"",
-                    ""path"": ""<Keyboard>/c"",
+                    ""path"": ""<Keyboard>/o"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -450,17 +468,158 @@ namespace MyInput
                     ""action"": ""OnPlayerSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""957868cf-ae43-45a5-a3b9-ecbb1eab01dd"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ba8ff906-a7f2-4bf2-9893-420173c80aa0"",
+                    ""path"": ""<XInputController>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b33c6189-d834-40f7-81cc-787a4cd9b300"",
+                    ""path"": ""<SwitchProControllerHID>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""1c064f60-42f2-4545-9451-e625fc6b7598"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""7729f1d5-fd04-40be-92dc-36cc874b79be"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""22855234-8e68-4a13-9b21-0d552067e147"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Xbox"",
+                    ""id"": ""94a20c88-9bb3-4908-83ca-e015558f98c0"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""adecc533-2d87-48ad-9519-93575794cf61"",
+                    ""path"": ""<XInputController>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""b4a42080-3f24-46ac-b2bc-4d707fb55a49"",
+                    ""path"": ""<XInputController>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Procon"",
+                    ""id"": ""3a831209-c0c9-434e-ad32-1f8409b8dbdb"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""8d55eeb5-8648-434d-9c85-c43a42b1e87e"",
+                    ""path"": ""<SwitchProControllerHID>/dpad/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""15a33e21-e769-4365-8155-bae7fd748186"",
+                    ""path"": ""<SwitchProControllerHID>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PlayerSelectMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
         {
-            ""name"": ""TalkEnter"",
+            ""name"": ""Talk"",
             ""id"": ""9df0b4bb-d696-40eb-950f-c58b09507372"",
             ""actions"": [
                 {
-                    ""name"": ""Enter"",
+                    ""name"": ""Next"",
                     ""type"": ""Button"",
                     ""id"": ""5df14a37-4251-48a0-9b51-4d4b168e7cfa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Skip"",
+                    ""type"": ""Button"",
+                    ""id"": ""0a4c7700-71ca-4340-abfd-87b4077a6146"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -471,19 +630,74 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""2e923dea-0ba9-4c8c-a810-2b09bfd9a3ea"",
-                    ""path"": ""<Mouse>/leftButton"",
+                    ""path"": ""<Keyboard>/space"",
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Enter"",
+                    ""action"": ""Next"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""83219e90-4350-41cd-a946-5969b246da57"",
-                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""path"": ""<XInputController>/buttonEast"",
                     ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5ea83a48-698c-4876-9ca3-1e7bbf975c9b"",
+                    ""path"": ""<SwitchProControllerHID>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0fb136f2-d119-4b2e-a912-a857dfef4c1a"",
+                    ""path"": ""<SwitchProControllerHID>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Skip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""59304058-3a89-43a2-a61b-6ca50654aa32"",
+                    ""path"": ""<XInputController>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Skip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""14d62424-26b0-4a39-b672-b74f223c74e9"",
+                    ""path"": ""<Keyboard>/backspace"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Skip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2637034c-a0a9-47ca-bee1-73108f11ec7c"",
+                    ""path"": ""<SwitchProControllerHID>/buttonEast"",
+                    ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Enter"",
@@ -535,7 +749,7 @@ namespace MyInput
             ],
             ""bindings"": [
                 {
-                    ""name"": ""GamePadLeftStick"",
+                    ""name"": ""Xbox"",
                     ""id"": ""69df584f-a704-45f1-8016-5c986752baa3"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -548,7 +762,7 @@ namespace MyInput
                 {
                     ""name"": ""negative"",
                     ""id"": ""06e0def6-e0a8-46eb-9cda-5a9797975664"",
-                    ""path"": ""<Gamepad>/leftStick/left"",
+                    ""path"": ""<XInputController>/leftStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -559,7 +773,7 @@ namespace MyInput
                 {
                     ""name"": ""positive"",
                     ""id"": ""21a5d47e-9634-48d7-a14a-aba6cd97adea"",
-                    ""path"": ""<Gamepad>/leftStick/right"",
+                    ""path"": ""<XInputController>/leftStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -568,7 +782,7 @@ namespace MyInput
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""GamePadDPad"",
+                    ""name"": ""ProCon"",
                     ""id"": ""abf51382-9bc4-4cc5-8c78-e9b66a9dc5b7"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -581,7 +795,7 @@ namespace MyInput
                 {
                     ""name"": ""negative"",
                     ""id"": ""19a37073-189c-489e-8461-8a1d41b4911e"",
-                    ""path"": ""<Gamepad>/dpad/left"",
+                    ""path"": ""<SwitchProControllerHID>/leftStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -592,7 +806,7 @@ namespace MyInput
                 {
                     ""name"": ""positive"",
                     ""id"": ""256d59cb-ae68-44a8-a597-f388b69baf7b"",
-                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""path"": ""<SwitchProControllerHID>/leftStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -647,7 +861,7 @@ namespace MyInput
                 {
                     ""name"": ""negative"",
                     ""id"": ""51dc3a32-bca9-4d19-aab9-cebd814b755d"",
-                    ""path"": ""<Gamepad>/leftStick/down"",
+                    ""path"": ""<XInputController>/leftStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -658,7 +872,7 @@ namespace MyInput
                 {
                     ""name"": ""positive"",
                     ""id"": ""c01d49b0-32de-4aea-8232-43c03943b4ef"",
-                    ""path"": ""<Gamepad>/leftStick/up"",
+                    ""path"": ""<XInputController>/leftStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -667,7 +881,7 @@ namespace MyInput
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""GamePadDPad"",
+                    ""name"": ""ProCon"",
                     ""id"": ""76d6f0c9-a65d-4001-aae3-f6f7ff5294df"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -680,7 +894,7 @@ namespace MyInput
                 {
                     ""name"": ""negative"",
                     ""id"": ""9471e6cd-bf8e-48db-9596-2d951e665ce3"",
-                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""path"": ""<SwitchProControllerHID>/leftStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -691,7 +905,7 @@ namespace MyInput
                 {
                     ""name"": ""positive"",
                     ""id"": ""706979cf-2319-4b17-afcb-0c7ed6ed20e2"",
-                    ""path"": ""<Gamepad>/dpad/up"",
+                    ""path"": ""<SwitchProControllerHID>/leftStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -735,7 +949,7 @@ namespace MyInput
                 {
                     ""name"": """",
                     ""id"": ""21179f7d-025d-47dd-b9de-9516dfa1434c"",
-                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""path"": ""<XInputController>/buttonEast"",
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
@@ -756,8 +970,19 @@ namespace MyInput
                 },
                 {
                     ""name"": """",
+                    ""id"": ""0b1d74d9-f824-468f-a40e-08e6ff87a4e9"",
+                    ""path"": ""<SwitchProControllerHID>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""3e6bd2a1-533a-4517-aeb2-df0ae26135b2"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""path"": ""<XInputController>/buttonSouth"",
                     ""interactions"": ""Press"",
                     ""processors"": """",
                     ""groups"": """",
@@ -775,17 +1000,46 @@ namespace MyInput
                     ""action"": ""Back"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d815dae6-bbb5-44ee-9b5e-1e8a7ec8fcd1"",
+                    ""path"": ""<SwitchProControllerHID>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
         {
-            ""name"": ""AnyPress"",
-            ""id"": ""15d43d69-4a38-4c0e-82c3-b99389b86a6b"",
+            ""name"": ""Title"",
+            ""id"": ""2924a5f5-66ff-4df0-bd91-273002e08a67"",
             ""actions"": [
                 {
-                    ""name"": ""AnyKey"",
+                    ""name"": ""Credit"",
                     ""type"": ""Button"",
-                    ""id"": ""d21cd9a6-37d5-4f58-a0c5-5317a9fde74b"",
+                    ""id"": ""be6b2205-6f3e-4046-8afd-7bcd912f8148"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Scroll"",
+                    ""type"": ""Button"",
+                    ""id"": ""fc3e2bc2-2582-455b-873b-b65d09d40367"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Next"",
+                    ""type"": ""Button"",
+                    ""id"": ""c6769ead-46ee-4046-b2fa-eafcbc02ef15"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -795,12 +1049,216 @@ namespace MyInput
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""bbf43bd8-7759-408c-a4a7-1da6172b2f4d"",
-                    ""path"": ""<Keyboard>/anyKey"",
+                    ""id"": ""36b2df30-9c4f-4c4f-ae2d-86a662920595"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""54801d80-162f-454f-a0c4-f60a7948a986"",
+                    ""path"": ""<XInputController>/buttonEast"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""39a99e5c-c298-40a6-a1dc-21aaa2f04eb9"",
+                    ""path"": ""<SwitchProControllerHID>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""AnyKey"",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7b1d44ff-c3e6-471a-b6f5-21a83bcb0577"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Credit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""22decdb3-789a-4c99-b1c5-30d3bafbdb8c"",
+                    ""path"": ""<XInputController>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Credit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bd3c9fbd-0c51-4b73-b1da-58e5ea3b2757"",
+                    ""path"": ""<SwitchProControllerHID>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Credit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""GamePadLeftStick"",
+                    ""id"": ""acc02412-c5d5-4c3c-8a2f-542f14746b21"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""bb81a7d8-54bc-4c63-92ca-d4b685ce2cf9"",
+                    ""path"": ""<XInputController>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""fbaf972c-4d4f-4816-b0b3-9d9f94906cfc"",
+                    ""path"": ""<XInputController>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""ProCon"",
+                    ""id"": ""00e1a6d3-f294-49e6-b3a5-08f3d3408ad1"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""34084d15-a181-4b20-8c89-b24743297df3"",
+                    ""path"": ""<SwitchProControllerHID>/leftStick/left"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""02ee44a3-a68f-4a09-a97b-49be233239e6"",
+                    ""path"": ""<SwitchProControllerHID>/leftStick/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""7ff837dc-f146-4004-aa5c-b42564d259db"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""2e63f837-47af-4163-94c5-09a08637c451"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""5b0b88dd-b1e1-401f-bd26-d2493049686b"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
+        },
+        {
+            ""name"": ""Score"",
+            ""id"": ""79547074-38fb-4833-9132-52bbfb841d6c"",
+            ""actions"": [
+                {
+                    ""name"": ""Next"",
+                    ""type"": ""Button"",
+                    ""id"": ""2f2427fd-65cd-4d6b-9aba-8fa3af2e6ec7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""a77fe66d-1800-41bf-85bf-3db52cd6944e"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0ad4407b-7493-4ed1-b1ae-0157e467471d"",
+                    ""path"": ""<XInputController>/buttonEast"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""64b6d705-e96e-4b18-9935-16cc787d284f"",
+                    ""path"": ""<SwitchProControllerHID>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Next"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -821,18 +1279,26 @@ namespace MyInput
             m_Player_Player3 = m_Player.FindAction("Player3", throwIfNotFound: true);
             m_Player_Player4 = m_Player.FindAction("Player4", throwIfNotFound: true);
             m_Player_OnPlayerSelect = m_Player.FindAction("OnPlayerSelect", throwIfNotFound: true);
-            // TalkEnter
-            m_TalkEnter = asset.FindActionMap("TalkEnter", throwIfNotFound: true);
-            m_TalkEnter_Enter = m_TalkEnter.FindAction("Enter", throwIfNotFound: true);
+            m_Player_PlayerSelectMove = m_Player.FindAction("PlayerSelectMove", throwIfNotFound: true);
+            m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
+            // Talk
+            m_Talk = asset.FindActionMap("Talk", throwIfNotFound: true);
+            m_Talk_Next = m_Talk.FindAction("Next", throwIfNotFound: true);
+            m_Talk_Skip = m_Talk.FindAction("Skip", throwIfNotFound: true);
             // PlayerCustom
             m_PlayerCustom = asset.FindActionMap("PlayerCustom", throwIfNotFound: true);
             m_PlayerCustom_HorizontalMove = m_PlayerCustom.FindAction("HorizontalMove", throwIfNotFound: true);
             m_PlayerCustom_VerticalMove = m_PlayerCustom.FindAction("VerticalMove", throwIfNotFound: true);
             m_PlayerCustom_Next = m_PlayerCustom.FindAction("Next", throwIfNotFound: true);
             m_PlayerCustom_Back = m_PlayerCustom.FindAction("Back", throwIfNotFound: true);
-            // AnyPress
-            m_AnyPress = asset.FindActionMap("AnyPress", throwIfNotFound: true);
-            m_AnyPress_AnyKey = m_AnyPress.FindAction("AnyKey", throwIfNotFound: true);
+            // Title
+            m_Title = asset.FindActionMap("Title", throwIfNotFound: true);
+            m_Title_Credit = m_Title.FindAction("Credit", throwIfNotFound: true);
+            m_Title_Scroll = m_Title.FindAction("Scroll", throwIfNotFound: true);
+            m_Title_Next = m_Title.FindAction("Next", throwIfNotFound: true);
+            // Score
+            m_Score = asset.FindActionMap("Score", throwIfNotFound: true);
+            m_Score_Next = m_Score.FindAction("Next", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -902,6 +1368,8 @@ namespace MyInput
         private readonly InputAction m_Player_Player3;
         private readonly InputAction m_Player_Player4;
         private readonly InputAction m_Player_OnPlayerSelect;
+        private readonly InputAction m_Player_PlayerSelectMove;
+        private readonly InputAction m_Player_Next;
         public struct PlayerActions
         {
             private @InputMap m_Wrapper;
@@ -916,6 +1384,8 @@ namespace MyInput
             public InputAction @Player3 => m_Wrapper.m_Player_Player3;
             public InputAction @Player4 => m_Wrapper.m_Player_Player4;
             public InputAction @OnPlayerSelect => m_Wrapper.m_Player_OnPlayerSelect;
+            public InputAction @PlayerSelectMove => m_Wrapper.m_Player_PlayerSelectMove;
+            public InputAction @Next => m_Wrapper.m_Player_Next;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -955,6 +1425,12 @@ namespace MyInput
                     @OnPlayerSelect.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnOnPlayerSelect;
                     @OnPlayerSelect.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnOnPlayerSelect;
                     @OnPlayerSelect.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnOnPlayerSelect;
+                    @PlayerSelectMove.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlayerSelectMove;
+                    @PlayerSelectMove.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlayerSelectMove;
+                    @PlayerSelectMove.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPlayerSelectMove;
+                    @Next.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNext;
+                    @Next.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNext;
+                    @Next.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNext;
                 }
                 m_Wrapper.m_PlayerActionsCallbackInterface = instance;
                 if (instance != null)
@@ -989,43 +1465,57 @@ namespace MyInput
                     @OnPlayerSelect.started += instance.OnOnPlayerSelect;
                     @OnPlayerSelect.performed += instance.OnOnPlayerSelect;
                     @OnPlayerSelect.canceled += instance.OnOnPlayerSelect;
+                    @PlayerSelectMove.started += instance.OnPlayerSelectMove;
+                    @PlayerSelectMove.performed += instance.OnPlayerSelectMove;
+                    @PlayerSelectMove.canceled += instance.OnPlayerSelectMove;
+                    @Next.started += instance.OnNext;
+                    @Next.performed += instance.OnNext;
+                    @Next.canceled += instance.OnNext;
                 }
             }
         }
         public PlayerActions @Player => new PlayerActions(this);
 
-        // TalkEnter
-        private readonly InputActionMap m_TalkEnter;
-        private ITalkEnterActions m_TalkEnterActionsCallbackInterface;
-        private readonly InputAction m_TalkEnter_Enter;
-        public struct TalkEnterActions
+        // Talk
+        private readonly InputActionMap m_Talk;
+        private ITalkActions m_TalkActionsCallbackInterface;
+        private readonly InputAction m_Talk_Next;
+        private readonly InputAction m_Talk_Skip;
+        public struct TalkActions
         {
             private @InputMap m_Wrapper;
-            public TalkEnterActions(@InputMap wrapper) { m_Wrapper = wrapper; }
-            public InputAction @Enter => m_Wrapper.m_TalkEnter_Enter;
-            public InputActionMap Get() { return m_Wrapper.m_TalkEnter; }
+            public TalkActions(@InputMap wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Next => m_Wrapper.m_Talk_Next;
+            public InputAction @Skip => m_Wrapper.m_Talk_Skip;
+            public InputActionMap Get() { return m_Wrapper.m_Talk; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(TalkEnterActions set) { return set.Get(); }
-            public void SetCallbacks(ITalkEnterActions instance)
+            public static implicit operator InputActionMap(TalkActions set) { return set.Get(); }
+            public void SetCallbacks(ITalkActions instance)
             {
-                if (m_Wrapper.m_TalkEnterActionsCallbackInterface != null)
+                if (m_Wrapper.m_TalkActionsCallbackInterface != null)
                 {
-                    @Enter.started -= m_Wrapper.m_TalkEnterActionsCallbackInterface.OnEnter;
-                    @Enter.performed -= m_Wrapper.m_TalkEnterActionsCallbackInterface.OnEnter;
-                    @Enter.canceled -= m_Wrapper.m_TalkEnterActionsCallbackInterface.OnEnter;
+                    @Next.started -= m_Wrapper.m_TalkActionsCallbackInterface.OnNext;
+                    @Next.performed -= m_Wrapper.m_TalkActionsCallbackInterface.OnNext;
+                    @Next.canceled -= m_Wrapper.m_TalkActionsCallbackInterface.OnNext;
+                    @Skip.started -= m_Wrapper.m_TalkActionsCallbackInterface.OnSkip;
+                    @Skip.performed -= m_Wrapper.m_TalkActionsCallbackInterface.OnSkip;
+                    @Skip.canceled -= m_Wrapper.m_TalkActionsCallbackInterface.OnSkip;
                 }
-                m_Wrapper.m_TalkEnterActionsCallbackInterface = instance;
+                m_Wrapper.m_TalkActionsCallbackInterface = instance;
                 if (instance != null)
                 {
-                    @Enter.started += instance.OnEnter;
-                    @Enter.performed += instance.OnEnter;
-                    @Enter.canceled += instance.OnEnter;
+                    @Next.started += instance.OnNext;
+                    @Next.performed += instance.OnNext;
+                    @Next.canceled += instance.OnNext;
+                    @Skip.started += instance.OnSkip;
+                    @Skip.performed += instance.OnSkip;
+                    @Skip.canceled += instance.OnSkip;
                 }
             }
         }
-        public TalkEnterActions @TalkEnter => new TalkEnterActions(this);
+        public TalkActions @Talk => new TalkActions(this);
 
         // PlayerCustom
         private readonly InputActionMap m_PlayerCustom;
@@ -1084,38 +1574,87 @@ namespace MyInput
         }
         public PlayerCustomActions @PlayerCustom => new PlayerCustomActions(this);
 
-        // AnyPress
-        private readonly InputActionMap m_AnyPress;
-        private IAnyPressActions m_AnyPressActionsCallbackInterface;
-        private readonly InputAction m_AnyPress_AnyKey;
-        public struct AnyPressActions
+        // Title
+        private readonly InputActionMap m_Title;
+        private ITitleActions m_TitleActionsCallbackInterface;
+        private readonly InputAction m_Title_Credit;
+        private readonly InputAction m_Title_Scroll;
+        private readonly InputAction m_Title_Next;
+        public struct TitleActions
         {
             private @InputMap m_Wrapper;
-            public AnyPressActions(@InputMap wrapper) { m_Wrapper = wrapper; }
-            public InputAction @AnyKey => m_Wrapper.m_AnyPress_AnyKey;
-            public InputActionMap Get() { return m_Wrapper.m_AnyPress; }
+            public TitleActions(@InputMap wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Credit => m_Wrapper.m_Title_Credit;
+            public InputAction @Scroll => m_Wrapper.m_Title_Scroll;
+            public InputAction @Next => m_Wrapper.m_Title_Next;
+            public InputActionMap Get() { return m_Wrapper.m_Title; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
             public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(AnyPressActions set) { return set.Get(); }
-            public void SetCallbacks(IAnyPressActions instance)
+            public static implicit operator InputActionMap(TitleActions set) { return set.Get(); }
+            public void SetCallbacks(ITitleActions instance)
             {
-                if (m_Wrapper.m_AnyPressActionsCallbackInterface != null)
+                if (m_Wrapper.m_TitleActionsCallbackInterface != null)
                 {
-                    @AnyKey.started -= m_Wrapper.m_AnyPressActionsCallbackInterface.OnAnyKey;
-                    @AnyKey.performed -= m_Wrapper.m_AnyPressActionsCallbackInterface.OnAnyKey;
-                    @AnyKey.canceled -= m_Wrapper.m_AnyPressActionsCallbackInterface.OnAnyKey;
+                    @Credit.started -= m_Wrapper.m_TitleActionsCallbackInterface.OnCredit;
+                    @Credit.performed -= m_Wrapper.m_TitleActionsCallbackInterface.OnCredit;
+                    @Credit.canceled -= m_Wrapper.m_TitleActionsCallbackInterface.OnCredit;
+                    @Scroll.started -= m_Wrapper.m_TitleActionsCallbackInterface.OnScroll;
+                    @Scroll.performed -= m_Wrapper.m_TitleActionsCallbackInterface.OnScroll;
+                    @Scroll.canceled -= m_Wrapper.m_TitleActionsCallbackInterface.OnScroll;
+                    @Next.started -= m_Wrapper.m_TitleActionsCallbackInterface.OnNext;
+                    @Next.performed -= m_Wrapper.m_TitleActionsCallbackInterface.OnNext;
+                    @Next.canceled -= m_Wrapper.m_TitleActionsCallbackInterface.OnNext;
                 }
-                m_Wrapper.m_AnyPressActionsCallbackInterface = instance;
+                m_Wrapper.m_TitleActionsCallbackInterface = instance;
                 if (instance != null)
                 {
-                    @AnyKey.started += instance.OnAnyKey;
-                    @AnyKey.performed += instance.OnAnyKey;
-                    @AnyKey.canceled += instance.OnAnyKey;
+                    @Credit.started += instance.OnCredit;
+                    @Credit.performed += instance.OnCredit;
+                    @Credit.canceled += instance.OnCredit;
+                    @Scroll.started += instance.OnScroll;
+                    @Scroll.performed += instance.OnScroll;
+                    @Scroll.canceled += instance.OnScroll;
+                    @Next.started += instance.OnNext;
+                    @Next.performed += instance.OnNext;
+                    @Next.canceled += instance.OnNext;
                 }
             }
         }
-        public AnyPressActions @AnyPress => new AnyPressActions(this);
+        public TitleActions @Title => new TitleActions(this);
+
+        // Score
+        private readonly InputActionMap m_Score;
+        private IScoreActions m_ScoreActionsCallbackInterface;
+        private readonly InputAction m_Score_Next;
+        public struct ScoreActions
+        {
+            private @InputMap m_Wrapper;
+            public ScoreActions(@InputMap wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Next => m_Wrapper.m_Score_Next;
+            public InputActionMap Get() { return m_Wrapper.m_Score; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(ScoreActions set) { return set.Get(); }
+            public void SetCallbacks(IScoreActions instance)
+            {
+                if (m_Wrapper.m_ScoreActionsCallbackInterface != null)
+                {
+                    @Next.started -= m_Wrapper.m_ScoreActionsCallbackInterface.OnNext;
+                    @Next.performed -= m_Wrapper.m_ScoreActionsCallbackInterface.OnNext;
+                    @Next.canceled -= m_Wrapper.m_ScoreActionsCallbackInterface.OnNext;
+                }
+                m_Wrapper.m_ScoreActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @Next.started += instance.OnNext;
+                    @Next.performed += instance.OnNext;
+                    @Next.canceled += instance.OnNext;
+                }
+            }
+        }
+        public ScoreActions @Score => new ScoreActions(this);
         public interface IPlayerActions
         {
             void OnMove(InputAction.CallbackContext context);
@@ -1128,10 +1667,13 @@ namespace MyInput
             void OnPlayer3(InputAction.CallbackContext context);
             void OnPlayer4(InputAction.CallbackContext context);
             void OnOnPlayerSelect(InputAction.CallbackContext context);
+            void OnPlayerSelectMove(InputAction.CallbackContext context);
+            void OnNext(InputAction.CallbackContext context);
         }
-        public interface ITalkEnterActions
+        public interface ITalkActions
         {
-            void OnEnter(InputAction.CallbackContext context);
+            void OnNext(InputAction.CallbackContext context);
+            void OnSkip(InputAction.CallbackContext context);
         }
         public interface IPlayerCustomActions
         {
@@ -1140,9 +1682,15 @@ namespace MyInput
             void OnNext(InputAction.CallbackContext context);
             void OnBack(InputAction.CallbackContext context);
         }
-        public interface IAnyPressActions
+        public interface ITitleActions
         {
-            void OnAnyKey(InputAction.CallbackContext context);
+            void OnCredit(InputAction.CallbackContext context);
+            void OnScroll(InputAction.CallbackContext context);
+            void OnNext(InputAction.CallbackContext context);
+        }
+        public interface IScoreActions
+        {
+            void OnNext(InputAction.CallbackContext context);
         }
     }
 }

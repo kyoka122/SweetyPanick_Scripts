@@ -15,16 +15,12 @@ namespace InGame.Database
             _fixedSweetsSubject = new Subject<GimmickSweets>();
             _fixedSweets = new List<GimmickSweets>();
 
-            _candyUpdateableData = new ReactiveProperty<PlayerUpdateableData>();
-            _fuUpdateableData = new ReactiveProperty<PlayerUpdateableData>();
-            _mashUpdateableData = new ReactiveProperty<PlayerUpdateableData>();
-            _kureUpdateableData = new ReactiveProperty<PlayerUpdateableData>();
-            
             _candyInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
             _fuInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
             _mashInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
             _kureInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
             _playerInstancePositions = new Dictionary<StageArea, PlayerInstancePositions>();
+            _allStageData = new AllStageData();
         }
         
         ///////////////////////////////////////////////////////////////////////////
@@ -131,64 +127,53 @@ namespace InGame.Database
         
         #region PlayerUpdateableData
 
-        private readonly ReactiveProperty<PlayerUpdateableData> _candyUpdateableData;
-        private readonly ReactiveProperty<PlayerUpdateableData> _fuUpdateableData;
-        private readonly ReactiveProperty<PlayerUpdateableData> _mashUpdateableData;
-        private readonly ReactiveProperty<PlayerUpdateableData> _kureUpdateableData;
+        private PlayerUpdateableData _candyUpdateableData;
+        private PlayerUpdateableData _fuUpdateableData;
+        private PlayerUpdateableData _mashUpdateableData;
+        private PlayerUpdateableData _kureUpdateableData;
 
-        public IReadOnlyReactiveProperty<PlayerUpdateableData> GetPlayerUpdateableDataObserver(PlayableCharacter type)
+        public PlayerUpdateableData[] GetAllPlayerUpdateableData()
+        {
+            return new[]{_candyUpdateableData, _mashUpdateableData, _fuUpdateableData,_kureUpdateableData};
+        }
+        
+        public PlayerUpdateableData GetPlayerUpdateableData(PlayableCharacter type)
         {
             switch (type)
             {
                 case PlayableCharacter.Candy:
                     return _candyUpdateableData;
                 case PlayableCharacter.Mash:
-                    return _fuUpdateableData;
-                case PlayableCharacter.Fu:
                     return _mashUpdateableData;
+                case PlayableCharacter.Fu:
+                    return _fuUpdateableData;
                 case PlayableCharacter.Kure:
                     return _kureUpdateableData;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-        }
-        
-        public PlayerUpdateableData GetPlayerUpdatedData(PlayableCharacter type)
-        {
-            switch (type)
-            {
-                case PlayableCharacter.Candy:
-                    return _candyUpdateableData.Value;
-                case PlayableCharacter.Mash:
-                    return _mashUpdateableData.Value;
-                case PlayableCharacter.Fu:
-                    return _fuUpdateableData.Value;
-                case PlayableCharacter.Kure:
-                    return _kureUpdateableData.Value;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    Debug.LogError($"ArgumentOutOfRangeException. type{type}");
+                    return new PlayerUpdateableData();
             }
         }
 
         public void SetPlayerUpdateableData(PlayableCharacter type,PlayerUpdateableData playerUpdateableData)
         {
-            Debug.Log($"SetPlayerUpdateableData: {type}");
             switch (type)
             {
                 case PlayableCharacter.Candy:
-                    _candyUpdateableData.Value=playerUpdateableData.Clone();
+                    _candyUpdateableData=playerUpdateableData;
                     break;
                 case PlayableCharacter.Mash:
-                    _mashUpdateableData.Value=playerUpdateableData.Clone();
+                    _mashUpdateableData=playerUpdateableData;
                     break;
                 case PlayableCharacter.Fu:
-                    _fuUpdateableData.Value=playerUpdateableData.Clone();
+                    _fuUpdateableData=playerUpdateableData;
                     break;
                 case PlayableCharacter.Kure:
-                    _kureUpdateableData.Value=playerUpdateableData.Clone();
+                    _kureUpdateableData=playerUpdateableData;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    Debug.LogError($"ArgumentOutOfRangeException. type{type}");
+                    break;
             }
         }
 
@@ -199,43 +184,29 @@ namespace InGame.Database
         #region CharacterUpdateableInStageData
 
 
+        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> CandyInStageData=>_candyInStageData;
+        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> FuInStageData=>_fuInStageData;
+        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> MashInStageData=>_mashInStageData;
+        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> KureInStageData=>_kureInStageData;
+        
         private readonly ReactiveProperty<CharacterUpdateableInStageData> _candyInStageData;
         private readonly ReactiveProperty<CharacterUpdateableInStageData> _fuInStageData;
-        
         private readonly ReactiveProperty<CharacterUpdateableInStageData> _mashInStageData;
-        
         private readonly ReactiveProperty<CharacterUpdateableInStageData> _kureInStageData;
 
-        public CharacterUpdateableInStageData[] GetAllCharacterInStageData()
+        public Dictionary<PlayableCharacter,CharacterUpdateableInStageData> GetAllCharacterInStageData()
         {
-            var data = new List<CharacterUpdateableInStageData>();
-            data.Add(_candyInStageData.Value);
-            data.Add(_fuInStageData.Value);
-            data.Add(_mashInStageData.Value);
-            data.Add(_kureInStageData.Value);
-            
-            return data
-                .Where(characterInStageData => characterInStageData!= null)
-                .ToArray();
-        }
-        
-        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> GetCharacterInStageDataObserver(PlayableCharacter type)
-        {
-            switch (type)
+            var data = new Dictionary<PlayableCharacter,CharacterUpdateableInStageData>
             {
-                case PlayableCharacter.Candy:
-                    return _candyInStageData;
-                case PlayableCharacter.Fu:
-                    return _mashInStageData;
-                case PlayableCharacter.Mash:
-                    return _fuInStageData;
-                case PlayableCharacter.Kure:
-                    return _kureInStageData;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
+                {PlayableCharacter.Candy,_candyInStageData.Value}, 
+                {PlayableCharacter.Fu,_fuInStageData.Value},
+                {PlayableCharacter.Mash,_mashInStageData.Value},
+                {PlayableCharacter.Kure,_kureInStageData.Value}
+            };
+
+            return data;
         }
-        
+
         public CharacterUpdateableInStageData GetCharacterInStageData(PlayableCharacter type)
         {
             switch (type)
@@ -249,7 +220,8 @@ namespace InGame.Database
                 case PlayableCharacter.Kure:
                     return _kureInStageData.Value;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    Debug.LogError($"ArgumentOutOfRangeException:{nameof(type)}");
+                    return new CharacterUpdateableInStageData();
             }
         }
 
@@ -258,19 +230,20 @@ namespace InGame.Database
             switch (type)
             {
                 case PlayableCharacter.Candy:
-                    _candyInStageData.Value=characterUpdateableInStageData.Clone();
+                    _candyInStageData.Value=characterUpdateableInStageData;
                     break;
                 case PlayableCharacter.Mash:
-                    _mashInStageData.Value=characterUpdateableInStageData.Clone();
+                    _mashInStageData.Value=characterUpdateableInStageData;
                     break;
                 case PlayableCharacter.Fu:
-                    _fuInStageData.Value=characterUpdateableInStageData.Clone();
+                    _fuInStageData.Value=characterUpdateableInStageData;
                     break;
                 case PlayableCharacter.Kure:
-                    _kureInStageData.Value=characterUpdateableInStageData.Clone();
+                    _kureInStageData.Value=characterUpdateableInStageData;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                    Debug.LogError($"ArgumentOutOfRangeException:{nameof(type)}");
+                    break;
             }
         }
 
@@ -463,16 +436,16 @@ namespace InGame.Database
 
         
 
-        private InStageData _inStageData;
+        private AllStageData _allStageData;
         
-        public InStageData GetInStageData()
+        public AllStageData GetAllStageData()
         {
-            return _inStageData.Clone();
+            return _allStageData.Clone();
         }
 
-        public void SetInStageData(InStageData inStageData)
+        public void SetAllStageData(AllStageData allStageData)
         {
-            _inStageData = inStageData;
+            _allStageData = allStageData.Clone();
         }
 
         
@@ -510,30 +483,8 @@ namespace InGame.Database
 
         #endregion
 
-        
-        
-        #region Load
-
-        private SceneLoadData _sceneLoadData;
-        
-        public SceneLoadData GetSceneLoadData()
-        {
-            return _sceneLoadData;
-        }
-
-        public void SetSceneLoadData(SceneLoadData sceneLoadData)
-        {
-            _sceneLoadData = sceneLoadData;
-        }
-
-        #endregion
-
         public void Dispose()
         {
-            _candyUpdateableData?.Dispose();
-            _fuUpdateableData?.Dispose();
-            _mashUpdateableData?.Dispose();
-            _kureUpdateableData?.Dispose();
             _candyInStageData?.Dispose();
             _fuInStageData?.Dispose();
             _mashInStageData?.Dispose();

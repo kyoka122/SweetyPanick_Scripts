@@ -96,17 +96,13 @@ namespace InGame.Player.Logic
         {
             _playerCommonUpdateableEntity.SetCanDamageFlag(false);
             _playerView.SetLayer(LayerInfo.NotCollideEnemyPlayerNum);
-            try
-            {
-                await UniTask.WaitWhile(
-                    () => _playerAnimatorView.GetCurrentAnimationName() ==
-                          PlayerAnimationName.GetEachName(_playerView.type, PlayerAnimationName.OnDamaged),
-                    cancellationToken: _playerAnimatorView.thisToken);
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.Log($"NockBack Canceled");
-            }
+            string damaged=PlayerAnimationName.GetEachName(_playerView.type, PlayerAnimationName.Damaged);
+
+            await UniTask.WaitUntil(()=>IsPlayingThisAnimation(damaged), 
+                cancellationToken: _playerView.thisToken);
+            await UniTask.WaitWhile(()=>IsPlayingThisAnimation(damaged),
+                cancellationToken: _playerView.thisToken);
+            
             _playerView.SetLayer(LayerInfo.PlayerNum);
             _playerCommonUpdateableEntity.SetCanDamageFlag(true);
         }
@@ -114,9 +110,34 @@ namespace InGame.Player.Logic
         private async void Defeat()
         {
             _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.OnDeath, true);
-            await UniTask.Delay(TimeSpan.FromSeconds(3), cancellationToken:_playerView.thisToken);
-            _playerView.gameObject.SetActive(false);
-            //_playerConstEntity.ObjectInScreenRange
+            string death=PlayerAnimationName.GetEachName(_playerView.type, PlayerAnimationName.Death);
+            
+            await UniTask.WaitUntil(()=>IsPlayingThisAnimation(death), 
+                cancellationToken: _playerView.thisToken);
+            await UniTask.WaitUntil(()=>IsFinishedThisAnimation(death),
+                cancellationToken: _playerView.thisToken);
+
+            _playerCommonUpdateableEntity.SetCanDamageFlag(false);
+            _playerCommonUpdateableEntity.SetOnUseCharacter(false);
+            
+            //MEMO: シーン上に他にプレイヤーがいたら
+            if (_playerCommonUpdateableEntity.LivingPlayerCount>0)
+            {
+                _playerView.gameObject.SetActive(false);
+                _playerCommonUpdateableEntity.SetCanTarget(false);
+            }
         }
+
+        private bool IsPlayingThisAnimation(string animationName)
+        {
+            return _playerAnimatorView.GetCurrentAnimationName() == animationName;
+        }
+        
+        private bool IsFinishedThisAnimation(string animationName)
+        {
+            AnimatorStateInfo stateInfo = _playerAnimatorView.GetCurrentAnimationStateInfo();
+            return stateInfo.normalizedTime >= 1 && _playerAnimatorView.GetCurrentAnimationName() == animationName;
+        }
+        
     }
 }

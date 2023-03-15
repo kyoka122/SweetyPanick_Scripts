@@ -142,6 +142,7 @@
 
     public enum ColateSpriteType
     {
+        None,
         Stand,
         RideChocolate,
         Falling,
@@ -169,7 +170,102 @@
 
     public enum TalkPartActionType
     {
+        None,
         EnterBossStage,
     }
+    
+    public enum MedalType
+    {
+        None,
+        Gold,
+        Silver,
+        Bronze
+    }
 
+    public enum CharacterName{
+        Candy,
+        Fu,
+        Mash,
+        Kure,
+        Queen,
+        Narration,
+        Mob,
+        Colete
+    }
+    
+    public enum CandyFaceSpriteType
+    {
+        None,
+        Normal,
+        Kime,
+        Question,
+        Smile,
+        Blink,
+        Sob,
+        Cry,
+        Damage
+    }
+    
+    public enum FuFaceSpriteType
+    {
+        None,
+        Normal,
+        Akire,
+        Blink,
+        Damage,
+        Hiki,
+        Kime,
+        Jito
+    }
+    
+    public enum MashFaceSpriteType
+    {
+        None,
+        Normal,
+        Blink,
+        Sob,
+        Cry,
+        Damage,
+        Kime,
+        Smile,
+        Surprise,
+    }
+    
+    public enum KureFaceSpriteType
+    {
+        None,
+        Normal,
+        Angry,
+        Blink,
+        Damage,
+        Kime,
+        Akire,
+        Smile,
+        Surprise
+    }
+    
+    public enum QueenFaceSpriteType
+    {
+        None,
+        Normal,
+        Magao,
+        Nigawarai,
+        Question
+    }
+    
+    public enum MobFaceSpriteType
+    {
+        None,
+        Normal
+    }
+    
+    public enum ColateFaceSpriteType
+    {
+        None,
+        Normal,
+        Odoodo,
+        Giliri,
+        Angry,
+        Cry
+    }
 }

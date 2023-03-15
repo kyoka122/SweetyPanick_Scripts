@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MyApplication;
 using OutGame.Database.ScriptableData;
-using OutGame.PlayerCustom.MyInput;
+using Common.MyInput.PlayerCustom;
+using TalkSystem;
 using UniRx;
 
 namespace OutGame.Database
@@ -12,17 +13,29 @@ namespace OutGame.Database
     {
         public OutGameDatabase()
         {
-            _playerInputs = new List<BaseCaseUnknownControllerInput>();
             _talkStageData = new ReactiveProperty<TalkPartPlayerMoveData>();
-            _talkPartActionFinished = new ReactiveProperty<TalkPartActionType>();
+            _talkPartActionFinished = new ReactiveProperty<TalkPartActionType>(TalkPartActionType.None);
         }
+
+        #region TitleScene
+
+        private TitleSceneScriptableData _titleSceneScriptableData;
+
+        public void SetTitleSceneScriptableData(TitleSceneScriptableData titleSceneScriptableData)
+        {
+            _titleSceneScriptableData = titleSceneScriptableData;
+        }
+        
+        public TitleSceneScriptableData GetTitleSceneScriptableData()
+        {
+            return _titleSceneScriptableData;
+        }
+
+        #endregion
         
         #region PlayerCustomScene
 
         private PlayerCustomSceneScriptableData _playerCustomSceneData;
-        private bool _canCharacterSelect;
-        private int _maxPlayerCount;
-        private List<BaseCaseUnknownControllerInput> _playerInputs;
 
         public void SetPlayerCustomSceneData(PlayerCustomSceneScriptableData data)
         {
@@ -50,23 +63,11 @@ namespace OutGame.Database
         {
             return _playerInputs.Select(input=>input.);
         }*/
-        
-        
-        public void SetMaxPlayerCount(int count)
-        {
-            _maxPlayerCount = count;
-        }
-        
-        public int GetMaxPlayerCount()
-        {
-            return _maxPlayerCount;
-        } 
-        
 
+
+        private List<BasePlayerCustomInput> _unknownControllerInputs;
         
-        private List<BaseCaseUnknownControllerInput> _unknownControllerInputs;
-        
-        public void AddCharacterSelectController(BaseCaseUnknownControllerInput newInput)
+        public void AddCharacterSelectController(BasePlayerCustomInput newInput)
         {
             var duplicationData = _unknownControllerInputs.FirstOrDefault(input => input == newInput);
             if (duplicationData == null)
@@ -80,12 +81,12 @@ namespace OutGame.Database
             }
         }
         
-        public void SetCharacterSelectController(List<BaseCaseUnknownControllerInput> data)
+        public void SetCharacterSelectController(List<BasePlayerCustomInput> data)
         {
-            _unknownControllerInputs = new List<BaseCaseUnknownControllerInput>(data);
+            _unknownControllerInputs = new List<BasePlayerCustomInput>(data);
         }
 
-        public IReadOnlyList<BaseCaseUnknownControllerInput> GetAllCharacterSelectController()
+        public IReadOnlyList<BasePlayerCustomInput> GetAllCharacterSelectController()
         {
             return _unknownControllerInputs;
         }
@@ -96,16 +97,16 @@ namespace OutGame.Database
 
         #region BossStage
 
-        private BossStageScriptableData _bossStageScriptableData;
+        private ColateStageScriptableData _colateStageScriptableData;
         
-        public void SetBossStageScriptableData(BossStageScriptableData bossStageScriptableData)
+        public void SetColateStageScriptableData(ColateStageScriptableData colateStageScriptableData)
         {
-            _bossStageScriptableData = bossStageScriptableData;
+            _colateStageScriptableData = colateStageScriptableData;
         }
 
-        public BossStageScriptableData GetBossStageScriptableData()
+        public ColateStageScriptableData GetColateStageScriptableData()
         {
-            return _bossStageScriptableData;
+            return _colateStageScriptableData;
         }
         
         public IReadOnlyReactiveProperty<TalkPartPlayerMoveData> TalkStageData => _talkStageData;
@@ -126,6 +127,38 @@ namespace OutGame.Database
 
         #endregion
 
+        #region Dialog
+
+        private DialogFaceSpriteScriptableData _dialogFaceSpriteScriptableData;
+
+        public void SetDialogFaceSpriteScriptableData(DialogFaceSpriteScriptableData dialogFaceSpriteScriptableData)
+        {
+            _dialogFaceSpriteScriptableData = dialogFaceSpriteScriptableData;
+        }
+        
+        public DialogFaceSpriteScriptableData GetDialogFaceSpriteScriptableData()
+        {
+            return _dialogFaceSpriteScriptableData;
+        }
+
+        #endregion
+
+        #region TalkPart
+
+        private TalkPartUIScriptableData _talkPartUIScriptableData;
+
+        public void SetTalkPartUIScriptableData(TalkPartUIScriptableData  talkPartUIScriptableData)
+        {
+            _talkPartUIScriptableData = talkPartUIScriptableData;
+        }
+        
+        public TalkPartUIScriptableData GetTalkPartUIScriptableData()
+        {
+            return  _talkPartUIScriptableData;
+        }
+
+        #endregion
+        
         public void Dispose()
         {
             _talkStageData?.Dispose();

@@ -1,7 +1,4 @@
-﻿using InGame.Player.Installer;
-using InGame.Player.View;
-using MyApplication;
-using UnityEngine;
+﻿using MyApplication;
 
 namespace InGame.Database
 {
@@ -9,42 +6,46 @@ namespace InGame.Database
     {
         public PlayableCharacter characterType;
 
-        public int maxHp;
-        public float maxSpeed;
-        public float accelerateRateX;
-        public float decelerateRateXOnPunching;
-        public float decelerateRateX;
-        public float jumpValue;
-        public float highJumpValue;
-        public float toGroundDistance;
-        public float toSweetsDistance;
-        public float toSlopeDistance;
-        public float normalSweetsFixingTime;
-        public float gimmickSweetsFixingTime;
-        public float knockBackValue;
-        public float warpDuration;
-        public float warpPosOffsetY;
-        public float maxColliderSizeX;
-     
+        public int MaxHp { get; }
+        public float MaxSpeed{ get; }
+        public float AccelerateRateX{ get; }
+        public float DecelerateRateXOnPunching{ get; }
+        public float DecelerateRateX{ get; }
+        public int BoundDelayCount { get; }
+        public float BoundValue { get; }
+        public float JumpValue{ get; }
+        public float HighJumpValue{ get; }
+        public float ToGroundDistance{ get; }
+        public float ToSweetsDistance{ get; }
+        public float ToSlopeDistance{ get; }
+        public float NormalSweetsFixingTime{ get; }
+        public float GimmickSweetsFixingTime{ get; }
+        public float KnockBackValue{ get; }
+        public float WarpDuration{ get; }
+        public float WarpPosOffsetY{ get; }
+        public float MaxColliderSizeX{ get; }
+
         public BaseCharacterCommonStatus(CharacterBaseParameter characterBaseParameter)
         {
             characterType = characterBaseParameter.characterType;
-            maxHp = characterBaseParameter.maxHp;
-            maxSpeed = characterBaseParameter.maxSpeed;
-            accelerateRateX = characterBaseParameter.accelerateRateX;
-            decelerateRateXOnPunching = characterBaseParameter.decelerateRateXOnPunching;
-            decelerateRateX = characterBaseParameter.decelerateRateX;
-            jumpValue = characterBaseParameter.jumpValue;
-            highJumpValue = characterBaseParameter.highJumpValue;
-            toGroundDistance = characterBaseParameter.toGroundDistance;
-            toSweetsDistance = characterBaseParameter.toSweetsDistance;
-            toSlopeDistance = characterBaseParameter.toSlopeDistance;
-            normalSweetsFixingTime = characterBaseParameter.normalSweetsFixingTime;
-            gimmickSweetsFixingTime = characterBaseParameter.gimmickSweetsFixingTime;
-            knockBackValue = characterBaseParameter.knockBackValue*10;
-            warpDuration = characterBaseParameter.warpDuration;
-            warpPosOffsetY = characterBaseParameter.warpPoaOffsetY;
-            maxColliderSizeX=characterBaseParameter.maxColliderSizeX;
+            MaxHp = characterBaseParameter.maxHp;
+            MaxSpeed = characterBaseParameter.maxSpeed;
+            AccelerateRateX = characterBaseParameter.accelerateRateX;
+            DecelerateRateXOnPunching = characterBaseParameter.decelerateRateXOnPunching;
+            DecelerateRateX = characterBaseParameter.decelerateRateX;
+            BoundDelayCount=characterBaseParameter.boundDelayCount;
+            BoundValue=characterBaseParameter.boundValue;
+            JumpValue = characterBaseParameter.jumpValue;
+            HighJumpValue = characterBaseParameter.highJumpValue;
+            ToGroundDistance = characterBaseParameter.toGroundDistance;
+            ToSweetsDistance = characterBaseParameter.toSweetsDistance;
+            ToSlopeDistance = characterBaseParameter.toSlopeDistance;
+            NormalSweetsFixingTime = characterBaseParameter.normalSweetsFixingTime;
+            GimmickSweetsFixingTime = characterBaseParameter.gimmickSweetsFixingTime;
+            KnockBackValue = characterBaseParameter.knockBackValue*10;
+            WarpDuration = characterBaseParameter.warpDuration;
+            WarpPosOffsetY = characterBaseParameter.warpPoaOffsetY;
+            MaxColliderSizeX=characterBaseParameter.maxColliderSizeX;
         }
         
     }

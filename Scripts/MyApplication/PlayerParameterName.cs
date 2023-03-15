@@ -33,8 +33,8 @@ namespace MyApplication
         public static readonly string OnFix = "GimmickFixStart";
         public static readonly string Fixing = "GimmickFix";
         public static readonly string Fixed = "GimmickFixEnd";
-        public static readonly string OnDamaged = "OnDamaged";
-        public static readonly string OnDeath = "OnDeath";
+        public static readonly string Damaged = "Damaged";
+        public static readonly string Death = "Death";
 
         public static string GetEachName(PlayableCharacter character,string actionName)
         {

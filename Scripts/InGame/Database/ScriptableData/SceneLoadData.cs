@@ -12,8 +12,9 @@ namespace InGame.Database.ScriptableData
         public float LoadBackgroundFadeOutDuration => loadBackgroundFadeOutDuration;
         public float WaveScrollSpeed => waveScrollSpeed;
         public float BackgroundScrollSpeed => backgroundScrollSpeed;
-        
-        
+        public float GameOverFadeInDuration => gameOverFadeInDuration;
+
+
         //[SerializeField] private float longLoaderXSize=18;
         [SerializeField,Header("黒背景のフェードインにかかる時間")] private float blackScreenFadeInDuration=1.5f;
         [SerializeField,Header("黒背景のフェードアウトにかかる時間")] private float blackScreenFadeOutDuration=1.5f;
@@ -23,6 +24,7 @@ namespace InGame.Database.ScriptableData
         [SerializeField,Header("ロード背景のフェードアウトにかかる時間")] private float loadBackgroundFadeOutDuration=1.5f;
         [SerializeField] private float waveScrollSpeed = 1;
         [SerializeField] private float backgroundScrollSpeed = 1;
+        [SerializeField] private float gameOverFadeInDuration = 3;
 
     }
 }

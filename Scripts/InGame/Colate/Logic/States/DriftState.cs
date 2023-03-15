@@ -27,6 +27,7 @@ namespace InGame.Colate.Logic
 
         protected override void Update()
         {
+            Drift();
             if (nextStateInstance!=null)
             {
                 stage = Event.Exit;

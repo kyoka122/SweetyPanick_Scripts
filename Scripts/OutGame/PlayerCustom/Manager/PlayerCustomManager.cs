@@ -5,22 +5,22 @@ namespace OutGame.PlayerCustom.Manager
 {
     public class PlayerCustomManager:IDisposable
     {
-        private PanelLogic _panelLogic;
-        private PlayerCountButtonLogic _playerCountButtonLogic;
-        private PlayerControllerLogic _playerControllerLogic;
-        private CharacterSelectLogic _characterSelectLogic;
-        private ConfirmLogic _confirmLogic;
-        private IDisposable[] _disposables;
+        private readonly PanelLogic _panelLogic;
+        private readonly PlayerCountButtonLogic _playerCountButtonLogic;
+        private readonly ControllerLogic _controllerLogic;
+        private readonly CharacterSelectLogic _characterSelectLogic;
+        private readonly FinishTalkLogic _finishTalkLogic;
+        private readonly IDisposable[] _disposables;
 
         public PlayerCustomManager(PanelLogic panelLogic, PlayerCountButtonLogic playerCountButtonLogic,
-            PlayerControllerLogic playerControllerLogic, CharacterSelectLogic characterSelectLogic,
-            ConfirmLogic confirmLogic,IDisposable[] disposables)
+            ControllerLogic controllerLogic, CharacterSelectLogic characterSelectLogic,
+            FinishTalkLogic finishTalkLogic,IDisposable[] disposables)
         {
             _panelLogic = panelLogic;
             _playerCountButtonLogic = playerCountButtonLogic;
-            _playerControllerLogic = playerControllerLogic;
+            _controllerLogic = controllerLogic;
             _characterSelectLogic = characterSelectLogic;
-            _confirmLogic = confirmLogic;
+            _finishTalkLogic = finishTalkLogic;
             _disposables = disposables;
         }
 

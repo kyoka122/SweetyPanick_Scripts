@@ -1,11 +1,12 @@
 ﻿using System;
 using Cinemachine;
+using DG.Tweening;
 using InGame.MyCamera.Interface;
 using UnityEngine;
 
 namespace InGame.MyCamera.View
 {
-    public class MainCameraView:MonoBehaviour,IReadOnlyCameraFunction,ICameraEvent
+    public class MainCameraView:MonoBehaviour,IReadOnlyCameraFunction,ICameraActionable
     {
         private CinemachineTargetGroup _targetGroup;
         private CinemachineImpulseSource _cinemachineImpulseSource;
@@ -32,7 +33,12 @@ namespace InGame.MyCamera.View
         {
             return _cameraTransform.position;
         }
-        
+
+        public Vector2 GetSize()
+        {
+            return _cameraTransform.localScale;
+        }
+
         public Vector2 WorldToViewPortPoint(Vector2 position)
         {
             return _camera.WorldToViewportPoint(position);
@@ -87,6 +93,11 @@ namespace InGame.MyCamera.View
             }
         }
 
+        public Transform GetCameraTransform()
+        {
+            return _cameraTransform;
+        }
+
         public void ChangeWeight(Transform characterTransform,float weight)
         {
             if (weight<0||1<weight)
@@ -112,10 +123,16 @@ namespace InGame.MyCamera.View
         {
             transform.position = pos;
         }
-
-        public void SetSize(float size)
+        
+        public void DoMoveXYPosition(Vector2 pos,float duration)
         {
-            _camera.orthographicSize = size;
+            transform.DOMove(new Vector3(pos.x,pos.y,transform.position.z),duration);
+        }
+
+        public void DoSize(float size,float duration)
+        {
+            DOTween.To(() => _camera.orthographicSize, val =>_camera.orthographicSize = val, 
+                size, duration);
         }
     }
 }

@@ -1,16 +1,10 @@
 ﻿namespace InGame.Database
 {
     /// <summary>
-    /// ステージ全体に関わるデータ
+    /// そのステージで保持されるデータ（ステージが変わるごとに更新）
     /// </summary>
     public class InStageData
     {
-        public bool havingKey;
-        public int score;
         
-        public InStageData Clone()
-        {
-            return (InStageData) MemberwiseClone();
-        }
     }
 }

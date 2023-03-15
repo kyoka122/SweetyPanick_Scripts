@@ -1,4 +1,4 @@
-﻿using InGame.MyInput;
+﻿using Common.MyInput.Player;
 
 namespace InGame.Database
 {

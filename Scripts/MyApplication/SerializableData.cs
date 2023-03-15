@@ -2,6 +2,7 @@
 using InGame.Player.Installer;
 using InGame.Stage.View;
 using InGame.Player.View;
+using TalkSystem;
 using UnityEngine;
 
 namespace MyApplication
@@ -83,6 +84,8 @@ namespace MyApplication
         public float accelerateRateX=1.02f;
         public float decelerateRateXOnPunching=0.95f;
         public float decelerateRateX=0.89f;
+        public int boundDelayCount = 12;
+        public float boundValue=3;
         public float jumpValue=5;
         public float highJumpValue=8;
         public float toGroundDistance=1;
@@ -94,6 +97,7 @@ namespace MyApplication
         public float warpDuration=1;
         public float warpPoaOffsetY=1;
         public float maxColliderSizeX=1.3f;
+
 
         public CharacterBaseParameter Clone()
         {
@@ -138,5 +142,117 @@ namespace MyApplication
 
         [SerializeField] private MyInputDeviceType type;
         [SerializeField] private GameObject imageObj;
+    }
+    
+    [Serializable]
+    public class MedalImages
+    {
+        public MedalType Type => type;
+        public Sprite Sprite => sprite;
+        public int Score => score;
+            
+        [SerializeField] private MedalType type;
+        [SerializeField] private Sprite sprite;
+        [SerializeField,Tooltip("このスコアより大きいスコアを取るとメダルimageのメダルになる")] private int score;
+    }
+
+
+    #region FaceSprite
+
+    [Serializable]
+    public class CandyFaceData
+    {
+        public CandyFaceSpriteType Type=>type;
+        public Sprite Sprite=>sprite;
+        
+        [SerializeField] private CandyFaceSpriteType type;
+        [SerializeField] private Sprite sprite;
+    }
+    
+    [Serializable]
+    public class FuFaceData
+    {
+        public FuFaceSpriteType Type=>type;
+        public Sprite Sprite=>sprite;
+        
+        [SerializeField] private FuFaceSpriteType type;
+        [SerializeField] private Sprite sprite;
+    }
+    
+    [Serializable]
+    public class MashFaceData
+    {
+        public MashFaceSpriteType Type=>type;
+        public Sprite Sprite=>sprite;
+        
+        [SerializeField] private MashFaceSpriteType type;
+        [SerializeField] private Sprite sprite;
+    }
+    
+    [Serializable]
+    public class KureFaceData
+    {
+        public KureFaceSpriteType Type=>type;
+        public Sprite Sprite=>sprite;
+        
+        [SerializeField] private KureFaceSpriteType type;
+        [SerializeField] private Sprite sprite;
+    }
+    
+    [Serializable]
+    public class QueenFaceData
+    {
+        public QueenFaceSpriteType Type=>type;
+        public Sprite Sprite=>sprite;
+        
+        [SerializeField] private QueenFaceSpriteType type;
+        [SerializeField] private Sprite sprite;
+    }
+    
+    [Serializable]
+    public class MobFaceData
+    {
+        public MobFaceSpriteType Type=>type;
+        public Sprite Sprite=>sprite;
+        
+        [SerializeField] private MobFaceSpriteType type;
+        [SerializeField] private Sprite sprite;
+    }
+    
+    [Serializable]
+    public class ColateFaceData
+    {
+        public ColateFaceSpriteType Type=>type;
+        public Sprite Sprite=>sprite;
+        
+        [SerializeField] private ColateFaceSpriteType type;
+        [SerializeField] private Sprite sprite;
+    }
+
+    #endregion
+   
+    /// <summary>
+    /// CharacterNameによってインスペクタでのFaceSpriteTypeの表示は1つに選ばれます
+    /// </summary>
+    [Serializable]
+    public class DialogFaceSpriteData
+    {
+        public CharacterName Name=>name;
+        public CandyFaceSpriteType CandyFace=>candyFace;
+        public FuFaceSpriteType FuFace=>fuFace;
+        public MashFaceSpriteType MashFace=>mashFace;
+        public KureFaceSpriteType KureFace=>kureFace;
+        public QueenFaceSpriteType QueenFace=>queenFace;
+        public MobFaceSpriteType MobFace=>mobFace;
+        public ColateFaceSpriteType ColateFace=>colateFace;
+        
+        [SerializeField] private CharacterName name;
+        [SerializeField] private CandyFaceSpriteType candyFace;
+        [SerializeField] private FuFaceSpriteType fuFace;
+        [SerializeField] private MashFaceSpriteType mashFace;
+        [SerializeField] private KureFaceSpriteType kureFace;
+        [SerializeField] private QueenFaceSpriteType queenFace;
+        [SerializeField] private MobFaceSpriteType mobFace;
+        [SerializeField] private ColateFaceSpriteType colateFace;
     }
 }

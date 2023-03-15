@@ -31,12 +31,12 @@ namespace InGame.Player.Installer
             
             var playerStatusView =
                 viewGenerator.GeneratePlayerStatusView(uiData.PlayerStatusView, uiData.Canvas.transform,uiData.PlayerStatusDataPos[playerNum-1]);
-            playerStatusView.Init(PlayableCharacterIndex.Fu,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Fu).maxHp);
+            playerStatusView.Init(PlayableCharacterIndex.Fu,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Fu).MaxHp);
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Fu);
             var fuConstEntity = new FuConstEntity(inGameDatabase);
             var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Fu,inGameDatabase);
-            var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, 
+            var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, commonDatabase,
                 PlayableCharacter.Fu,playerNum,fuView.GetTransform());
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
             
@@ -53,7 +53,8 @@ namespace InGame.Player.Installer
             var playerHealLogic = new PlayerHealLogic(playerConstEntity,playerCommonUpdateableEntity);
             var playerDamageLogic = new PlayerDamageLogic(fuView,playerAnimatorView, playerConstEntity,playerCommonInStageEntity
                 ,playerCommonUpdateableEntity,playerStatusView);
-            var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity, fuView,playerAnimatorView);
+            var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity,
+                playerCommonUpdateableEntity, fuView,playerAnimatorView);
             var playerParticleLogic = new PlayerParticleLogic(playerConstEntity, fuView, playerCommonInStageEntity);
             var playerFixSweetsLogic = new PlayerFixSweetsLogic(playerInputEntity, playerConstEntity,
                 playerCommonInStageEntity,playerCommonUpdateableEntity, fuView,playerAnimatorView,particleGeneratorView);
@@ -61,13 +62,17 @@ namespace InGame.Player.Installer
                 playerCommonInStageEntity, fuView);
             var playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity, 
                 playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Fu);
-            var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, fuView);
+            var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, fuView,playerStatusView);
             
-            var disposables = new List<IDisposable> {playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity};
+            var disposables = new List<IDisposable>
+            {
+                playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity,playerAnimatorView
+                
+            };
 
             return new FuController(playerNum, playerMoveLogic, playerJumpLogic, playerPunchLogic, fuSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
-                playerEnterDoorLogic, playableCharacterSelectLogic, playerTalkLogic,disposables, playerCommonUpdateableEntity.OnDead);
+                playerEnterDoorLogic, playableCharacterSelectLogic, playerTalkLogic,disposables, playerCommonUpdateableEntity.OnUse);
         }
     }
 }

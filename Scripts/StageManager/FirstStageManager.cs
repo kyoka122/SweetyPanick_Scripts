@@ -11,6 +11,7 @@ using InGame.SceneLoader;
 using InGame.Stage.Installer;
 using InGame.Stage.Manager;
 using MyApplication;
+using UniRx;
 using UnityEngine;
 
 namespace StageManager
@@ -35,13 +36,14 @@ namespace StageManager
             _moveNextSceneEvent = moveNextSceneEvent;
             _controllers = new List<BasePlayerController>();
             _enemyManager = inGameDatabase.GetEnemyData().EnemyInstaller.InstallWithStageEnemies();
-            MoveStage(StageArea.FirstStageFirst);
+            InitAtStageMove(StageArea.FirstStageFirst);
         }
         
 
         public void AddController(BasePlayerController controller)
         {
             _controllers.Add(controller);
+            RegisterUsePlayerObserver(controller);
         }
         
         public void FixedUpdateEnemy()
@@ -51,7 +53,6 @@ namespace StageManager
 
         public void LateInit()
         {
-            _stageGimmickManager.LateInit();
             foreach (var playerController in _controllers)
             {
                 playerController.LateInit();
@@ -62,16 +63,7 @@ namespace StageManager
         {
             var playerController=_controllers
                 .FirstOrDefault(controller => controller.GetPlayerNum() == currentMovePlayer);
-            if (playerController==null)
-            {
-                return;
-            }
-            if (playerController.isMoving)
-            {
-                playerController.FixedUpdateMoving();
-                return;
-            }
-            playerController.FixedUpdateStopping();
+            playerController?.FixedUpdate();
         }
 
         public void FixedUpdateStage()
@@ -79,13 +71,29 @@ namespace StageManager
             _stageGimmickManager.FixedUpdate();
         }
         
-        public void LateUpdate()
+        public void LateUpdateBackGround()
         {
-            _stageGimmickManager.LateUpdate();
+            _stageGimmickManager.LateUpdateBackGround();
+        }
+
+        public void FixedUpdateCamera()
+        {
+            _cameraController.FixedUpdate();
         }
 
         #region PlayerEvent
 
+        private void RegisterUsePlayerObserver(BasePlayerController playerController)
+        {
+            playerController.onChangedUseDataUse.Subscribe(_ =>
+            {
+                if (_controllers.Count(data=>data.isUsed)==0)
+                {
+                    LoadManager.Instance.TryPlayGameOverFadeIn();
+                }
+            });
+        }
+        
         public void RegisterPlayerEvent(BasePlayerController controller)
         {
             controller.RegisterPlayerEvent(SwitchPlayerActionEvent);
@@ -178,7 +186,7 @@ namespace StageManager
             {
                 controller.MoveStage(nextStageArea);
             }
-            _stageGimmickManager.InitAtStageMove();
+            _stageGimmickManager.InitAtStageMove(nextStageArea);
         }
 
         private void SetAllPlayerStop()

@@ -1,7 +1,7 @@
 ﻿using System;
 using InGame.Common.Database;
 using InGame.Database;
-using InGame.MyInput;
+using Common.MyInput.Player;
 using OutGame.Database;
 using UniRx;
 using UnityEngine;
@@ -30,7 +30,7 @@ namespace InGame.Player.Entity
         
         public PlayerInputEntity(int playerNum,InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
         {
-            var data=commonDatabase.GetControllerNumData(playerNum);
+            var data=commonDatabase.GetControllerData(playerNum);
             if (data==null)
             {
                 Debug.LogError($"Not Found PlayerData (playerNum:{playerNum})");

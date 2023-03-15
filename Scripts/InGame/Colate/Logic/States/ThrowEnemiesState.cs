@@ -23,6 +23,7 @@ namespace InGame.Colate.Logic
         protected override void Enter()
         {
             colateView.SetSprite(ColateSpriteType.RideChocolate);
+            colateView.FreezeConstrainsY();
             RegisterObserver();
             base.Enter();
         }
@@ -31,27 +32,23 @@ namespace InGame.Colate.Logic
         {
             _passedInterval += Time.deltaTime;
             Drift();
-            if (_passedInterval<colateEntity.ThrowEnemyInterval)
+            if (_passedInterval>colateEntity.ThrowEnemyInterval)
             {
                 ThrowEnemy();
                 _passedInterval = 0;
             }
 
-            if (nextStateInstance!=null)
+            if (nextStateInstance.state!=ColateState.ThrowEnemies)
             {
                 stage = Event.Exit;
                 return;
             }
             base.Update();
         }
-        
+
         protected override void Exit()
         {
-            foreach (var disposable in disposables)
-            {
-                disposable.Dispose();
-            }
-            base.Exit();
+            colateView.FreePositionConstrain();
         }
 
         private void RegisterObserver()
@@ -62,7 +59,7 @@ namespace InGame.Colate.Logic
         private void RegisterAttackedByEnemyObserver()
         {
             disposables.Add(
-                colateView.OnCollisionEnterEvent
+                colateView.OnTriggerEnterEvent
                     .Subscribe(collision =>
                     {
                         if (collision.gameObject.TryGetComponent(out IColateOrderAble colateOrderAble))
@@ -71,8 +68,8 @@ namespace InGame.Colate.Logic
                             {
                                 return;
                             }
-                            colateView.AddVelocity(new Vector2(colateEntity.NockBackPower.x * colateView.GetDirectionX(),
-                                colateEntity.NockBackPower.y));
+
+                            colateView.AddVelocity(colateView.AdjustModelDirectionX(colateEntity.NockBackPower));
                             nextStateInstance = new DroppingState(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
                         }
                     }).AddTo(colateView));
@@ -80,8 +77,10 @@ namespace InGame.Colate.Logic
         
         private void ThrowEnemy()
         {
-            var colateOrderAble=spawnEnemyEvent.Invoke(colateView.GetPosition());
+            colateView.OnExplosionEffect();
+            var colateOrderAble=spawnEnemyEvent.Invoke(colateView.GetPosition()+colateView.AdjustModelDirectionX(colateEntity.ThrowEnemyPivot));
             float xVelocity=colateView.GetDirectionX() * colateEntity.ThrowEnemyPower.x;
+            Debug.Log($"throwPower:{new Vector2(xVelocity, colateEntity.ThrowEnemyPower.y)}");
             colateOrderAble.AddVelocity(new Vector2(xVelocity, colateEntity.ThrowEnemyPower.y));
         }
     }

@@ -49,7 +49,7 @@ namespace SceneSequencer
             _commonDatabase = commonDatabase;
             _outGameDatabase = outGameDatabase;
             SetDatabase();
-            var cameraController = new CameraInstaller().InstallMoveCamera(inGameDatabase, commonDatabase, targetGroup,
+            var cameraController = inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveCamera(inGameDatabase, commonDatabase, targetGroup,
                 cinemachineImpulseSource, camera);
             _debugCharacterChanger = new DebugCharacterChanger();
             _debugStageManager=new DebugStageManager(moveStageGimmickInstaller,cameraController,_inGameDatabase,commonDatabase,
@@ -69,6 +69,7 @@ namespace SceneSequencer
                     TryInstancePlayer();
                     _debugStageManager.FixedUpdateEnemy();
                     _debugStageManager.FixedUpdateStage();
+                    _debugStageManager.FixedUpdateCamera();
                     _debugStageManager.FixedUpdatePlayableCharacter(currentMovePlayer);
                 })
                 .AddTo(this);
@@ -172,7 +173,7 @@ namespace SceneSequencer
 
         private void OnDestroy()
         {
-            _debugStageManager.Dispose();
+            _debugStageManager?.Dispose();
         }
     }
 }

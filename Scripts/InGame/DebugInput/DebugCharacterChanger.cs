@@ -1,4 +1,4 @@
-﻿using MyInput;
+﻿using MyApplication;
 using UniRx;
 using UnityEngine.InputSystem;
 
@@ -11,12 +11,12 @@ namespace DebugInput
         public int playerNum => _playerNum.Value;
         
         private readonly ReactiveProperty<int> _playerNum;
-        private DebugInputMap _gameInputMap;
+        private InputMap _gameInputMap;
 
         public DebugCharacterChanger()
         {
             // Input Actionインスタンス生成
-            _gameInputMap = new DebugInputMap();
+            _gameInputMap = new InputMap();
             _playerNum = new ReactiveProperty<int>(1);
             
             // Actionイベント登録

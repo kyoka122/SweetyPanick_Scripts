@@ -159,5 +159,14 @@ namespace Utility.TransitionFade
             return Fade(1, 0, duration,easeMode);
 
         }
+
+        /// <summary>
+        /// オブジェクトの破棄と同時にこのマテリアルも破棄する
+        /// </summary>
+        /// <returns></returns>
+        public Material GetDisposeMaterial()
+        {
+            return _transitionMaterial!=null ? _transitionMaterial : null;
+        }
     }
 }

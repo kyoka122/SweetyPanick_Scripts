@@ -9,16 +9,16 @@ namespace OutGame.PlayerCustom.Logic
 {
     public class PlayerCountButtonLogic
     {
-        private readonly InputCaseUnknownControllerEntity _inputCaseUnknownControllerEntity;
+        private readonly InputEntity _inputEntity;
         private readonly InSceneDataEntity _inSceneDataEntity;
         private readonly PlayerCountView _playerCountView;
         private readonly ToMessageWindowSenderView _toMessageWindowSenderView;
 
-        public PlayerCountButtonLogic(InputCaseUnknownControllerEntity inputCaseUnknownControllerEntity,
+        public PlayerCountButtonLogic(InputEntity inputEntity,
             InSceneDataEntity inSceneDataEntity, PlayerCountView playerCountView,
             ToMessageWindowSenderView toMessageWindowSenderView)
         {
-            _inputCaseUnknownControllerEntity = inputCaseUnknownControllerEntity;
+            _inputEntity = inputEntity;
             _inSceneDataEntity = inSceneDataEntity;
             _playerCountView = playerCountView;
             _toMessageWindowSenderView = toMessageWindowSenderView;
@@ -32,7 +32,7 @@ namespace OutGame.PlayerCustom.Logic
 
         private void RegisterObserver()
         {
-            foreach (var input in _inputCaseUnknownControllerEntity.CustomInputs)
+            foreach (var input in _inputEntity.CustomInputs)
             {
                 input.HorizontalDigitalMoveValue
                     .Where(direction=>direction!=0)
@@ -56,7 +56,7 @@ namespace OutGame.PlayerCustom.Logic
                     .AddTo(_playerCountView);
             }
 
-            _inSceneDataEntity.changedSettingsState
+            _inSceneDataEntity.ChangedSettingsState
                 .Where(state => state == PlayerCustomState.PlayerCount)
                 .Subscribe(_ =>
                 {
@@ -66,7 +66,7 @@ namespace OutGame.PlayerCustom.Logic
                 })
                 .AddTo(_playerCountView);
             
-            _inSceneDataEntity.hadFinishedPopUpWindow
+            _inSceneDataEntity.HadFinishedPopUpWindow
                 .Where(state => state == PlayerCustomState.PlayerCount)
                 .Subscribe(_ =>
                 {

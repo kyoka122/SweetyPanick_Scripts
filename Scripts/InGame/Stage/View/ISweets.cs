@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using MyApplication;
+using UniRx;
 using UnityEngine;
 
 namespace InGame.Stage.View
@@ -10,6 +11,7 @@ namespace InGame.Stage.View
         public CancellationToken cancellationToken { get; }
         public SweetsType type { get; }
         public FixState fixState { get; }
+        public ReactiveProperty<bool> onFix{ get; }
         
         public UniTask FixSweets(float duration,CancellationToken token);
 

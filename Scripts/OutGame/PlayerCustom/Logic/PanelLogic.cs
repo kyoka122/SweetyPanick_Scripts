@@ -33,7 +33,7 @@ namespace OutGame.PlayerCustom.Logic
         
         private void RegisterObserver()
         {
-            _inSceneDataEntity.changedSettingsState
+            _inSceneDataEntity.ChangedSettingsState
                 .Subscribe(ChangePanel)
                 .AddTo(_controllersPanelView);
         }

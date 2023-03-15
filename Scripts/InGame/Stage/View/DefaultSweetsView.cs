@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using MyApplication;
+using UniRx;
 using UnityEngine;
 using Utility.TransitionFade;
 
@@ -11,8 +12,9 @@ namespace InGame.Stage.View
     public class DefaultSweetsView:MonoBehaviour,ISweets
     {
         public CancellationToken cancellationToken { get; private set; }
-        public SweetsType type { get; } = SweetsType.Sweets;
+        public SweetsType type => SweetsType.Sweets;
         public FixState fixState { get; private set; }
+        public ReactiveProperty<bool> onFix { get; private set; }
 
         [SerializeField]private SpriteRenderer fadeSpriteRenderers;
         [SerializeField] private PlayableCharacter editableCharacterType;
@@ -26,6 +28,7 @@ namespace InGame.Stage.View
             _transition = new Transition(fadeSpriteRenderers.material,this,1);
             cancellationToken = this.GetCancellationTokenOnDestroy();
             fixState = FixState.Broken;
+            onFix = new ReactiveProperty<bool>();
         }
         
         public async UniTask FixSweets(float duration,CancellationToken token)
@@ -47,7 +50,8 @@ namespace InGame.Stage.View
             }
 
             fixState = FixState.Fixed;
-            Debug.Log($"FixedGimmickSweets!");
+            onFix.Value = true;
+            Debug.Log($"FixedSweets!");
         }
         
         public async UniTask BreakSweets(float duration, CancellationToken token)
@@ -68,8 +72,10 @@ namespace InGame.Stage.View
                 fixState = FixState.Fixed;
                 return;
             }
+            
             fixState = FixState.Broken;
-            Debug.Log($"BrokenGimmickSweets!");
+            onFix.Value = false;
+            Debug.Log($"BrokenSweets!");
         }
         
         
@@ -101,6 +107,14 @@ namespace InGame.Stage.View
         public Vector3 GetPlayParticlePos()
         {
             return particleInstanceTransform.position;
+        }
+
+        private void OnDestroy()
+        {
+            if (_transition.GetDisposeMaterial()!=null)
+            {
+                Destroy(_transition.GetDisposeMaterial());
+            }
         }
     }
 }

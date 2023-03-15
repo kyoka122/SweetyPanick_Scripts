@@ -1,6 +1,8 @@
 ﻿using InGame.Player.Entity;
 using InGame.Player.View;
 using MyApplication;
+using UniRx;
+using UniRx.Triggers;
 using UnityEngine;
 
 namespace InGame.Player.Logic
@@ -9,18 +11,26 @@ namespace InGame.Player.Logic
     {
         private readonly PlayerConstEntity _playerConstEntity;
         private readonly PlayerCommonInStageEntity _playerCommonInStageEntity;
+        private readonly PlayerCommonUpdateableEntity _playerCommonUpdateableEntity;
         private readonly BasePlayerView _playerView;
         private readonly PlayerAnimatorView _playerAnimatorView;
 
-        public PlayerStatusLogic(PlayerConstEntity playerConstEntity,
-            PlayerCommonInStageEntity playerCommonInStageEntity, BasePlayerView playerView,
+        public PlayerStatusLogic(PlayerConstEntity playerConstEntity, PlayerCommonInStageEntity playerCommonInStageEntity, 
+            PlayerCommonUpdateableEntity playerCommonUpdateableEntity,BasePlayerView playerView,
             PlayerAnimatorView playerAnimatorView)
         {
             _playerConstEntity = playerConstEntity;
             _playerCommonInStageEntity = playerCommonInStageEntity;
+            _playerCommonUpdateableEntity = playerCommonUpdateableEntity;
             _playerView = playerView;
             _playerAnimatorView = playerAnimatorView;
         }
+
+        public int GetPlayerNum()
+        {
+            return _playerCommonUpdateableEntity.PlayerNum;
+        }
+
 
         //TODO: これ廃止する。Viewから直接参照させる
         public void UpdateAnimationStatus()
@@ -28,7 +38,13 @@ namespace InGame.Player.Logic
             string animationName=_playerAnimatorView.GetCurrentAnimationName();
             _playerCommonInStageEntity.SetCurrentAnimation(animationName,_playerCommonInStageEntity.CharacterType);
         }
-        
+
+        public void SetInstalled()
+        {
+            //MEMO: カメラのターゲットに登録するため
+            _playerCommonUpdateableEntity.SetCanTarget(true);
+        }
+
         public void Stop()
         {
             _playerAnimatorView.ResetAllParameter();

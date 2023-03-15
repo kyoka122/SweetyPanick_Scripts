@@ -11,13 +11,17 @@ namespace InGame.Stage.View
     [RequireComponent(typeof(Animator))]
     public class DoorView:MonoBehaviour
     {
-        public bool NeedToKey => needToKey;
+        public bool IsIgnoreKeyCheck => isIgnoreKeyCheck;
+        public bool IsKeyDoor => isKeyDoor;
         public IObservable<DoorView> EnterDoorObserver=>_onEnterDoor;
-        
-        [SerializeField] private bool needToKey=false;
+
+        [SerializeField, Tooltip("デバッグ用。offにすると鍵無しでも入れるようになる")]
+        private bool isIgnoreKeyCheck = false;
+        [SerializeField] private bool isKeyDoor=false;
         
         private Subject<DoorView> _onEnterDoor;
         private Animator _animator;
+        private string DoorAnimationName => isKeyDoor ? StageAnimationClipName.KeyDoorAnimation : StageAnimationClipName.DoorAnimation;
 
         private bool _isDoorOpen;
 
@@ -51,8 +55,8 @@ namespace InGame.Stage.View
         private bool HadFinishedOpenAnimation()
         {
             var stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-            return stateInfo.normalizedTime >= 0 &&
-                   stateInfo.IsName(StageAnimationClipName.DoorAnimation);
+            return stateInfo.normalizedTime >= 1 &&
+                   stateInfo.IsName(DoorAnimationName);
         }
 
     }

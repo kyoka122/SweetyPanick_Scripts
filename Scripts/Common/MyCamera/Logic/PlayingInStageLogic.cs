@@ -1,10 +1,11 @@
-﻿using InGame.Database;
+﻿using System;
+using InGame.Common.Database.ScriptableData;
+using InGame.Database;
 using InGame.MyCamera.Entity;
 using InGame.MyCamera.View;
 using MyApplication;
 using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem.Utilities;
 
 namespace InGame.MyCamera.Logic
 {
@@ -17,94 +18,71 @@ namespace InGame.MyCamera.Logic
         {
             _cameraEntity = cameraEntity;
             _mainCameraView = mainCameraView;
-            RegisterTargetAddObserver();
-            RegisterTargetRemoveObserver();
+            RegisterTargetObserver();
+    
+            foreach (var inStageData in _cameraEntity.GetCharacterUpdateableInStageData())
+            {
+                TrySetTargetGroup(inStageData.Value, inStageData.Key);
+            }
         }
 
-        private void RegisterTargetAddObserver()
+        private void RegisterTargetObserver()
         {
-            _cameraEntity.candyUpdateableInStageData
-                .Subscribe(property=>TrySetTargetGroup(property,PlayableCharacter.Candy))
+            _cameraEntity.CandyUpdateableInStageData
+                .Subscribe(property=> TrySetTargetGroup(property, PlayableCharacter.Candy))
                 .AddTo(_mainCameraView);
             
-            _cameraEntity.fuUpdateableInStageData
-                .Subscribe(property=>TrySetTargetGroup(property,PlayableCharacter.Fu))
+            _cameraEntity.FuUpdateableInStageData
+                .Subscribe(property=> TrySetTargetGroup(property, PlayableCharacter.Fu))
                 .AddTo(_mainCameraView);
             
-            _cameraEntity.mashUpdateableInStageData
-                .Subscribe(property=>TrySetTargetGroup(property,PlayableCharacter.Mash))
+            _cameraEntity.MashUpdateableInStageData
+                .Subscribe(property=> TrySetTargetGroup(property, PlayableCharacter.Mash))
                 .AddTo(_mainCameraView);
             
-            _cameraEntity.kureUpdateableInStageData
-                .Subscribe(property=>TrySetTargetGroup(property,PlayableCharacter.Kure))
+            _cameraEntity.KureUpdateableInStageData
+                .Subscribe(property=> TrySetTargetGroup(property, PlayableCharacter.Kure))
                 .AddTo(_mainCameraView);
         }
-
-        private void RegisterTargetRemoveObserver()
-        {
-            _cameraEntity.candyUpdateableData
-                .Subscribe(data =>
-                {
-                    Debug.Log($"data:{data?.isDead}");
-                    if (data is {isDead: true})
-                    {
-                        TryRemoveTargetGroup(_cameraEntity.GetCharacterTransform(PlayableCharacter.Candy));
-                    }
-                });
-            
-            _cameraEntity.mashUpdateableData
-                .Subscribe(data =>
-                {
-                    if (data is {isDead: true})
-                    {
-                        TryRemoveTargetGroup(_cameraEntity.GetCharacterTransform(PlayableCharacter.Mash));
-                    }
-                });
-            _cameraEntity.fuUpdateableData
-                .Subscribe(data =>
-                {
-                    if (data is {isDead: true})
-                    {
-                        TryRemoveTargetGroup(_cameraEntity.GetCharacterTransform(PlayableCharacter.Fu));
-                    }
-                });
-            _cameraEntity.kureUpdateableData
-                .Subscribe(data =>
-                {
-                    if (data is {isDead: true})
-                    {
-                        TryRemoveTargetGroup(_cameraEntity.GetCharacterTransform(PlayableCharacter.Kure));
-                    }
-                });
-        }
+        
 
         private void TrySetTargetGroup(CharacterUpdateableInStageData property,PlayableCharacter characterType)
         {
-            if (property==null)
-            {
-                return;
-            }
             if (property.transform==null)
             {
                 return;
             }
-            /*if (_cameraEntity.GetHadTargetGroup(characterType))
-            {
-                _cameraView.ChangeWeight(property.transform, property.nearnessFromTargetView);
-                return;
-            }*/
 
-            if (_mainCameraView.TryAddTargetGroup(property.transform))
-            {
-                _cameraEntity.SetCharacterHadTargetGroup(characterType);
-            }
-            
+            TryAddTargetGroup(property, characterType);
+            TryRemoveTargetGroup(property, characterType);
         }
 
-        private void TryRemoveTargetGroup(Transform characterTransform)
+        private void TryAddTargetGroup(CharacterUpdateableInStageData property,PlayableCharacter characterType)
         {
-            _mainCameraView.TryRemoveTargetGroup(characterTransform);
+            if (property.canTargetCamera && !_cameraEntity.GetHadTargetGroup(characterType))
+            {
+                if (_mainCameraView.TryAddTargetGroup(property.transform))
+                {
+                    _cameraEntity.SetCharacterHadTargetGroup(characterType);
+                }
+            }
         }
 
+        private void TryRemoveTargetGroup(CharacterUpdateableInStageData property,PlayableCharacter characterType)
+        {
+            if (!property.canTargetCamera && _cameraEntity.GetHadTargetGroup(characterType))
+            {
+                if (_mainCameraView.TryRemoveTargetGroup(property.transform))
+                {
+                    _cameraEntity.RemoveCharacterHadTargetGroup(characterType);
+                }
+            }
+        }
+        
+        public void SetCameraData(CameraData cameraData)
+        {
+            _mainCameraView.DoMoveXYPosition(cameraData.Position,cameraData.MoveDuration);
+            _mainCameraView.DoSize(cameraData.Size,cameraData.MoveDuration);
+        }
     }
 }

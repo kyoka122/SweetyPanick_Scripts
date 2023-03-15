@@ -12,6 +12,7 @@ using InGame.SceneLoader;
 using OutGame.Database;
 using OutGame.Database.ScriptableData;
 using OutGame.PlayerCustom.View;
+using TalkSystem;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -30,16 +31,22 @@ namespace SceneSequencer
         [SerializeField] private ToMessageWindowSenderView toMessageWindowSenderView;
         [SerializeField] private Camera camera;
         
+        [SerializeField] private Dialogs playerCountDialog;
+        [SerializeField] private Dialogs controllerDialog;
+        [SerializeField] private Dialogs characterDialog;
+        [SerializeField] private Dialogs cheerDialog;
+        
         private PlayerCustomManager _manager;
         private PlayerCustomInstaller _playerCustomInstaller;
         
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
-            new CameraInstaller().InstallConstCamera(inGameDatabase,commonDatabase,camera);
+            inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallConstCamera(inGameDatabase,commonDatabase,camera);
             var onMoveScene = new Subject<bool>();
             _playerCustomInstaller = new PlayerCustomInstaller();
             _manager=_playerCustomInstaller.Install(playerCountView, controllersPanelView, 
                 characterSelectPanelView, fromMessageWindowRecieverView, toMessageWindowSenderView,
+                playerCountDialog,controllerDialog,characterDialog,cheerDialog,
                 outGameDatabase,commonDatabase, onMoveScene);
             
             onMoveScene
@@ -70,6 +77,11 @@ namespace SceneSequencer
             }
             
             SceneManager.LoadScene(nextSceneName);
+        }
+
+        private void OnDestroy()
+        {
+            _manager?.Dispose();
         }
     }
 }

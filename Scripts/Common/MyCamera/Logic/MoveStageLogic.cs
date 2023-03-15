@@ -2,6 +2,7 @@
 using InGame.MyCamera.Entity;
 using InGame.MyCamera.View;
 using MyApplication;
+using UnityEngine;
 
 namespace InGame.MyCamera.Logic
 {
@@ -10,28 +11,36 @@ namespace InGame.MyCamera.Logic
         private readonly CameraEntity _cameraEntity;
         private readonly MainCameraView _mainCameraView;
         private readonly CinemachineConfiner2D _cinemachineConfiner2D;
+        private readonly bool _haveCinemachineConfinerInStage;
 
         public MoveStageLogic(CameraEntity cameraEntity, MainCameraView mainCameraView)
         {
             _cameraEntity = cameraEntity;
             _mainCameraView = mainCameraView;
+            _haveCinemachineConfinerInStage = false;
         }
         public MoveStageLogic(CameraEntity cameraEntity, MainCameraView mainCameraView,CinemachineConfiner2D cinemachineConfiner2D)
         {
             _cameraEntity = cameraEntity;
             _mainCameraView = mainCameraView;
             _cinemachineConfiner2D = cinemachineConfiner2D;
+            _haveCinemachineConfinerInStage = true;
         }
 
         public void MoveStage(StageArea area)
         {
-            var cameraData = _cameraEntity.GetCameraSettingsData(area);
+            var cameraData = _cameraEntity.GetCameraInitData(area);
             if (cameraData==null)
             {
+                Debug.LogWarning($"Not Find CameraData. area:{area}");
                 return;
             }
 
-            _cinemachineConfiner2D.m_BoundingShape2D = cameraData.StageAreaCollider;
+            if (_haveCinemachineConfinerInStage)
+            {
+                _cinemachineConfiner2D.m_BoundingShape2D = cameraData.StageAreaCollider;
+            }
+            
             _mainCameraView.SetPosition(cameraData.InitPosition);
             //_cameraView.SetSize();
 

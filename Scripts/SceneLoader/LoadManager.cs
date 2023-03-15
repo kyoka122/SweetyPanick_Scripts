@@ -6,7 +6,9 @@ using InGame.Database;
 using InGame.SceneLoader.Entity;
 using InGame.SceneLoader.Logic;
 using InGame.SceneLoader.View;
+using MyApplication;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utility;
 
 namespace InGame.SceneLoader
@@ -17,22 +19,26 @@ namespace InGame.SceneLoader
 
         [SerializeField] private LoadScreenView loadScreenView;
         [SerializeField] private BlackFadeView blackFadeView;
+        [SerializeField] private GameOverView gameOverView;
         [SerializeField] private LoadCameraView loadCameraView;
         
         private LoadEntity _loadEntity;
         private BlackFadeLogic _blackFadeLogic;
         private LoadLogic _loadLogic;
+        private GameOverLogic _gameOverLogic;
 
         public void Init(InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
         {
             loadScreenView.Init();
             blackFadeView.Init();
+            gameOverView.Init();
             loadCameraView.Init();
             _loadEntity = new LoadEntity(inGameDatabase,commonDatabase);
             _loadLogic = new LoadLogic(_loadEntity, loadScreenView,blackFadeView,loadCameraView);
             _blackFadeLogic = new BlackFadeLogic(_loadEntity, blackFadeView,loadCameraView);
+            _gameOverLogic = new GameOverLogic(_loadEntity, gameOverView, loadCameraView);
         }
-        
+
         protected override void Awake()
         {
             base.Awake();
@@ -59,10 +65,14 @@ namespace InGame.SceneLoader
         public async UniTask TryPlayBlackFadeIn()
         {
             CancellationToken thisToken = this.GetCancellationTokenOnDestroy();
-            await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading, cancellationToken: thisToken);
-
-            if (_blackFadeLogic.isFadeIn||_loadLogic.isLoading)
+            await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading||_gameOverLogic.isFading,
+                cancellationToken: thisToken);
+            
+            //MEMO: 他のLoadが実行中であれば実行しない
+            if (_blackFadeLogic.isFadeIn||_loadLogic.isLoading||_gameOverLogic.isFadeIn)
             {
+                Debug.Log(
+                    $"Already Load. Load:{_loadLogic.isLoading}, BlackFade:{_blackFadeLogic.isFadeIn}, gameOver:{_gameOverLogic.isFadeIn}");
                 return;
             }
             await _blackFadeLogic.PlayFadeIn(thisToken);
@@ -83,10 +93,14 @@ namespace InGame.SceneLoader
         public async UniTask TryPlayLoadScreen(float thisTaskDuration,float toFadeOutDurationMin)
         {
             CancellationToken thisToken = this.GetCancellationTokenOnDestroy();
-            await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading, cancellationToken: thisToken);
-      
-            if (_blackFadeLogic.isFadeIn||_loadLogic.isLoading)
+            await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading||
+                                          _gameOverLogic.isFading, cancellationToken: thisToken);
+            
+            //MEMO: 他のLoadが実行中であれば実行しない
+            if (_blackFadeLogic.isFadeIn||_loadLogic.isLoading||_gameOverLogic.isFadeIn)
             {
+                Debug.Log(
+                    $"Already Load. Load:{_loadLogic.isLoading}, BlackFade:{_blackFadeLogic.isFadeIn}, gameOver:{_gameOverLogic.isFadeIn}");
                 return;
             }
             await _loadLogic.PlayLoadScreen(toFadeOutDurationMin,thisToken);
@@ -107,6 +121,7 @@ namespace InGame.SceneLoader
             {
                 Debug.Log($"BlackFadeOut!");
                 await _blackFadeLogic.TryPlayBlackFadeOut(thisToken);
+                _gameOverLogic.TrySetFadeOut();
                 return;
             }
             if (_loadLogic.isLoading)
@@ -118,6 +133,29 @@ namespace InGame.SceneLoader
             }
             
             Debug.Log($"Couldn`t FadeOut!");
+        }
+        
+        public async void TryPlayGameOverFadeIn()
+        {
+            CancellationToken thisToken = this.GetCancellationTokenOnDestroy();
+            await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading, cancellationToken: thisToken);
+
+            //MEMO: 他のLoadが実行中であれば実行しない
+            if (_blackFadeLogic.isFadeIn||_loadLogic.isLoading||_gameOverLogic.isFadeIn)
+            {
+                Debug.Log(
+                    $"Already Load. Load:{_loadLogic.isLoading}, BlackFade:{_blackFadeLogic.isFadeIn}, gameOver:{_gameOverLogic.isFadeIn}");
+                return;
+            }
+            await _gameOverLogic.PlayFadeIn(thisToken);
+            await _gameOverLogic.WaitOnNextKey();
+            await _blackFadeLogic.PlayFadeIn(thisToken);
+            SceneManager.LoadScene(SceneName.Title);
+        }
+
+        private void OnDestroy()
+        {
+            _loadEntity?.Dispose();
         }
     }
 }

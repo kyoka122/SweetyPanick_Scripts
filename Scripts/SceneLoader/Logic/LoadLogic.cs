@@ -138,5 +138,6 @@ namespace InGame.SceneLoader.Logic
                 rectTransform.localPosition=new Vector3(defaultPosX,rectTransform.localPosition.y,rectTransform.localPosition.z);
             }
         }
+
     }
 }

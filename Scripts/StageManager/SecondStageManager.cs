@@ -35,7 +35,7 @@ namespace StageManager
             _moveNextSceneEvent = moveNextSceneEvent;
             _controllers = new List<BasePlayerController>();
             _enemyManager = inGameDatabase.GetEnemyData().EnemyInstaller.InstallWithStageEnemies();
-            MoveStage(StageArea.FirstStageFirst);
+            InitAtStageMove(StageArea.SecondStageFirst);
         }
         
 
@@ -51,7 +51,6 @@ namespace StageManager
 
         public void LateInit()
         {
-            _stageGimmickManager.LateInit();
             foreach (var playerController in _controllers)
             {
                 playerController.LateInit();
@@ -66,12 +65,7 @@ namespace StageManager
             {
                 return;
             }
-            if (playerController.isMoving)
-            {
-                playerController.FixedUpdateMoving();
-                return;
-            }
-            playerController.FixedUpdateStopping();
+            playerController.FixedUpdate();
         }
 
         public void FixedUpdateStage()
@@ -79,9 +73,14 @@ namespace StageManager
             _stageGimmickManager.FixedUpdate();
         }
         
+        public void FixedUpdateCamera()
+        {
+            _cameraController.FixedUpdate();
+        }
+        
         public void LateUpdate()
         {
-            _stageGimmickManager.LateUpdate();
+            _stageGimmickManager.LateUpdateBackGround();
         }
 
         #region PlayerEvent
@@ -137,7 +136,7 @@ namespace StageManager
                     break;
                 case StageEvent.EnterSecondStageGoalDoor:
                     SetAllPlayerStop();
-                    _moveNextSceneEvent.Invoke(SceneName.PlayerCustom);
+                    _moveNextSceneEvent.Invoke(SceneName.ColateStage);
                     break;
                 default:
                     Debug.LogError($"Could Not Found stageEvent: {stageEvent}");
@@ -156,12 +155,8 @@ namespace StageManager
             {
                 Debug.Log($"Cancel Loading");
             }
-            
-            _cameraController.SetCameraMoveState(nextStageArea);
-            foreach (var controller in _controllers)
-            {
-                controller.MoveStage(nextStageArea);
-            }
+
+            InitAtStageMove(nextStageArea);
             try
             {
                 await LoadManager.Instance.TryPlayFadeOut();
@@ -172,6 +167,16 @@ namespace StageManager
             }
             
             SetAllPlayerReStart();
+        }
+        
+        private void InitAtStageMove(StageArea nextStageArea)
+        {
+            _cameraController.SetCameraMoveState(nextStageArea);
+            foreach (var controller in _controllers)
+            {
+                controller.MoveStage(nextStageArea);
+            }
+            _stageGimmickManager.InitAtStageMove(nextStageArea);
         }
 
         private void SetAllPlayerStop()

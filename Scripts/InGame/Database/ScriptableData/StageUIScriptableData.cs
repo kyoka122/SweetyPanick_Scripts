@@ -8,15 +8,17 @@ namespace InGame.Database.ScriptableData
     public class StageUIScriptableData:ScriptableObject
     {
         public PlayerStatusView PlayerStatusView => playerStatusView;
-        public Vector2[] StatusDataPositions => statusDataPositions;
+        public Vector2[] PlayerStatusDataPositions => playerStatusDataPositions;
         
         public ColateStatusView ColateStatusView => colateStatusView;
-        public Vector2 ColateStatusPosition => colateStatusPositions;
-        
+        public Vector2 ColateStatusDataPosition => colateStatusDataPositions;
+        public float ScoreCountUpDuration => scoreCountUpDuration;
+
         [SerializeField] private PlayerStatusView playerStatusView;
         [SerializeField] private ColateStatusView colateStatusView;
-        [SerializeField] private Vector2[] statusDataPositions;
-        [SerializeField] private Vector2 colateStatusPositions;
+        [SerializeField] private float scoreCountUpDuration = 0.3f;
+        [SerializeField] private Vector2[] playerStatusDataPositions;
+        [SerializeField] private Vector2 colateStatusDataPositions;
         
     }
 }

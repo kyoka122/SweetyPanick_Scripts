@@ -23,6 +23,8 @@ namespace InGame.Colate.Logic
         }
 
         public abstract ColateState state { get; }
+        
+        
         protected readonly ColateEntity colateEntity;
         protected readonly ColateView colateView;
         protected readonly ColateStatusView colateStatusView;
@@ -30,7 +32,7 @@ namespace InGame.Colate.Logic
         protected readonly Func<Vector2, IColateOrderAble> spawnEnemyEvent;
         protected readonly List<IDisposable> disposables;
         protected bool isTalking { get; private set; }
-        
+
         protected Event stage;
 
         protected BaseColateStateLogic(ColateEntity colateEntity, ColateView colateView,ColateStatusView colateStatusView,
@@ -77,6 +79,7 @@ namespace InGame.Colate.Logic
         protected virtual void Enter()
         {
             stage = Event.Update;
+            Debug.Log($"Enter:{state}");
         }
 
         /// <summary>
@@ -85,43 +88,58 @@ namespace InGame.Colate.Logic
         protected virtual void Update()
         {
             stage = Event.Update;
+            ForceCheckIsDead();
         }
 
         protected virtual void Exit()
         {
             stage = Event.Exit;
+            foreach (var disposable in disposables)
+            {
+                disposable.Dispose();
+            }
         }
         
         
         #region ステート間共通メソッド
         
-        protected void Drift()
+        protected virtual void Drift()
         {
-            colateView.SetVelocity(new Vector2(colateEntity.MoveSpeed * colateView.GetDirectionX(), colateView.GetVelocity().y));
+            colateView.SetVelocity(new Vector2(colateEntity.MoveSpeed * colateView.GetDirectionX(), 0));
             if (FacedSideWall())
             {
                 TurnAround();
             }
         }
 
-        private void TurnAround()
+        protected void TurnAround()
         {
+            Debug.Log($"TurnAround!!");
             colateView.TurnAround();
         }
 
-        protected bool FacedSideWall()
+        protected virtual bool FacedSideWall()
         {
             var direction = new Vector2(colateView.GetDirectionX(), 0);
-            RaycastHit2D raycastHit2D = Physics2D.Raycast(colateView.GetToSweetsRayPos(), direction,
-                colateEntity.ToSideWallDistance, LayerInfo.SideWallNum);
+            RaycastHit2D raycastHit2D = Physics2D.Raycast(colateView.GetToSideWallRayPos(), direction,
+                colateEntity.ToSideWallDistance, LayerInfo.SideWallMask);
             
 #if UNITY_EDITOR
             if (colateView.OnDrawRay)
             {
-                DrawSweetsRay(direction * colateEntity.ToSideWallDistance);
+                DrawSideWallRay(direction * colateEntity.ToSideWallDistance);
             }
 #endif
             return raycastHit2D.collider!=null;
+        }
+
+        private void ForceCheckIsDead()
+        {
+            if (colateEntity.CurrentColateHp==0&&state!=ColateState.Dead)
+            {
+                nextStateInstance = new DeadState(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
+                stage = Event.Exit;
+            }
         }
 
         public bool CanDamage()
@@ -135,11 +153,10 @@ namespace InGame.Colate.Logic
         
 #if UNITY_EDITOR
         [Conditional("UNITY_EDITOR")]
-        private void DrawSweetsRay(Vector2 vector)
+        protected void DrawSideWallRay(Vector2 vector)
         {
-            Debug.DrawRay(colateView.GetToSweetsRayPos(), vector, Color.green, 0.5f);
+            Debug.DrawRay(colateView.GetToSideWallRayPos(), vector, Color.green, 0.5f);
         }
 #endif
-        
     }
 }

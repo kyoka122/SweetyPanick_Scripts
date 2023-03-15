@@ -63,6 +63,5 @@ namespace InGame.SceneLoader.Logic
             isFadeIn = false;
             isFading = false;
         }
-
     }
 }

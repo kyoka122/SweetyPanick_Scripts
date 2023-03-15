@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using InGame.Stage.Logic;
+using MyApplication;
 
 namespace InGame.Stage.Manager
 {
@@ -31,11 +32,6 @@ namespace InGame.Stage.Manager
             return _healAnimationLogic.PlayHealAnimationTask();
         }
 
-        public void LateInit()
-        {
-            _backgroundLogic.LateInit();
-        }
-
         public void FixedUpdate()
         {
             foreach (var moveFloorLogic in _moveFloorLogics)
@@ -44,14 +40,15 @@ namespace InGame.Stage.Manager
             }
         }
 
-        public void LateUpdate()
+        public void LateUpdateBackGround()
         {
-            _backgroundLogic.LateUpdate();
+            _backgroundLogic.LateUpdateBackGround();
         }
 
-        public void InitAtStageMove()
+        public void InitAtStageMove(StageArea newStageArea)
         {
             _doorLogic.InitAtStageMove();
+            _backgroundLogic.InitAtMoveStage(newStageArea);
         }
 
         public void Dispose()

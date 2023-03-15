@@ -1,59 +1,70 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using InGame.SceneLoader;
-using OutGame.Prologue.MyInput;
-using UniRx;
-using MyApplication;
+using OutGame.Database;
+using TalkSystem;
 using UnityEngine;
+using Utility;
 
 namespace OutGame.Prologue
 {
     public class PrologueBehaviour:MonoBehaviour,IDisposable
     {
-        [SerializeField] Fungus.Flowchart flowchart;
+        [SerializeField] private Dialogs dialogs;
         [SerializeField] private ProloguePlayerAnimation prologuePlayerAnimation;
 
         [SerializeField] private GameObject castleObj;
         [SerializeField] private GameObject worldMapObj;
         [SerializeField] private SpriteRenderer backGroundFilter;
 
-        private IReadOnlyList<IButtonInput> _buttonInputs;
+        [SerializeField] private SkipGaugeChargeView skipGaugeChargeView;
+        
         private CancellationToken _token;
         private Action _toNextSceneEvent;
+        private AllTalkInputObserver _allTalkInputObserver;
+        private OutGameDatabase _outGameDatabase;
+
+        private bool _isPlayingSkipGaugeAnimation;
         
-        public void Init(Action toNextSceneEvent,List<IButtonInput> buttonInputs)
+        public void Init(Action toNextSceneEvent,OutGameDatabase outGameDatabase)
         {
             _toNextSceneEvent = toNextSceneEvent;
-            _buttonInputs = buttonInputs;//MEMO: コールバックでListの中身が変動する恐れあり
+            _outGameDatabase = outGameDatabase;
+            _allTalkInputObserver = new AllTalkInputObserver();
+            dialogs.Init(_allTalkInputObserver,outGameDatabase.GetDialogFaceSpriteScriptableData());
             prologuePlayerAnimation.Init();
+            skipGaugeChargeView.Init(_allTalkInputObserver.OnSkip);
+            
             worldMapObj.SetActive(true);
             castleObj.SetActive(false);
             backGroundFilter.enabled = true;
-            RegisterInputObserver();
         }
 
-        /// <summary>
-        /// このメソッドを呼び出すと会話シーン用のキー入力受け付けを開始します
-        /// </summary>
-        private void RegisterInputObserver()
+        public void CallStartNarration()
         {
-            List<IButtonInput> buttonInputs = new List<IButtonInput>(_buttonInputs);
-            foreach (var buttonInput in buttonInputs)
-            {
-                buttonInput.OnButton.Subscribe(_ =>
-                {
-                    OnClickMethod();
-                }).AddTo(_token);
-            }
+            Debug.Log($"StartNarration");
+            dialogs.StartDialogs();
+            ActiveSkip();
         }
-
-        private void OnClickMethod()
+        
+        private async void ActiveSkip()
         {
-            //MEMO: ここにクリック後の処理を書く。メソッド名は変えてOK。文字表記処理の最中にも呼ばれ続けるので、文字表記処理中かどうかのフラグを用いた分岐処理を行うといい
+            await UniTask.Delay(TimeSpan.FromSeconds(_outGameDatabase.GetTalkPartUIScriptableData().ToSkipFadeInTime),
+                cancellationToken: this.GetCancellationTokenOnDestroy());
+            skipGaugeChargeView.PlayFadeInObjects(_outGameDatabase.GetTalkPartUIScriptableData().SkipFadeInDuration);
+            skipGaugeChargeView.RegisterSkipObserver(MoveNextScene, null,
+                _outGameDatabase.GetTalkPartUIScriptableData().SkipGaugeDuration);
         }
+        
+       
+        private void ChangeToCastleScene()
+        {
+            worldMapObj.SetActive(false);
+            castleObj.SetActive(true);
+            backGroundFilter.enabled = false;
+        }
+        
 
         #region Callbacks
         
@@ -77,7 +88,7 @@ namespace OutGame.Prologue
                 Debug.Log($"Cancel Loading");
             }
             backGroundFilter.enabled = true;
-            CallStartTalkInCastle();
+            dialogs.SetFinishAction();
         }
 
         public async void ExitCandy()
@@ -87,7 +98,7 @@ namespace OutGame.Prologue
             await prologuePlayerAnimation.ExitCandy(_token);
             Debug.Log($"Finish");
             backGroundFilter.enabled = true;
-            CallAfterExitCandy();
+            dialogs.SetFinishAction();
         }
 
         public async void ExitAllPrincess()
@@ -95,51 +106,20 @@ namespace OutGame.Prologue
             backGroundFilter.enabled = false;
             await prologuePlayerAnimation.ExitPrincess(_token);
             backGroundFilter.enabled = true;
-            CallAfterExitPrincess();
+            dialogs.SetFinishAction();
         }
 
         public void MoveNextScene()
         {
+            dialogs.ExitDialog();
             _toNextSceneEvent.Invoke();
         }
 
         #endregion
-        
-        
-        
-        public void CallStartNarration()
-        {
-            flowchart.SendFungusMessage(FungusCallMethodName.Narration);
-        }
-
-        private void CallStartTalkInCastle()
-        {
-            flowchart.SendFungusMessage(FungusCallMethodName.StartTalk);
-        }
-
-        private void CallAfterExitCandy()
-        {
-            flowchart.SendFungusMessage(FungusCallMethodName.AfterExitCandy);
-        }
-
-        private void CallAfterExitPrincess()
-        {
-            flowchart.SendFungusMessage(FungusCallMethodName.AfterExitPrincess);
-        }
-
-        private void ChangeToCastleScene()
-        {
-            worldMapObj.SetActive(false);
-            castleObj.SetActive(true);
-            backGroundFilter.enabled = false;
-        }
 
         public void Dispose()
         {
-            foreach (var buttonInput in _buttonInputs)
-            {
-                buttonInput.Dispose();
-            }
+            _allTalkInputObserver.Dispose();
         }
     }
 }

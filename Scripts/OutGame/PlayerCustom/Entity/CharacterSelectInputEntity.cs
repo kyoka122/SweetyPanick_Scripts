@@ -1,5 +1,5 @@
 ﻿using System;
-using OutGame.PlayerCustom.MyInput;
+using Common.MyInput.PlayerCustom;
 using UniRx;
 
 namespace OutGame.PlayerCustom.Entity
@@ -9,22 +9,22 @@ namespace OutGame.PlayerCustom.Entity
     /// </summary>
     public class CharacterSelectInputEntity:IDisposable
     {
-        public IReadOnlyReactiveProperty<float> horizontalValue=>_caseUnknownControllerInput.HorizontalValue;
-        public IReadOnlyReactiveProperty<float> verticalValue=>_caseUnknownControllerInput.VerticalValue;
-        public IReadOnlyReactiveProperty<bool> next=>_caseUnknownControllerInput.Next;
-        public IReadOnlyReactiveProperty<bool> back => _caseUnknownControllerInput.Back;
+        public IReadOnlyReactiveProperty<float> horizontalValue=>_playerCustomInput.HorizontalValue;
+        public IReadOnlyReactiveProperty<float> verticalValue=>_playerCustomInput.VerticalValue;
+        public IReadOnlyReactiveProperty<bool> next=>_playerCustomInput.Next;
+        public IReadOnlyReactiveProperty<bool> back => _playerCustomInput.Back;
         
-        private readonly BaseCaseUnknownControllerInput _caseUnknownControllerInput;
+        private readonly BasePlayerCustomInput _playerCustomInput;
         
-        public CharacterSelectInputEntity(BaseCaseUnknownControllerInput caseUnknownControllerInput)
+        public CharacterSelectInputEntity(BasePlayerCustomInput playerCustomInput)
         {
-            _caseUnknownControllerInput = caseUnknownControllerInput;
+            _playerCustomInput = playerCustomInput;
         }
 
 
         public void Dispose()
         {
-            _caseUnknownControllerInput?.Dispose();
+            _playerCustomInput?.Dispose();
         }
     }
 }

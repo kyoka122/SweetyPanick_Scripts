@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Cinemachine;
-using DebugInput;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Stage.Installer;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using InGame.Database.ScriptableData;
-using InGame.MyCamera.Installer;
+using InGame.Player.Installer;
 using InGame.SceneLoader;
 using OutGame.Database;
 using StageManager;
@@ -32,6 +32,8 @@ namespace SceneSequencer
         [SerializeField] private MoveStageGimmickInstaller moveStageGimmickInstaller;
         [SerializeField] private CinemachineTargetGroup targetGroup;
         [SerializeField] private CinemachineImpulseSource cinemachineImpulseSource;
+        [SerializeField] private CameraInitData firstStageCameraData;
+        
         [SerializeField] private Canvas canvas;
         
         [SerializeField] private Camera camera;
@@ -40,7 +42,8 @@ namespace SceneSequencer
         private InGameDatabase _inGameDatabase;
         private OutGameDatabase _outGameDatabase;
         private CommonDatabase _commonDatabase;
-        private bool _startSceneChange;
+        private bool _isChangingScene;
+        private int _playerCount;
 
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
@@ -49,30 +52,37 @@ namespace SceneSequencer
             if (inGameDatabase==null)
             {
                 Debug.LogError($"Not Found InGameDatabase");
-            }
-            else
-            {
-                _inGameDatabase = inGameDatabase;
+                return;
             }
             
             _inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
             _outGameDatabase = outGameDatabase;
             SetInGameDatabase();
-            var cameraController = new CameraInstaller().InstallMoveCamera(inGameDatabase, commonDatabase, targetGroup,
+            var cameraController = _inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveCamera(inGameDatabase, commonDatabase, targetGroup,
                 cinemachineImpulseSource, camera);
             //_debugCharacterChanger = new DebugCharacterChanger();
+            commonDatabase.AddCameraInitData(firstStageCameraData);
             _firstStageManager=new FirstStageManager(moveStageGimmickInstaller,cameraController,_inGameDatabase,_commonDatabase,
                 MoveNextScene);
             InstallAllPlayer();
             _firstStageManager.LateInit();
+            _playerCount = _commonDatabase.GetUseCharacterData().Count;
         }
 
         protected override async void ProcessInOrder()
         {
             BGMManager.Instance.Stop();
+            
+            this.LateUpdateAsObservable()
+                .Subscribe(_ =>
+                {
+                    _firstStageManager.LateUpdateBackGround();
+                }).AddTo(this);
+            
             try
             {
+                Debug.Log($"FadeOut!!");
                 await LoadManager.Instance.TryPlayFadeOut();
             }
             catch (OperationCanceledException)
@@ -82,26 +92,25 @@ namespace SceneSequencer
             
             BGMManager.Instance.Play(BGMPath.STAGE_BGM);
             
+            
+            
             this.FixedUpdateAsObservable()
                 .Subscribe(_ =>
                 {
-                    if (_startSceneChange)
+                    if (_isChangingScene)
                     {
                         return;
                     }
                     _firstStageManager.FixedUpdateEnemy();
                     _firstStageManager.FixedUpdateStage();
-                    for (int i = 1; i <=  _commonDatabase.GetUseCharacterData().Count; i++)
+                    _firstStageManager.FixedUpdateCamera();
+                    for (int i = 1; i <= _playerCount; i++)
                     {
                         _firstStageManager.FixedUpdatePlayableCharacter(i);
                     }
                 })
                 .AddTo(this);
-            this.LateUpdateAsObservable()
-                .Subscribe(_ =>
-                {
-                    _firstStageManager.LateUpdate();
-                }).AddTo(this);
+            
         }
 
         protected override async void Finish(string nextSceneName)
@@ -180,6 +189,13 @@ namespace SceneSequencer
             CharacterCommonConstData[] allCharacterConstData = _inGameDatabase.GetAllCharacterConstData();
             var characterData=_commonDatabase.GetUseCharacterData();
 
+            //MEMO: Player設定シーンを飛ばした場合、仮でキーボード、Candyのデータを追加する
+            if (characterData == null)
+            {
+                new DebugInputInstaller().Install(_commonDatabase);
+            }
+            characterData=_commonDatabase.GetUseCharacterData();
+            
             for (int i = 1; i <= characterData.Count; i++)
             {
                 var oneCharacterData = characterData.FirstOrDefault(data => data.playerNum == i);
@@ -205,13 +221,13 @@ namespace SceneSequencer
 
         private void MoveNextScene(string sceneName)
         {
-            _startSceneChange = true;
+            _isChangingScene = true;
             toNextSceneFlag.OnNext(sceneName);
         }
 
         private void OnDestroy()
         {
-            _firstStageManager.Dispose();
+            _firstStageManager?.Dispose();
         }
     }
 }

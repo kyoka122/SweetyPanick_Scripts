@@ -1,39 +1,64 @@
 ﻿using System;
 using System.Threading;
-using MyApplication;
+using Cysharp.Threading.Tasks;
+using OutGame.Database;
+using OutGame.Prologue;
+using TalkSystem;
 using UnityEngine;
+using UnityEngine.UI;
+using Utility;
 
 namespace OutGame.Epilogue
 {
-    public class EpilogueBehaviour:MonoBehaviour
+    public class EpilogueBehaviour:MonoBehaviour,IDisposable
     {
-        [SerializeField] Fungus.Flowchart flowchart;
-        //[SerializeField] private Image fadeSpriteImage;
+        [SerializeField] Dialogs dialogs;
+        [SerializeField] private SkipGaugeChargeView skipGaugeChargeView;
         
-        //private ScreenFader _screenFader;
+        private AllTalkInputObserver _allTalkInputObserver;
+        private OutGameDatabase _outGameDatabase;
         private CancellationToken _token;
         private Action _toNextSceneEvent;
         
-        public void Init(Action toNextSceneEvent)
+        
+        public void Init(Action toNextSceneEvent,OutGameDatabase outGameDatabase)
         {
-            //_screenFader = new ScreenFader(fadeSpriteImage);
             _toNextSceneEvent = toNextSceneEvent;
-            CallStartTalk();
+            _outGameDatabase = outGameDatabase;
+            _allTalkInputObserver = new AllTalkInputObserver();
+            dialogs.Init(_allTalkInputObserver,outGameDatabase.GetDialogFaceSpriteScriptableData());
+            skipGaugeChargeView.Init(_allTalkInputObserver.OnSkip);
+        }
+
+        public void CallStartTalk()
+        {
+            dialogs.StartDialogs();
+            ActiveSkip();
         }
         
-        private void CallStartTalk()
+        private async void ActiveSkip()
         {
-            flowchart.SendFungusMessage(FungusCallMethodName.StartTalk);
+            await UniTask.Delay(TimeSpan.FromSeconds(_outGameDatabase.GetTalkPartUIScriptableData().ToSkipFadeInTime),
+                cancellationToken: this.GetCancellationTokenOnDestroy());
+            skipGaugeChargeView.PlayFadeInObjects(_outGameDatabase.GetTalkPartUIScriptableData().SkipFadeInDuration);
+            skipGaugeChargeView.RegisterSkipObserver(MoveNextScene, null,
+                _outGameDatabase.GetTalkPartUIScriptableData().SkipGaugeDuration);
+        }
+
+        private void MoveNextScene()
+        {
+            dialogs.ExitDialog();
+            _toNextSceneEvent.Invoke();
         }
 
         #region Callbacks
+        
 
-        public void MoveNextScene()
-        {
-            _toNextSceneEvent.Invoke();
-        }
-        
         #endregion
-        
+
+        public void Dispose()
+        {
+            _allTalkInputObserver?.Dispose();
+        }
     }
 }

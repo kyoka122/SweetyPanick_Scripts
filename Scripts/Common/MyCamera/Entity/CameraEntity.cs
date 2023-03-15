@@ -10,21 +10,26 @@ namespace InGame.MyCamera.Entity
 {
     public class CameraEntity
     {
-        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> candyUpdateableInStageData { get; private set; }
-        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> mashUpdateableInStageData{ get;private set; }
-        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> fuUpdateableInStageData{ get; private set;}
-        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> kureUpdateableInStageData{ get; private set;}
-        
-        public IReadOnlyReactiveProperty<PlayerUpdateableData> candyUpdateableData{ get; private set;}
-        public IReadOnlyReactiveProperty<PlayerUpdateableData> mashUpdateableData{ get; private set;}
-        public IReadOnlyReactiveProperty<PlayerUpdateableData> fuUpdateableData{ get; private set;}
-        public IReadOnlyReactiveProperty<PlayerUpdateableData> kureUpdateableData{ get; private set;}
-        
-        public Transform GetCharacterTransform(PlayableCharacter characterType) =>
-            _inGameDatabase.GetCharacterInStageData(characterType).transform;
+        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> CandyUpdateableInStageData =>
+            _inGameDatabase.CandyInStageData;
+
+        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> MashUpdateableInStageData =>
+            _inGameDatabase.MashInStageData;
+
+        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> FuUpdateableInStageData =>
+            _inGameDatabase.FuInStageData;
+
+        public IReadOnlyReactiveProperty<CharacterUpdateableInStageData> KureUpdateableInStageData =>
+            _inGameDatabase.KureInStageData;
+
+        public int MaxPriority => 10;
+        public int MinPriority => 0;
+
+        public Dictionary<PlayableCharacter,CharacterUpdateableInStageData> GetCharacterUpdateableInStageData() =>
+            _inGameDatabase.GetAllCharacterInStageData();
         //public Dictionary<PlayableCharacter, bool> HadTargetGroup => _hadTargetGroup;
         
-        public CameraData GetCameraSettingsData(StageArea area)=>_commonDatabase.GetCameraSettingsData(area);
+        public CameraInitData GetCameraInitData(StageArea area)=>_commonDatabase.GetCameraInitData(area);
         
         private readonly Dictionary<PlayableCharacter, bool> _hadTargetGroup;
         private readonly InGameDatabase _inGameDatabase;
@@ -40,22 +45,8 @@ namespace InGame.MyCamera.Entity
             {
                 _hadTargetGroup.Add((PlayableCharacter) i, false);
             }
-            GetObserver();
         }
-
-        private void GetObserver()
-        {
-            candyUpdateableInStageData = _inGameDatabase.GetCharacterInStageDataObserver(PlayableCharacter.Candy);
-            mashUpdateableInStageData = _inGameDatabase.GetCharacterInStageDataObserver(PlayableCharacter.Mash);
-            fuUpdateableInStageData = _inGameDatabase.GetCharacterInStageDataObserver(PlayableCharacter.Fu);
-            kureUpdateableInStageData = _inGameDatabase.GetCharacterInStageDataObserver(PlayableCharacter.Kure);
-            
-            candyUpdateableData = _inGameDatabase.GetPlayerUpdateableDataObserver(PlayableCharacter.Candy);
-            mashUpdateableData = _inGameDatabase.GetPlayerUpdateableDataObserver(PlayableCharacter.Mash);
-            fuUpdateableData = _inGameDatabase.GetPlayerUpdateableDataObserver(PlayableCharacter.Fu);
-            kureUpdateableData = _inGameDatabase.GetPlayerUpdateableDataObserver(PlayableCharacter.Kure);
-        }
-
+        
         /*public void SetCameraFunctionInDatabase(IReadOnlyCameraFunction readOnlyFunction)
         {
             _commonDatabase.SetReadOnlyCameraFunction(readOnlyFunction);

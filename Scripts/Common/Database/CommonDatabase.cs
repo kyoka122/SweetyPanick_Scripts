@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using InGame.Database;
+using InGame.Database.ScriptableData;
 using InGame.MyCamera.Interface;
-using InGame.MyInput;
+using Common.MyInput.Player;
 using MyApplication;
 
 namespace InGame.Common.Database
@@ -12,72 +13,87 @@ namespace InGame.Common.Database
         public CommonDatabase()
         {
             StaticDatabase.input = new List<ControllerNumData>();
-            _cameraData = new List<CameraData>();
+            _cameraData = new List<CameraInitData>();
         }
 
+        #region GameData
+        
+        
+        private int _maxPlayerCount;
+        public void SetMaxPlayerCount(int count)
+        {
+            _maxPlayerCount = count;
+        }
+        
+        public int GetMaxPlayerCount()
+        {
+            return _maxPlayerCount;
+        } 
+
+        #endregion
 
         #region JoyconData
 
-        public void SetControllerNumData(List<ControllerNumData> data)
+        public void SetAllControllerData(List<ControllerNumData> data)
         {
             StaticDatabase.input = new List<ControllerNumData>(data);
         }
 
-        public BasePlayerInput GetControllerNumData(int playerNum)
+        public BasePlayerInput GetControllerData(int playerNum)
         {
             return StaticDatabase.input.FirstOrDefault(num => num.playerNum == playerNum)?.playerInput;
         }
 
-        public IReadOnlyList<ControllerNumData> GetAllControllerNumData()
+        public IReadOnlyList<ControllerNumData> GetAllControllerData()
         {
             return StaticDatabase.input;
         }
-
+        
         #endregion
 
         #region CameraData
 
-        private IReadOnlyCameraFunction _cameraFunction;
+        private IReadOnlyCameraFunction _readOnlyCameraFunction;
 
         public IReadOnlyCameraFunction GetReadOnlyCameraController()
         {
-            return _cameraFunction;
+            return _readOnlyCameraFunction;
         }
 
         public void SetReadOnlyCameraFunction(IReadOnlyCameraFunction cameraFunction)
         {
-            _cameraFunction = cameraFunction;
+            _readOnlyCameraFunction = cameraFunction;
         }
         
         
         
-        private ICameraEvent _cameraEvent;
+        private ICameraActionable _cameraActionable;
 
-        public ICameraEvent GetCameraEvent()
+        public ICameraActionable GetCameraEvent()
         {
-            return _cameraEvent;
+            return _cameraActionable;
         }
 
-        public void SetCameraEvent(ICameraEvent cameraEvent)
+        public void SetCameraEvent(ICameraActionable cameraActionable)
         {
-            _cameraEvent = cameraEvent;
+            _cameraActionable = cameraActionable;
         }
 
         
 
-        private List<CameraData> _cameraData;
+        private List<CameraInitData> _cameraData;
 
-        public void SetCameraData(CameraData[] cameraData)
+        public void SetCameraData(CameraInitData[] cameraData)
         {
             _cameraData = cameraData.ToList();
         }
         
-        public void AddCameraData(CameraData cameraData)
+        public void AddCameraInitData(CameraInitData cameraInitData)
         {
-            _cameraData.Add(cameraData);
+            _cameraData.Add(cameraInitData);
         }
 
-        public CameraData GetCameraSettingsData(StageArea area)
+        public CameraInitData GetCameraInitData(StageArea area)
         {
             return _cameraData.FirstOrDefault(data => data.StageArea == area);
         }
@@ -100,6 +116,21 @@ namespace InGame.Common.Database
 
         #endregion
 
+        #region Load
+
+        private SceneLoadData _sceneLoadData;
+        
+        public SceneLoadData GetSceneLoadData()
+        {
+            return _sceneLoadData;
+        }
+
+        public void SetSceneLoadData(SceneLoadData sceneLoadData)
+        {
+            _sceneLoadData = sceneLoadData;
+        }
+
+        #endregion
         private static class StaticDatabase
         {
             // region PlayerInput

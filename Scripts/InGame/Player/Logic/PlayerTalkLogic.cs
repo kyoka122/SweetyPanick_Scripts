@@ -6,7 +6,6 @@ using InGame.Player.View;
 using MyApplication;
 using OutGame.Database;
 using UniRx;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace InGame.Player.Logic
@@ -16,25 +15,30 @@ namespace InGame.Player.Logic
         private readonly PlayerTalkEntity _playerTalkEntity;
         private readonly PlayerAnimatorView _playerAnimatorView;
         private readonly BasePlayerView _playerView;
+        private readonly PlayerStatusView _playerStatusView;
 
         //private float princessEnterTime=3;
 
-        public PlayerTalkLogic(PlayerTalkEntity playerTalkEntity, PlayerAnimatorView playerAnimatorView, BasePlayerView playerView)
+        public PlayerTalkLogic(PlayerTalkEntity playerTalkEntity, PlayerAnimatorView playerAnimatorView,
+            BasePlayerView playerView,PlayerStatusView playerStatusView)
         {
             _playerTalkEntity = playerTalkEntity;
             _playerAnimatorView = playerAnimatorView;
             _playerView = playerView;
+            _playerStatusView = playerStatusView;
             RegisterObserver();
         }
 
         public void StartTalk()
         {
             _playerAnimatorView.SetAnimatorSpeed(0);
+            _playerStatusView.SetActive(false);
         }
         
         public void FinishTalk()
         {
             _playerAnimatorView.SetAnimatorSpeed(1);
+            _playerStatusView.SetActive(true);
         }
         
         private void RegisterObserver()
@@ -66,16 +70,8 @@ namespace InGame.Player.Logic
         {
             Vector2 destination = (Vector2) _playerView.GetTransform().position + moveVec;
 
-            try
-            {
-                await DOTween.Sequence(_playerView.GetTransform().DOMove(destination, exitTime))
-                    .AsyncWaitForCompletion();
-
-            }
-            catch (OperatorException)
-            {
-                Debug.Log($"Canceled Move");
-            }
+            await _playerView.GetTransform().DOMove(destination, exitTime)
+                .ToUniTask(cancellationToken: token);
         }
 
         private void OffRunAnimation()

@@ -1,5 +1,6 @@
 ﻿using InGame.Common.Interface;
 using InGame.Stage.Entity;
+using KanKikuchi.AudioManager;
 using MyApplication;
 using UniRx;
 
@@ -24,9 +25,18 @@ namespace InGame.Stage.Logic
                 animationCallbackSender.OnAnimationEvent
                     .Subscribe(name =>
                     {
-                        if (name==StageAnimationCallbackName.OnCrepeCameraShake)
+                        switch (name)
                         {
-                            _stageGimmickEntity.CameraShakeEvent.Invoke(_stageGimmickEntity.CrepeCameraShakeVelocity);
+                            case StageAnimationCallbackName.OnCrepeImpact:
+                                _stageGimmickEntity.CameraShakeEvent.Invoke(_stageGimmickEntity.CrepeCameraShakeVelocity);
+                                SEManager.Instance.Play(SEPath.CREPE_ROLLING);
+                                break;
+                            case StageAnimationCallbackName.OnCrepeSoundLoop:
+                                SEManager.Instance.Play(SEPath.CREPE_ROLLING,isLoop:true);
+                                break;
+                            case StageAnimationCallbackName.OffCrepeSoundLoop:
+                                SEManager.Instance.Stop(SEPath.CREPE_ROLLING);
+                                break;
                         }
                     });
             }

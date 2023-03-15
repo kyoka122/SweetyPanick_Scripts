@@ -5,7 +5,7 @@ using DebugInput;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Database.ScriptableData;
-using InGame.MyCamera.Installer;
+using InGame.Player.Installer;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
 using KanKikuchi.AudioManager;
@@ -21,15 +21,19 @@ namespace SceneSequencer
 {
     public class SecondStageSequencer:BaseSceneSequencer
     {
+        private const float ToNextStageDelay = 1.0f;
+        private const float ToMoveSceneFadeOutDurationMin = 5.0f;
+        
         [SerializeField] private int currentMovePlayer;
         
         [SerializeField] private StageUIScriptableData stageUIScriptableData;
         [SerializeField] private PlayerInstancePositions secondStageStartInstancePositions;
         [SerializeField] private PlayerInstancePositions secondStageMiddleInstancePositions;
         [SerializeField] private PlayerInstancePositions secondHiddenStageInstancePositions;
-        [SerializeField] private CameraData secondStageCameraData;
-        [SerializeField] private CameraData secondHiddenStageCameraData;
-        [SerializeField] private CameraData secondStageMiddleCameraData;
+        [SerializeField] private StageSettingsScriptableData stageSettingsScriptableData;
+        [SerializeField] private CameraInitData secondStageCameraData;
+        [SerializeField] private CameraInitData secondHiddenStageCameraData;
+        [SerializeField] private CameraInitData secondStageMiddleCameraData;
 
         [SerializeField] private MoveStageGimmickInstaller moveStageGimmickInstaller;
         [SerializeField] private CinemachineTargetGroup targetGroup;
@@ -47,26 +51,33 @@ namespace SceneSequencer
 
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
-            Debug.Log($"Init SecondStage!!!!!!!!!!!!!!!!!!!!!!!!!",gameObject);
+            Debug.Log($"Init SecondStage!!",gameObject);
             _inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
             _outGameDatabase = outGameDatabase;
             SetInGameDatabase();
-            var cameraController = new CameraInstaller().InstallMoveAndMultiStageCamera(inGameDatabase, commonDatabase, targetGroup,
+            commonDatabase.AddCameraInitData(secondStageCameraData);
+            commonDatabase.AddCameraInitData(secondHiddenStageCameraData);
+            commonDatabase.AddCameraInitData(secondStageMiddleCameraData);
+            
+            var cameraController = _inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveAndMultiStageCamera(inGameDatabase, commonDatabase, targetGroup,
                 cinemachineImpulseSource, camera,cinemachineConfiner2D);
-            _debugCharacterChanger = new DebugCharacterChanger();
+            //_debugCharacterChanger = new DebugCharacterChanger();
             _secondStageManager=new SecondStageManager(moveStageGimmickInstaller,cameraController,_inGameDatabase,_commonDatabase,
                 MoveNextScene);
             
-            commonDatabase.AddCameraData(secondStageCameraData);
-            commonDatabase.AddCameraData(secondHiddenStageCameraData);
-            commonDatabase.AddCameraData(secondStageMiddleCameraData);
             InstallAllPlayer();
             _secondStageManager.LateInit();
         }
 
         protected override async void ProcessInOrder()
         {
+            this.LateUpdateAsObservable()
+                .Subscribe(_ =>
+                {
+                    _secondStageManager.LateUpdate();
+                }).AddTo(this);
+            
             try
             {
                 await LoadManager.Instance.TryPlayFadeOut();
@@ -74,6 +85,11 @@ namespace SceneSequencer
             catch (OperationCanceledException)
             {
                 Debug.Log($"Cancel Loading");
+            }
+            
+            if (!BGMManager.Instance.IsPlaying())
+            {
+                BGMManager.Instance.Play(BGMPath.STAGE_BGM);
             }
 
             this.FixedUpdateAsObservable()
@@ -85,24 +101,23 @@ namespace SceneSequencer
                     }
                     _secondStageManager.FixedUpdateEnemy();
                     _secondStageManager.FixedUpdateStage();
+                    _secondStageManager.FixedUpdateCamera();
                     for (int i = 1; i <=  _commonDatabase.GetUseCharacterData().Count; i++)
                     {
                         _secondStageManager.FixedUpdatePlayableCharacter(i);
                     }
                 })
                 .AddTo(this);
-            this.LateUpdateAsObservable()
-                .Subscribe(_ =>
-                {
-                    _secondStageManager.LateUpdate();
-                }).AddTo(this);
         }
 
         protected override async void Finish(string nextSceneName)
         {
+            BGMManager.Instance.FadeOut(BGMPath.STAGE_BGM, 2, () => {
+                Debug.Log("BGMフェードアウト終了");
+            });
             try
             {
-                await LoadManager.Instance.TryPlayBlackFadeIn();
+                await LoadManager.Instance.TryPlayLoadScreen(ToNextStageDelay,ToMoveSceneFadeOutDurationMin);
             }
             catch (OperationCanceledException)
             {
@@ -118,13 +133,21 @@ namespace SceneSequencer
             _inGameDatabase.AddPlayerInstancePositions(StageArea.SecondStageFirst,secondStageStartInstancePositions);
             _inGameDatabase.AddPlayerInstancePositions(StageArea.SecondHiddenStage,secondHiddenStageInstancePositions);
             _inGameDatabase.AddPlayerInstancePositions(StageArea.SecondStageMiddle,secondStageMiddleInstancePositions);
+            _inGameDatabase.SetStageSettings(stageSettingsScriptableData);
         }
 
         private void InstallAllPlayer()
         {
             CharacterCommonConstData[] allCharacterConstData = _inGameDatabase.GetAllCharacterConstData();
             var characterData=_commonDatabase.GetUseCharacterData();
-
+            
+            //MEMO: Player設定シーンを飛ばした場合、仮でキーボード、Candyのデータを追加する
+            if (characterData == null)
+            {
+                new DebugInputInstaller().Install(_commonDatabase);
+            }
+            characterData=_commonDatabase.GetUseCharacterData();
+            
             for (int i = 1; i <= characterData.Count; i++)
             {
                 UseCharacterData useCharacterData = characterData.FirstOrDefault(data => data.playerNum == i);
@@ -138,7 +161,6 @@ namespace SceneSequencer
                         .Installer.Install(i,StageArea.SecondStageFirst, _inGameDatabase,_outGameDatabase, _commonDatabase);
                
                 _secondStageManager.AddController(playerController);
-                //targetGroup.AddMember(controller.GetPlayerPrefabTransform(),cinemaChineWeight,cinemaChineRadius);
                 _secondStageManager.RegisterPlayerEvent(playerController);
             }
         }
@@ -151,7 +173,7 @@ namespace SceneSequencer
 
         private void OnDestroy()
         {
-            _secondStageManager.Dispose();
+            _secondStageManager?.Dispose();
         }
 
     }

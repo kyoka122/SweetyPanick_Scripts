@@ -27,7 +27,7 @@ namespace InGame.SceneLoader.View
         [SerializeField] private Image loadDissolveFaderImage;
         [SerializeField] private RectTransform loadBackgroundRectTransform;
         [SerializeField] private RectTransform waveTransform;
-        [SerializeField] private Material playersMaterial;
+        [SerializeField] private Material playersMaterial;//MEMO: プレイヤーをまとめてフェードしたいのでマテリアルを変更する
         [SerializeField] private Material loadUIMaterial;
 
         public void Init()
@@ -50,16 +50,14 @@ namespace InGame.SceneLoader.View
         {
             return materials.DOSameFades(1, fadeDuration)
                 .SetEase(ease)
-                .AsyncWaitForCompletion()
-                .AsUniTask();
+                .ToUniTask(cancellationToken: token);
         }
         
         public UniTask FadeOutLoadObjects(Material[] materials,float fadeDuration,Ease ease,CancellationToken token)
         {
             return materials.DOSameFades(0, fadeDuration)
                 .SetEase(ease)
-                .AsyncWaitForCompletion()
-                .AsUniTask();
+                .ToUniTask(cancellationToken: token);
         }
 
         public void InitOnFadeIn()
@@ -67,6 +65,16 @@ namespace InGame.SceneLoader.View
             CancellationToken token = this.GetCancellationTokenOnDestroy();
             FadeOutLoadObjects(LoadScreenMaterials, 0, Ease.Unset, token);
             LoadScreenFader.FadeOut(0, Ease.Unset, token).Forget();
+        }
+        
+        public void OnDestroy()
+        {
+            if (LoadScreenFader?.GetDisposeMaterial()!=null)
+            {
+                Destroy(LoadScreenFader.GetDisposeMaterial());
+            }
+
+            InitOnFadeIn();
         }
     }
 }

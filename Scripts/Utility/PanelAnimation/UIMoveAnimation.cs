@@ -41,7 +41,7 @@ namespace Utility.PanelAnimation
                     _upTarget.gameObject.SetActive(true);
                     _downTarget.gameObject.SetActive(true);
                 })
-                .AsyncWaitForCompletion();
+                .ToUniTask(cancellationToken:token);
         }
 
         public async UniTask Exit(CancellationToken token)
@@ -54,7 +54,7 @@ namespace Utility.PanelAnimation
                     _upTarget.gameObject.SetActive(false);
                     _downTarget.gameObject.SetActive(false);
                 })
-                .AsyncWaitForCompletion();
+                .ToUniTask(cancellationToken:token);
         }
     }
 }
