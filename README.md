@@ -6,6 +6,8 @@
 ## 担当箇所
 [Scripts/TalkSystem](https://github.com/kyoka122/SweetyPanick_Scripts/tree/main/Scripts/TalkSystem) 一部機能以外全て
 
+その他参考資料がある場合はスクリプトの上部に書いてあります。
+
 ## 使用ライブラリ（ライブラリは同封しておりません）
 * [UniTask (ver.2.3.3)](https://github.com/Cysharp/UniTask)
 * [UniRx (ver.7.1.0)](https://assetstore.unity.com/packages/tools/integration/unirx-reactive-extensions-for-unity-17276?locale=ja-JP)
