@@ -18,7 +18,7 @@
 * InputSystem (ver.1.3.0) (UnityRegistry)
 
 
-## クラス図
+## クラス図（インゲーム部分）
 
 [pumlファイル](https://github.com/kyoka122/SweetyPanick_Scripts/blob/main/Scripts/ClassDiagram/InGame.puml)
 
