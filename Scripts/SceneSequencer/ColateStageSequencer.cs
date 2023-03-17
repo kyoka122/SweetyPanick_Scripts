@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.MyInput.Player;
+using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Common.Database.ScriptableData;
 using InGame.Database;
@@ -17,13 +17,15 @@ using StageManager;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 namespace SceneSequencer
 {
     public class ColateStageSequencer:BaseSceneSequencer
     {
+        private const float ToFadeInTime = 2;
+        private const float FadeInBGMTime = 3;
+        
         [SerializeField] private ColateStageTalkPartBehaviour colateStageTalkPartBehaviour;
         [SerializeField] private ColateStageGimmickInstaller colateStageGimmickInstaller;
         [SerializeField] private StageUIScriptableData stageUiScriptableData;
@@ -160,7 +162,9 @@ namespace SceneSequencer
         protected override async void Finish(string nextSceneName)
         {
             DisposeInGameController();
-            BGMManager.Instance.FadeOut(BGMPath.PROLOGUE, 2, () => {
+            await UniTask.Delay(TimeSpan.FromSeconds(ToFadeInTime), cancellationToken: this.GetCancellationTokenOnDestroy());
+            
+            BGMManager.Instance.FadeOut(BGMPath.PROLOGUE, FadeInBGMTime, () => {
                 Debug.Log("BGMフェードアウト終了");
             });
             

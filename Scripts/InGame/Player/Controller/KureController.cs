@@ -14,10 +14,10 @@ namespace InGame.Player.Controller
             PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic,
             PlayerFixSweetsLogic playerFixSweetsLogic, PlayerEnterDoorLogic playerEnterDoorLogic,
             PlayableCharacterSelectLogic playableCharacterSelectLogic, PlayerTalkLogic playerTalkLogic,
-            List<IDisposable> disposables, IObservable<bool> onChangedUseDataUse)
+            List<IDisposable> disposables, IObservable<bool> onChangedUseData)
             : base(playerNum, playerMoveLogic, playerJumpLogic, playerPunchLogic, kureSkillLogic, playerReShapeLogic,
                 playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic, playerEnterDoorLogic,
-                playableCharacterSelectLogic, playerTalkLogic, disposables, onChangedUseDataUse)
+                playableCharacterSelectLogic, playerTalkLogic, disposables, onChangedUseData)
         {
             _kureSkillLogic = kureSkillLogic;
         }

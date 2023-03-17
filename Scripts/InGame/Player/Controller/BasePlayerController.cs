@@ -30,7 +30,7 @@ namespace InGame.Player.Controller
         /// <summary>
         /// Logicから使用中かのデータを受け取る
         /// </summary>
-        public readonly IObservable<bool> onChangedUseDataUse;
+        public readonly IObservable<bool> onChangedUseData;
 
         protected BasePlayerController(int playerNum,PlayerMoveLogic playerMoveLogic, PlayerJumpLogic playerJumpLogic,
             PlayerPunchLogic playerPunchLogic,
@@ -38,7 +38,7 @@ namespace InGame.Player.Controller
             PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic,
             PlayerParticleLogic playerParticleLogic, PlayerFixSweetsLogic playerFixSweetsLogic,
             PlayerEnterDoorLogic playerEnterDoorLogic, PlayableCharacterSelectLogic playableCharacterSelectLogic,
-            PlayerTalkLogic playerTalkLogic, List<IDisposable> disposables,IObservable<bool> onChangedUseDataUse)
+            PlayerTalkLogic playerTalkLogic, List<IDisposable> disposables,IObservable<bool> onChangedUseData)
         {
             this.playerMoveLogic = playerMoveLogic;
             this.playerJumpLogic = playerJumpLogic;
@@ -53,14 +53,14 @@ namespace InGame.Player.Controller
             this.playableCharacterSelectLogic = playableCharacterSelectLogic;
             this.playerTalkLogic = playerTalkLogic;
             this.disposables = disposables;
-            this.onChangedUseDataUse = onChangedUseDataUse;
+            this.onChangedUseData = onChangedUseData;
             RegisterObserver();
             playerStatusLogic.SetInstalled();
         }
 
         private void RegisterObserver()
         {
-            onChangedUseDataUse.Subscribe(used =>
+            onChangedUseData.Subscribe(used =>
                 {
                     if (used)
                     {

@@ -35,7 +35,10 @@ namespace InGame.Stage.View
         public void InitAtStageMove()
         {
             _isDoorOpen = false;
-            _animator.SetTrigger(StageAnimatorParameter.OnClose);
+            if (_animator.GetCurrentAnimatorStateInfo(0).IsName(DoorAnimationName))
+            {
+                _animator.SetTrigger(StageAnimatorParameter.OnClose);
+            }
         }
 
         public async void TryEnterDoor()
@@ -44,6 +47,7 @@ namespace InGame.Stage.View
             {
                 return;
             }
+
             _isDoorOpen = true;
             _animator.SetTrigger(StageAnimatorParameter.OnOpen);
             CancellationToken token = this.GetCancellationTokenOnDestroy();
@@ -55,8 +59,7 @@ namespace InGame.Stage.View
         private bool HadFinishedOpenAnimation()
         {
             var stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-            return stateInfo.normalizedTime >= 1 &&
-                   stateInfo.IsName(DoorAnimationName);
+            return stateInfo.normalizedTime >= 1 && stateInfo.IsName(DoorAnimationName);
         }
 
     }

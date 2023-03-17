@@ -23,6 +23,9 @@ namespace InGame.Stage.View
         
         public void SetPosition(Vector2 pos)
         {
+            Debug.Log($"CurrentBackGroundPos:{transform.position}",gameObject);
+            Debug.Log($"CurrentLocalBackGroundPos:{transform.localPosition}",gameObject);
+            Debug.Log($"BackGround SetPos:{pos}",gameObject);
             transform.position = pos;
         }
         

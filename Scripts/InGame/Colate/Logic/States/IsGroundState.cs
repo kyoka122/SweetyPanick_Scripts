@@ -36,7 +36,7 @@ namespace InGame.Colate.Logic
             _passedInterval += Time.deltaTime;
             if (_passedInterval>colateEntity.ConfuseDuration)
             {
-                nextStateInstance = new SurfaceState(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
+                nextStateInstance = new DamagedSurface(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
                 stage = Event.Exit;
                 return;
             }

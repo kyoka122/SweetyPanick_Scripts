@@ -34,6 +34,7 @@ namespace InGame.Enemy.Logic
             }
             if (!enemyView.inScreenX)
             {
+                //TODO: アニメーション停止処理追加
                 return;
             }
             if (enemyView.state==EnemyState.ChangeDirection)

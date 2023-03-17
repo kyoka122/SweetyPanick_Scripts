@@ -32,6 +32,7 @@ namespace SceneSequencer
             try
             {
                 await LoadManager.Instance.TryPlayFadeOut();
+                Debug.Log($"FadeOut");
             }
             catch (OperationCanceledException)
             {

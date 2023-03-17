@@ -38,7 +38,7 @@ namespace InGame.MyCamera.Logic
 
             if (_haveCinemachineConfinerInStage)
             {
-                _cinemachineConfiner2D.m_BoundingShape2D = cameraData.StageAreaCollider;
+                _cinemachineConfiner2D.m_BoundingShape2D = cameraData.StageAreaCompositeCollider;
             }
             
             _mainCameraView.SetPosition(cameraData.InitPosition);

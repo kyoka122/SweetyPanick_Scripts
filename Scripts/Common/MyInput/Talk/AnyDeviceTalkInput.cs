@@ -61,7 +61,7 @@ namespace Common.MyInput.Talk
 
         public override void Dispose()
         {
-            _inputMap.Dispose();
+            _inputMap.Disable();
             base.Dispose();
         }
     }

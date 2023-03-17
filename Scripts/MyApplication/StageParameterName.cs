@@ -22,9 +22,4 @@
         public const string OnCrepeSoundLoop = "OnCrepeSoundLoop";
         public const string OffCrepeSoundLoop = "OffCrepeSoundLoop";
     }
-    
-    public static class ColateAnimatorParameter
-    {
-        public const string OnEffect = "OnEffect";//MEMO: 敵出現時のエフェクト
-    }
 }

@@ -85,7 +85,7 @@ namespace StageManager
 
         private void RegisterUsePlayerObserver(BasePlayerController playerController)
         {
-            playerController.onChangedUseDataUse.Subscribe(_ =>
+            playerController.onChangedUseData.Subscribe(_ =>
             {
                 if (_controllers.Count(data=>data.isUsed)==0)
                 {
@@ -175,7 +175,8 @@ namespace StageManager
             {
                 Debug.Log($"Cancel Loading");
             }
-            
+
+            Debug.Log($"Stage Moved!: {nextStageArea}");
             SetAllPlayerReStart();
         }
 

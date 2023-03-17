@@ -24,6 +24,7 @@ namespace InGame.Colate.Logic
         {
             colateView.SetActiveGravity(true);
             colateView.SetSprite(ColateSpriteType.Falling);
+            colateView.SetBoolAnimation(ColateAnimatorParameter.IsDropBlinking,true);
             base.Enter();
         }
         
@@ -60,6 +61,11 @@ namespace InGame.Colate.Logic
             Debug.DrawRay(colateView.GetToGroundRayPos(),Vector3.up*rayDistance,Color.red,0.5f);
         }
 
+        protected override void Exit()
+        {
+            colateView.SetBoolAnimation(ColateAnimatorParameter.IsDropBlinking,false);
+            base.Exit();
+        }
 
     }
 }

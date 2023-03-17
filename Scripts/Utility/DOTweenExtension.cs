@@ -45,13 +45,11 @@ namespace Utility
         
         public static TweenerCore<Color, Color, ColorOptions> DOSameFades(this MaskableGraphic[] target, float endValue, float duration)
         {
-            Debug.Log($"targetColor: {target[0].color} endValue:{endValue}",target[0]);
             TweenerCore<Color, Color, ColorOptions> t=null;
             foreach (var targetMaterial in target)
             {
                 t = DOTween.ToAlpha(() => targetMaterial.color, x => targetMaterial.color = x, endValue, duration);
                 t.SetTarget(target);
-                Debug.Log($"targetMaterial: {targetMaterial.color}",targetMaterial);
             }
             return t;
         }

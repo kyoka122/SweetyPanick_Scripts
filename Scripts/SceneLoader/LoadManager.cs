@@ -120,8 +120,8 @@ namespace InGame.SceneLoader
             if (_blackFadeLogic.isFadeIn)
             {
                 Debug.Log($"BlackFadeOut!");
-                await _blackFadeLogic.TryPlayBlackFadeOut(thisToken);
                 _gameOverLogic.TrySetFadeOut();
+                await _blackFadeLogic.TryPlayBlackFadeOut(thisToken);
                 return;
             }
             if (_loadLogic.isLoading)

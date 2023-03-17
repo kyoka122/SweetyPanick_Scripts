@@ -27,28 +27,42 @@ namespace InGame.Stage.Logic
             {
                 _currentBackGroundView.SetParent(null);
             }
-            _currentBackGroundView = _stageBaseEntity.GetCameraData(newStageArea).BackgroundView;
-            
-            if(_currentBackGroundView==null)
+
+            var data = _stageBaseEntity.GetCameraData(newStageArea);
+            if(data==null)
             {
-                Debug.LogWarning($"Not Found BackGroundView! area:{newStageArea}");
-                _canUpdateBackGroundPos = false;
-                _stageBaseEntity.SetBackGroundRangeCollider(null);
+                _currentBackGroundView = null;
                 _stageBaseEntity.SetCameraInitPos(Vector2.zero);
                 _stageBaseEntity.SetPrevCameraPos(Vector2.zero);
+                _canUpdateBackGroundPos = false;
+                _stageBaseEntity.SetStageRangeCollider(null);
                 return;
             }
 
-            _canUpdateBackGroundPos = true;
-            _stageBaseEntity.SetBackGroundRangeCollider(_stageBaseEntity.StageAreaCollider2D(newStageArea));
-            _stageBaseEntity.SetCameraInitPos(_stageBaseEntity.CameraPos);
+            _currentBackGroundView = data.BackgroundView;
+            if (_currentBackGroundView==null)
+            {
+                _canUpdateBackGroundPos = false;
+                Debug.LogWarning($"Not Found BackGroundView! area:{newStageArea}");
+            }
+            else
+            {
+                _canUpdateBackGroundPos = true;
+            }
+
+            _stageBaseEntity.SetStageRangeCollider(_stageBaseEntity.GetStageAreaCollider2D(newStageArea));
+          
+            //_stageBaseEntity.SetCameraInitPos(_stageBaseEntity.CameraPos);
             _stageBaseEntity.SetPrevCameraPos(_stageBaseEntity.CameraPos);
             
             //MEMO: 子オブジェクトにすることで追従させる
             _currentBackGroundView.SetParent(_stageBaseEntity.CameraTransform);
-            
+
+            //Debug.Log($"backGroundCollider2D:{_currentBackGroundView.backGroundCollider2D.transform.position}",_currentBackGroundView.backGroundCollider2D);
+            //Debug.Log($"stageRangeCollider2D:{_stageBaseEntity.stageRangeCollider2D.transform.position}",_stageBaseEntity.stageRangeCollider2D);
             SetBackGroundRange();
             SetStageRange();
+            //Debug.Log($"astageRangeCollider2D:{_stageBaseEntity.stageRangeCollider2D.transform.position}",_stageBaseEntity.stageRangeCollider2D);
         }
         
         //MEMO: カメラ位置によって背景位置をずらすことで背景に奥行きを出す
@@ -64,6 +78,7 @@ namespace InGame.Stage.Logic
             SetStageRange();//MEMO: 実行中のColliderサイズの変更に対応させるため
 #endif
             UpdateBackGroundPos(_stageBaseEntity.backGroundRangeRect, _stageBaseEntity.stageRangeRect);
+            //Debug.Log($"astageRangeCollider2D:{_stageBaseEntity.stageRangeCollider2D.transform.position}",_stageBaseEntity.stageRangeCollider2D);
         }
         
         
@@ -75,8 +90,8 @@ namespace InGame.Stage.Logic
         {
             Vector2 colliderSize = _currentBackGroundView.backGroundCollider2D.size;
             Vector2 colliderOffset = _currentBackGroundView.backGroundCollider2D.offset;
-            Matrix4x4 localToWorldMatrix = _currentBackGroundView.transform.localToWorldMatrix;
-            Rect worldBoxColliderRange=GetWorldColliderRangeRect(colliderOffset, colliderSize, localToWorldMatrix);
+            
+            Rect worldBoxColliderRange=GetWorldColliderRangeRect(colliderOffset, colliderSize, _currentBackGroundView.GetPosition());
             _stageBaseEntity.SetBackGroundRangeRect(worldBoxColliderRange);
         }
         
@@ -87,16 +102,16 @@ namespace InGame.Stage.Logic
         {
             Vector2 colliderSize = _stageBaseEntity.stageRangeCollider2D.size;
             Vector2 colliderOffset = _stageBaseEntity.stageRangeCollider2D.offset;
-            Matrix4x4 localToWorldMatrix = _stageBaseEntity.stageRangeCollider2D.transform.localToWorldMatrix;
-            Rect worldBoxColliderRange=GetWorldColliderRangeRect(colliderOffset, colliderSize, localToWorldMatrix);
+            Vector2 colliderObjPos = _stageBaseEntity.stageRangeCollider2D.transform.position;
+            Rect worldBoxColliderRange=GetWorldColliderRangeRect(colliderOffset, colliderSize, colliderObjPos);
+            
             _stageBaseEntity.SetStageRangeRect(worldBoxColliderRange);
         }
         
-        private Rect GetWorldColliderRangeRect(Vector2 localOffset,Vector2 localSize,Matrix4x4 localToWorldMatrix)
+        private Rect GetWorldColliderRangeRect(Vector2 localOffset,Vector2 localSize,Vector2 pos)
         {
-            Vector2 worldColliderSize = localToWorldMatrix * localSize;
-            Vector2 worldColliderOffset = localToWorldMatrix * localOffset;
-            Rect range = new Rect(worldColliderOffset, worldColliderSize);
+            Vector2 rectPosition = pos + localOffset - localSize / 2f;
+            Rect range = new Rect(rectPosition, localSize);
             return range;
         }
 
@@ -104,10 +119,11 @@ namespace InGame.Stage.Logic
         private void UpdateBackGroundPos(Rect backGroundRange,Rect stageRange)
         {
             float backGroundMoveXFactoredStage = (_stageBaseEntity.CameraPos.x - stageRange.center.x) /
-                stageRange.width * backGroundRange.width + backGroundRange.x;
+                (stageRange.width) * backGroundRange.width / 2 - _currentBackGroundView.backGroundCollider2D.offset.x;
+
             float backGroundMoveYFactoredStage = (_stageBaseEntity.CameraPos.y - stageRange.center.y) /
-                stageRange.height * backGroundRange.height * 1.5f + backGroundRange.y;
-            _currentBackGroundView.SetLocalXYPosition(new Vector2(-backGroundMoveXFactoredStage, -backGroundMoveYFactoredStage));
+                stageRange.height * backGroundRange.height / 2 / 7-5f;
+            _currentBackGroundView.SetLocalXYPosition(new Vector2(-backGroundMoveXFactoredStage,-backGroundMoveYFactoredStage));
         }
     }
 }

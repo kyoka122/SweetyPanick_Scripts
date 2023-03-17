@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace InGame.Colate.View
 {
-    [RequireComponent(typeof(Rigidbody2D),typeof(ColateChildComponents))]
+    [RequireComponent(typeof(Rigidbody2D),typeof(ColateChildComponents),typeof(Animator))]
     public class ColateView:MonoBehaviour,IEnemyDamageAble,IDisposable
     {
         public bool OnDrawRay => onDrawRay;
@@ -16,10 +16,11 @@ namespace InGame.Colate.View
         public IObservable<bool> Attacked=>_attackedSubject;
         
         [SerializeField] private bool onDrawRay;
+        [SerializeField] private ColateSprite[] _colateSprites;
         
         private ColateChildComponents _colateChildComponents;
-        [SerializeField] private ColateSprite[] _colateSprites;
         private Rigidbody2D _rigidbody;
+        private Animator _animator;
 
         private GameObject _currentSpriteObj;
         private Subject<Collider2D> _onTriggerEnterSubject;
@@ -34,6 +35,8 @@ namespace InGame.Colate.View
             _attackedSubject = new Subject<bool>();
             _rigidbody = GetComponent<Rigidbody2D>();
             _colateChildComponents = GetComponent<ColateChildComponents>();
+            _animator = GetComponent<Animator>();
+            
             _defaultGravityScale = _rigidbody.gravityScale;
             _prevDirection = -1;
             _currentSpriteObj = _colateSprites.FirstOrDefault(data => data.Type == ColateSpriteType.Stand)?.SpriteObj;
@@ -157,6 +160,12 @@ namespace InGame.Colate.View
         public void OnExplosionEffect()
         {
             _colateChildComponents.ExplosionAnimator.SetTrigger(ColateAnimatorParameter.OnEffect);
+        }
+
+
+        public void SetBoolAnimation(string animationName,bool on)
+        {
+            _animator.SetBool(animationName,on);
         }
     }
 }

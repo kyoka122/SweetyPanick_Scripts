@@ -15,13 +15,15 @@ namespace InGame.Stage.Entity
         public Transform CameraTransform => _commonDatabase.GetCameraEvent().GetCameraTransform();
         public float BackGroundMoveRateX => _inGameDatabase.GetStageSettings().BackGroundMoveRateX;
         public float BackGroundMoveRateY => _inGameDatabase.GetStageSettings().BackGroundMoveRateY;
-        public BoxCollider2D StageAreaCollider2D(StageArea area) => _commonDatabase.GetCameraInitData(area)
+        public BoxCollider2D GetStageAreaCollider2D(StageArea area) => _commonDatabase.GetCameraInitData(area)
             .StageAreaCollider;
+        
+        public CompositeCollider2D GetStageAreaCompositeCollider2D(StageArea area) => _commonDatabase.GetCameraInitData(area)
+            .StageAreaCompositeCollider;
 
         public CameraInitData GetCameraData(StageArea newStageArea) => _commonDatabase.GetCameraInitData(newStageArea);
         
         public BoxCollider2D stageRangeCollider2D { get; private set; }
-        
         public Vector2 prevCameraPos { get; private set; }
         public Vector2 cameraInitPos { get; private set; }
         public Rect stageRangeRect{ get; private set; }
@@ -62,9 +64,9 @@ namespace InGame.Stage.Entity
             cameraRangeRect = cameraRect;
         }
 
-        public void SetBackGroundRangeCollider(BoxCollider2D backGroundRangeCollider2D)
+        public void SetStageRangeCollider(BoxCollider2D collider2D)
         {
-            stageRangeCollider2D = backGroundRangeCollider2D;
+            stageRangeCollider2D = collider2D;
         }
     }
 }

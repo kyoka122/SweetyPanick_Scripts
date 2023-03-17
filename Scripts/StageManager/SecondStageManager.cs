@@ -12,6 +12,7 @@ using InGame.SceneLoader;
 using InGame.Stage.Installer;
 using InGame.Stage.Manager;
 using MyApplication;
+using UniRx;
 using UnityEngine;
 
 namespace StageManager
@@ -26,11 +27,13 @@ namespace StageManager
         private readonly CameraController _cameraController;
         private readonly Action<string> _moveNextSceneEvent;
         private CancellationTokenSource _blackFadeInTokenSource;
+        private readonly CommonDatabase _commonDatabase;
         
         public SecondStageManager(MoveStageGimmickInstaller moveStageGimmickInstaller,CameraController cameraController,
             InGameDatabase inGameDatabase,CommonDatabase commonDatabase, Action<string> moveNextSceneEvent)
         {
-            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, inGameDatabase,commonDatabase);
+            _commonDatabase = commonDatabase;
+            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, inGameDatabase,_commonDatabase);
             _cameraController = cameraController;
             _moveNextSceneEvent = moveNextSceneEvent;
             _controllers = new List<BasePlayerController>();
@@ -42,6 +45,7 @@ namespace StageManager
         public void AddController(BasePlayerController controller)
         {
             _controllers.Add(controller);
+            RegisterUsePlayerObserver(controller);
         }
         
         public void FixedUpdateEnemy()
@@ -89,7 +93,18 @@ namespace StageManager
         {
             controller.RegisterPlayerEvent(SwitchPlayerActionEvent);
         }
-        
+
+        private void RegisterUsePlayerObserver(BasePlayerController playerController)
+        {
+            playerController.onChangedUseData.Subscribe(_ =>
+            {
+                if (_controllers.Count(data => data.isUsed) == 0)
+                {
+                    LoadManager.Instance.TryPlayGameOverFadeIn();
+                }
+            });
+        }
+
         private void SwitchPlayerActionEvent(FromPlayerEvent fromPlayerEvent)
         {
             switch (fromPlayerEvent)
@@ -171,11 +186,12 @@ namespace StageManager
         
         private void InitAtStageMove(StageArea nextStageArea)
         {
-            _cameraController.SetCameraMoveState(nextStageArea);
+            Debug.Log($"CameraInit");
             foreach (var controller in _controllers)
             {
                 controller.MoveStage(nextStageArea);
             }
+            _cameraController.SetCameraMoveState(nextStageArea);
             _stageGimmickManager.InitAtStageMove(nextStageArea);
         }
 

@@ -26,13 +26,13 @@ namespace InGame.Player.Logic
 
         public void UpdatePlayerEnterDoor()
         {
-            _playerInputEntity.OffEnterDoorFlag();
             if (!_playerInputEntity.enterDoorFlag)
             {
                 return;
             }
             if (!CanEnterDoor())
             {
+                _playerInputEntity.OffEnterDoorFlag();
                 return;
             }
             DoorView door = GetFacedDoor();
@@ -41,15 +41,21 @@ namespace InGame.Player.Logic
 #if UNITY_EDITOR
                 if (door.IsIgnoreKeyCheck)
                 {
+                    Debug.Log($"KeyIgnore. Enter");
                     door.TryEnterDoor();
+                    _playerInputEntity.OffEnterDoorFlag();
                     return;
                 }
 #endif
                 if (CanEnterDoorByKeyCheck(door.IsKeyDoor))
                 {
+                    Debug.Log($"TryEnterDoor");
                     door.TryEnterDoor();
+                    _playerInputEntity.OffEnterDoorFlag();
+                    return;
                 }
             }
+            _playerInputEntity.OffEnterDoorFlag();
         }
 
         public void Stop()
@@ -69,6 +75,7 @@ namespace InGame.Player.Logic
             {
                 return null;
             }
+
             var door = raycastHit2D.collider.gameObject.GetComponent<DoorView>();
             
 #if UNITY_EDITOR

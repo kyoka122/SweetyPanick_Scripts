@@ -50,7 +50,7 @@ namespace InGame.SceneLoader.Logic
             isFading = true;
             _gameOverView.SetFadeOut();
             _gameOverView.SetActive(false);
-            _loadCameraView.SetActive(false);
+            //_loadCameraView.SetActive(false);//MEMO: カメラは別スクリーンでfalseにする
             isFadeIn = false;
             isFading = false;
         }
