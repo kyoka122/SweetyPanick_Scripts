@@ -76,8 +76,8 @@ namespace InGame.Player.Logic
 
         public void UpdateStopping()
         {
+            Debug.Log($"Move Stopping");
             _playerView.SetXVelocity(0);
-            //PlayMoveAnimation(0);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace InGame.Player.Logic
         
         private float AddedInputValue(float originXSpeed)
         {
-            if (!(_playerCommonInStageEntity.IsUsingSkill||_playerCommonInStageEntity.IsFixing||_playerCommonUpdateableEntity.IsDead))
+            if (!(_playerAnimatorView.IsUsingSkill()||_playerAnimatorView.IsFixing()||_playerCommonUpdateableEntity.IsDead))
             {
                 originXSpeed += _playerInputEntity.xMoveValue * _playerConstEntity.AccelerateRateX;
             }
@@ -129,7 +129,7 @@ namespace InGame.Player.Logic
         
         private float AddFriction(float originXSpeed)
         {
-            if (_playerCommonInStageEntity.IsPunching)
+            if (_playerCommonInStageEntity.isPunching)
             {
                 originXSpeed *= _playerConstEntity.DecelerateRateXOnPunching;
             }
@@ -148,7 +148,7 @@ namespace InGame.Player.Logic
                 return;
             }
 
-            if (_playerCommonInStageEntity.IsUsingSkill||_playerCommonInStageEntity.IsFixing||_playerCommonUpdateableEntity.IsDead)
+            if (_playerCommonInStageEntity.isUsingSkill||_playerCommonInStageEntity.isFixing||_playerCommonUpdateableEntity.IsDead)
             {
                 return;
             }

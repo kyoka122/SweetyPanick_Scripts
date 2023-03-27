@@ -9,7 +9,7 @@ namespace InGame.Stage.Logic
     {
         private readonly StageBaseEntity _stageBaseEntity;
         private BackgroundView _currentBackGroundView;
-        private bool _canUpdateBackGroundPos = true;
+        private bool _canUpdateBackGroundTransform = true;
         
         public BackgroundLogic(StageBaseEntity stageBaseEntity)
         {
@@ -21,35 +21,37 @@ namespace InGame.Stage.Logic
             Init(newStageArea);
         }
 
-        private void Init(StageArea newStageArea)
+        public void UnsetBackGroundParent()
         {
             if (_currentBackGroundView!=null)
             {
                 _currentBackGroundView.SetParent(null);
             }
+        }
 
+        private void Init(StageArea newStageArea)
+        {
             var data = _stageBaseEntity.GetCameraData(newStageArea);
             if(data==null)
             {
                 _currentBackGroundView = null;
                 _stageBaseEntity.SetCameraInitPos(Vector2.zero);
                 _stageBaseEntity.SetPrevCameraPos(Vector2.zero);
-                _canUpdateBackGroundPos = false;
+                _canUpdateBackGroundTransform = false;
                 _stageBaseEntity.SetStageRangeCollider(null);
                 return;
             }
 
-            _currentBackGroundView = data.BackgroundView;
-            if (_currentBackGroundView==null)
+            if (data.BackgroundView==null)
             {
-                _canUpdateBackGroundPos = false;
+                _canUpdateBackGroundTransform = false;
                 Debug.LogWarning($"Not Found BackGroundView! area:{newStageArea}");
+                return;
             }
-            else
-            {
-                _canUpdateBackGroundPos = true;
-            }
-
+            
+            _currentBackGroundView = data.BackgroundView;
+            _canUpdateBackGroundTransform = true;
+            SetSizeRate();
             _stageBaseEntity.SetStageRangeCollider(_stageBaseEntity.GetStageAreaCollider2D(newStageArea));
           
             //_stageBaseEntity.SetCameraInitPos(_stageBaseEntity.CameraPos);
@@ -58,17 +60,14 @@ namespace InGame.Stage.Logic
             //MEMO: 子オブジェクトにすることで追従させる
             _currentBackGroundView.SetParent(_stageBaseEntity.CameraTransform);
 
-            //Debug.Log($"backGroundCollider2D:{_currentBackGroundView.backGroundCollider2D.transform.position}",_currentBackGroundView.backGroundCollider2D);
-            //Debug.Log($"stageRangeCollider2D:{_stageBaseEntity.stageRangeCollider2D.transform.position}",_stageBaseEntity.stageRangeCollider2D);
             SetBackGroundRange();
             SetStageRange();
-            //Debug.Log($"astageRangeCollider2D:{_stageBaseEntity.stageRangeCollider2D.transform.position}",_stageBaseEntity.stageRangeCollider2D);
         }
         
         //MEMO: カメラ位置によって背景位置をずらすことで背景に奥行きを出す
         public void LateUpdateBackGround()
         {
-            if (!_canUpdateBackGroundPos)
+            if (!_canUpdateBackGroundTransform)
             {
                 return;
             }
@@ -76,12 +75,11 @@ namespace InGame.Stage.Logic
             SetBackGroundRange();
 #if UNITY_EDITOR
             SetStageRange();//MEMO: 実行中のColliderサイズの変更に対応させるため
+            SetSizeRate();
 #endif
             UpdateBackGroundPos(_stageBaseEntity.backGroundRangeRect, _stageBaseEntity.stageRangeRect);
-            //Debug.Log($"astageRangeCollider2D:{_stageBaseEntity.stageRangeCollider2D.transform.position}",_stageBaseEntity.stageRangeCollider2D);
+            UpdateBackGroundSize(_stageBaseEntity.CameraSize);
         }
-        
-        
 
         /// <summary>
         /// 背景のワールドRectをセット
@@ -108,6 +106,16 @@ namespace InGame.Stage.Logic
             _stageBaseEntity.SetStageRangeRect(worldBoxColliderRange);
         }
         
+        /// <summary>
+        /// カメラのSizeに対する背景のSize拡張度を設定
+        /// </summary>
+        private void SetSizeRate()
+        {
+            var rate = (_currentBackGroundView.MaxSize-_currentBackGroundView.MinSize) /
+                       (_stageBaseEntity.CameraMaxSize - _stageBaseEntity.CameraMinSize);
+            _stageBaseEntity.SetBackGroundSizeRate(rate);
+        }
+        
         private Rect GetWorldColliderRangeRect(Vector2 localOffset,Vector2 localSize,Vector2 pos)
         {
             Vector2 rectPosition = pos + localOffset - localSize / 2f;
@@ -122,8 +130,17 @@ namespace InGame.Stage.Logic
                 (stageRange.width) * backGroundRange.width / 2 - _currentBackGroundView.backGroundCollider2D.offset.x;
 
             float backGroundMoveYFactoredStage = (_stageBaseEntity.CameraPos.y - stageRange.center.y) /
-                stageRange.height * backGroundRange.height / 2 / 7-5f;
+                stageRange.height * backGroundRange.height / 2 / 7-4f;
             _currentBackGroundView.SetLocalXYPosition(new Vector2(-backGroundMoveXFactoredStage,-backGroundMoveYFactoredStage));
         }
+        
+        private void UpdateBackGroundSize(float cameraSize)
+        {
+            float addSizeRate = _stageBaseEntity.backGroundSizeRate * (cameraSize - _stageBaseEntity.CameraMinSize);
+            addSizeRate=Mathf.Max(0, addSizeRate);
+            float size = _currentBackGroundView.MaxSize + addSizeRate;
+            _currentBackGroundView.SetSize(size);
+        }
+
     }
 }

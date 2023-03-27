@@ -83,7 +83,7 @@ namespace InGame.Common.Database
 
         private List<CameraInitData> _cameraData;
 
-        public void SetCameraData(CameraInitData[] cameraData)
+        public void SetCameraInitData(CameraInitData[] cameraData)
         {
             _cameraData = cameraData.ToList();
         }

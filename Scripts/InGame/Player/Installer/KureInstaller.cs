@@ -17,27 +17,32 @@ namespace InGame.Player.Installer
         public override BasePlayerController Install(int playerNum,StageArea stageArea,InGameDatabase inGameDatabase,
             OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
-            var kureStatus = inGameDatabase.GetKureStatus();
-            inGameDatabase.SetKureStatus(kureStatus);
+            if (inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Kure)==null)
+            {
+                inGameDatabase.SetPlayerUpdateableData(PlayableCharacter.Kure, new PlayerUpdateableData(playerNum,
+                    inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Kure).MaxHp,true,false));
+            }
+            
             var kureView = viewGenerator.GenerateKure(inGameDatabase.GetKureConstData().Prefab);
             kureView.Init();
-            kureView.transform.position = inGameDatabase.GetPlayerInstancePositions(stageArea)
-                .KureInstancePos;
+            kureView.transform.position = inGameDatabase.GetPlayerInstanceData(stageArea)
+                .GetPosition(PlayableCharacter.Kure);
             var weaponView = kureView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
             var playerAnimatorView = kureView.GetAnimatorObject().GetComponent<PlayerAnimatorView>();
-            playerAnimatorView.Init();
-            UIData uiData = inGameDatabase.GetUIData();
+            playerAnimatorView.Init(PlayableCharacter.Kure);
+            StageUIData stageUIData = inGameDatabase.GetUIData();
             
             
-            var playerStatusView = viewGenerator.GeneratePlayerStatusView(uiData.PlayerStatusView,uiData.Canvas.transform,uiData.PlayerStatusDataPos[playerNum-1]);
-            playerStatusView.Init(PlayableCharacterIndex.Kure,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Kure).MaxHp);
+            var playerStatusView = viewGenerator.GeneratePlayerStatusView(stageUIData.PlayerStatusView,stageUIData.Canvas.transform,stageUIData.PlayerStatusDataPos[playerNum-1]);
+            playerStatusView.Init(PlayableCharacterIndex.Kure,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Kure).MaxHp,
+                inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Kure).currentHp);
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Kure);
             var kureConstEntity = new KureConstEntity(inGameDatabase);
             var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Kure,inGameDatabase);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, commonDatabase,
-                PlayableCharacter.Kure,playerNum,kureView.GetTransform());
+                PlayableCharacter.Kure,playerNum,kureView.GetTransform());//MEMO: PlayerUpdateableDataが存在する事を確認してから実行
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
             
             var playerMoveLogic = new PlayerMoveLogic(playerConstEntity, playerInputEntity, playerCommonInStageEntity,
@@ -62,6 +67,8 @@ namespace InGame.Player.Installer
             var playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Kure);
             var playerLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, kureView,playerStatusView);
+            var playerGetKeyLogic = new PlayerGetKeyLogic(playerCommonUpdateableEntity,playerConstEntity,
+                playerCommonInStageEntity,kureView, inGameDatabase.GetUIData().Key);
             
             var disposables = new List<IDisposable>
             {
@@ -70,7 +77,8 @@ namespace InGame.Player.Installer
             
             return new KureController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, kureSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
-                playerEnterDoorLogic, playableCharacterSelectLogic,playerLogic,disposables,playerCommonUpdateableEntity.OnUse);
+                playerEnterDoorLogic, playableCharacterSelectLogic,playerLogic,playerGetKeyLogic,disposables,
+                playerCommonUpdateableEntity.OnUse);
         }
     }
 }

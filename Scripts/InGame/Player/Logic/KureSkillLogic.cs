@@ -29,6 +29,8 @@ namespace InGame.Player.Logic
                 return;
             }
             playerAnimatorView.PlayTriggerAnimation(PlayerAnimatorParameter.OnSkill);
+            playerCommonInStageEntity.SetIsUsingSkill(true);
+            CheckSkillFlagByAnimator();
             _playerEvent.Invoke(FromPlayerEvent.AllPlayerHeal);
             Debug.Log($"HealEventInvoke!");
             playerInputEntity.OffSkillFlag();

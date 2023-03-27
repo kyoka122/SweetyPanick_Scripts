@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
+using InGame.Colate.View;
 using InGame.Common.Database;
 using InGame.Common.Database.ScriptableData;
 using InGame.Database;
+using InGame.Database.Installer;
 using InGame.Database.ScriptableData;
-using InGame.Player.Installer;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
 using KanKikuchi.AudioManager;
@@ -24,24 +24,26 @@ namespace SceneSequencer
     public class ColateStageSequencer:BaseSceneSequencer
     {
         private const float ToFadeInTime = 2;
-        private const float FadeInBGMTime = 3;
+        private const float FadeInBGMDuration = 3;
         
         [SerializeField] private ColateStageTalkPartBehaviour colateStageTalkPartBehaviour;
         [SerializeField] private ColateStageGimmickInstaller colateStageGimmickInstaller;
         [SerializeField] private StageUIScriptableData stageUiScriptableData;
         [SerializeField] private EnemyScriptableData enemyScriptableData;
-        [SerializeField] private PlayerInstancePositions playerInstancePositions;
+        [SerializeField] private PlayerInstanceData playerInstanceData;
         [SerializeField] private StageSettingsScriptableData stageSettingsScriptableData;
         [SerializeField] private CameraData battleCameraData;
+        [SerializeField] private DefaultSweetsLiftView[] sweetsLifts;
         
         [SerializeField] private Canvas canvas;
         [SerializeField] private Camera camera;
         
-        
         private ColateStageManager _colateStageManager;
+        private CommonInGameDatabaseInstaller _commonInGameDatabaseInstaller;
         private InGameDatabase _inGameDatabase;
         private OutGameDatabase _outGameDatabase;
         private CommonDatabase _commonDatabase;
+        
         private bool _startSceneChange;
         
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
@@ -50,15 +52,15 @@ namespace SceneSequencer
             _outGameDatabase = outGameDatabase;
             _commonDatabase = commonDatabase;
 
-            SetInGameDatabase();
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            SetDatabase();
+            
             var cameraController = inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveCamera(inGameDatabase, 
                 commonDatabase,camera);
+            _colateStageManager=new ColateStageManager(colateStageGimmickInstaller,cameraController,battleCameraData,
+                sweetsLifts, _inGameDatabase,_commonDatabase, MoveNextScene);
             
-            _colateStageManager=new ColateStageManager(colateStageGimmickInstaller,cameraController,battleCameraData,_inGameDatabase,_commonDatabase,
-                MoveNextScene);
-            
-            //MEMO: Playerのインスタンス
-            InstallAllPlayer();
+            _commonInGameDatabaseInstaller.InstallAllPlayer(_colateStageManager,StageArea.ColateStageFirst);
             colateStageTalkPartBehaviour.Init(StartBattle,outGameDatabase);
             _colateStageManager.LateInit();
         }
@@ -100,50 +102,17 @@ namespace SceneSequencer
                     }
                 }).AddTo(this);
         }
-
-        private void SetInGameDatabase()
+        
+        private void SetDatabase()
         {
-            _inGameDatabase.AddPlayerInstancePositions(StageArea.ColateStageFirst,playerInstancePositions);
-            _inGameDatabase.SetUIData(new UIData(stageUiScriptableData,canvas));
+            var uiData = new StageUIData(stageUiScriptableData, canvas, null,null);
+            _commonInGameDatabaseInstaller.SetInGameDatabase(uiData, stageSettingsScriptableData,
+                new[] { new EachStagePlayerInstanceData(StageArea.ColateStageFirst,playerInstanceData)},
+                null);
             _inGameDatabase.SetStageSettings(stageSettingsScriptableData);
             _inGameDatabase.SetEnemyData(enemyScriptableData);
         }
-
-       
-        private void InstallAllPlayer()
-        {
-            CharacterCommonConstData[] allCharacterConstData = _inGameDatabase.GetAllCharacterConstData();
-            var characterData=_commonDatabase.GetUseCharacterData();
-
-            //MEMO: Player設定シーンを飛ばした場合、仮でキーボード、Candyのデータを追加する
-            if (characterData == null)
-            {
-                new DebugInputInstaller().Install(_commonDatabase);
-            }
-            characterData=_commonDatabase.GetUseCharacterData();
-            
-            for (int i = 1; i <= characterData.Count; i++)
-            {
-                var oneCharacterData = characterData.FirstOrDefault(data => data.playerNum == i);
-                if (oneCharacterData==null)
-                {
-                    Debug.LogError($"Couldn`t Find OneCharacterData");
-                    continue;
-                }
-                PlayableCharacter character =
-                    oneCharacterData.playableCharacter;
-                var installer = allCharacterConstData.FirstOrDefault(data => data.CharacterType == character)
-                    ?.Installer;
-                if (installer==null)
-                {
-                    continue;
-                }
-                var playerController = installer.Install(i,StageArea.ColateStageFirst, _inGameDatabase,_outGameDatabase, _commonDatabase);
-                _colateStageManager.AddController(playerController);
-                _colateStageManager.RegisterPlayerEvent(playerController);
-            }
-        }
-
+        
         private void MoveNextScene(string sceneName)
         {
             _startSceneChange = true;
@@ -164,7 +133,7 @@ namespace SceneSequencer
             DisposeInGameController();
             await UniTask.Delay(TimeSpan.FromSeconds(ToFadeInTime), cancellationToken: this.GetCancellationTokenOnDestroy());
             
-            BGMManager.Instance.FadeOut(BGMPath.PROLOGUE, FadeInBGMTime, () => {
+            BGMManager.Instance.FadeOut(BGMPath.STAGE_BGM, FadeInBGMDuration, () => {
                 Debug.Log("BGMフェードアウト終了");
             });
             

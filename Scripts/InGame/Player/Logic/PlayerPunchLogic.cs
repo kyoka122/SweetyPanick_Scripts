@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using InGame.Enemy.View;
 using MyApplication;
 using InGame.Player.Entity;
@@ -59,21 +60,23 @@ namespace InGame.Player.Logic
             {
                 return;
             }
-            if (_playerCommonInStageEntity.IsPunching)//MEMO: Punchアニメーション中
+            
+            if (_playerCommonInStageEntity.isPunching)//MEMO: Punchアニメーション中
             {
-                _playerView.SetLayer(LayerInfo.NotCollideEnemyPlayerNum);//MEMO: 敵との当たり判定を無視
+                _playerView.SetLayer(LayerInfo.NotCollideEnemyNum);//MEMO: 敵との当たり判定を無視
                 _playerInputEntity.OffPunchFlag();//MEMO:PunchキーのInputを無視
                 return;
             }
-            
             _playerView.SetLayer(LayerInfo.PlayerNum);
-            if (!_playerInputEntity.punchFlag)
+            if (_playerInputEntity.punchFlag)
             {
-                return;
+                _playerView.SetLayer(LayerInfo.NotCollideEnemyNum);
+                _playerAnimatorView.PlayTriggerAnimation(PlayerAnimatorParameter.OnPunch);
+                _playerCommonInStageEntity.OnPunchTrigger();
+                _playerCommonInStageEntity.SetIsPunching(true);
+                CheckPunchFlagByAnimator();
+                _playerInputEntity.OffPunchFlag();
             }
-            _playerView.SetLayer(LayerInfo.NotCollideEnemyPlayerNum);
-            _playerAnimatorView.PlayTriggerAnimation(PlayerAnimatorParameter.OnPunch);
-            _playerCommonInStageEntity.OnPunchTrigger();
             _playerInputEntity.OffPunchFlag();
         }
 
@@ -82,13 +85,25 @@ namespace InGame.Player.Logic
             IReadOnlyList<Collider2D> triggerStayColliders = _weaponView.TriggerStayColliders;
             foreach (var collider in triggerStayColliders)
             {
-                if (collider.TryGetComponent(out IEnemyDamageAble damageable))
+                if (collider!=null&&collider.TryGetComponent(out IEnemyDamageAble damageable))
                 {
                     damageable.OnDamaged(new Struct.DamagedInfo(Attacker.Player,_playerView.transform.position));
                     _playerInputEntity.rumble?.Invoke();
                     SEManager.Instance.Play(AudioName.GetAttackPath(_playerView.type));
                 }
             }
+        }
+
+        private async void CheckPunchFlagByAnimator()
+        {
+            if (!_playerAnimatorView.IsPunching())
+            {
+                await UniTask.WaitUntil(() => _playerAnimatorView.IsPunching(),
+                    cancellationToken: _playerAnimatorView.thisToken);
+            }
+            await UniTask.WaitWhile(() => _playerAnimatorView.IsPunching(),
+                cancellationToken: _playerAnimatorView.thisToken);
+            _playerCommonInStageEntity.SetIsPunching(false);
         }
     }
 }

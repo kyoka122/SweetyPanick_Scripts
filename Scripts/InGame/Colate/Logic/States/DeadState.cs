@@ -1,7 +1,6 @@
 ﻿using System;
 using InGame.Colate.Entity;
 using InGame.Colate.View;
-using InGame.Enemy.Interface;
 using MyApplication;
 using UnityEngine;
 
@@ -12,8 +11,8 @@ namespace InGame.Colate.Logic
         public override ColateState state => ColateState.Dead;
 
         public DeadState(ColateEntity colateEntity, ColateView colateView, ColateStatusView colateStatusView,
-            Func<Vector2, IColateOrderAble> spawnEnemyEvent)
-            : base(colateEntity, colateView, colateStatusView, spawnEnemyEvent)
+            Func<Vector2, IColateOrderAble> spawnEnemyEvent,DefaultSweetsLiftView[] sweetsLiftViews)
+            : base(colateEntity, colateView, colateStatusView, spawnEnemyEvent,sweetsLiftViews)
         {
 
         }

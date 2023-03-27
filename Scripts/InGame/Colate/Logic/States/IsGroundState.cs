@@ -1,7 +1,6 @@
 ﻿using System;
 using InGame.Colate.Entity;
 using InGame.Colate.View;
-using InGame.Enemy.Interface;
 using MyApplication;
 using UniRx;
 using UnityEngine;
@@ -15,7 +14,8 @@ namespace InGame.Colate.Logic
         private float _passedInterval;
         
         public IsGroundState(ColateEntity colateEntity,ColateView colateView,ColateStatusView colateStatusView,
-            Func<Vector2, IColateOrderAble> spawnEnemyEvent) : base(colateEntity,colateView,colateStatusView,spawnEnemyEvent)
+            Func<Vector2, IColateOrderAble> spawnEnemyEvent,DefaultSweetsLiftView[] sweetsLiftViews) 
+            : base(colateEntity,colateView,colateStatusView,spawnEnemyEvent,sweetsLiftViews)
         {
         }
 
@@ -25,6 +25,8 @@ namespace InGame.Colate.Logic
                 colateView.Attacked.Subscribe(_ =>
                     {
                         colateEntity.DamageDefault();
+                        colateView.Rumble(colateEntity.DamagedRumbleDuration, colateEntity.DamagedRumbleStrength,
+                            colateEntity.DamagedRumbleVibrato);
                     }
                 ).AddTo(colateView));
             colateView.SetSprite(ColateSpriteType.Confuse);
@@ -36,7 +38,7 @@ namespace InGame.Colate.Logic
             _passedInterval += Time.deltaTime;
             if (_passedInterval>colateEntity.ConfuseDuration)
             {
-                nextStateInstance = new DamagedSurface(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
+                nextStateInstance = new DamagedSurface(colateEntity, colateView, colateStatusView, spawnEnemyEvent,sweetsLiftViews);
                 stage = Event.Exit;
                 return;
             }

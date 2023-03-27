@@ -14,8 +14,8 @@ namespace InGame.Database.ScriptableData
         public float StageBottom => stageBottom;
         public Vector2 FixNormalSweetsParticleSize => fixNormalSweetsParticleSize;
         public Vector2 FixGimmickSweetsParticleSize => fixGimmickSweetsParticleSize;
-        public float BackGroundMoveRateX => backGroundMoveRateX;
-        public float BackGroundMoveRateY => backGroundMoveRateY;
+        public float CameraMaxSize => cameraMaxSize;
+        public float CameraMinSize => cameraMinSize;
         public CameraInstaller CameraInstallerPrefab => cameraInstallerPrefab;
 
         [SerializeField] private SquareRange objectInScreenRange;
@@ -23,8 +23,8 @@ namespace InGame.Database.ScriptableData
         [SerializeField] private float stageBottom;
         [SerializeField] private Vector2 fixNormalSweetsParticleSize=new(1,1);
         [SerializeField] private Vector2 fixGimmickSweetsParticleSize=new(2,2);
-        [SerializeField] private float backGroundMoveRateX=0.9f;
-        [SerializeField] private float backGroundMoveRateY=0.95f;
+        [SerializeField] private float cameraMaxSize=17f;
+        [SerializeField] private float cameraMinSize=1f;
         [SerializeField] private CameraInstaller cameraInstallerPrefab;
         
     }

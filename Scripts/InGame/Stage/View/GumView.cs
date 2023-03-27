@@ -13,11 +13,11 @@ namespace InGame.Stage.View
     {
         public CancellationToken cancellationToken { get; private set; }
         public SweetsType type => SweetsType.Sweets;
+        public PlayableCharacter Specialist => PlayableCharacter.Fu;
         public FixState fixState { get; private set; }
         public ReactiveProperty<bool> onFix { get; private set; }
 
-        private const PlayableCharacter EditableCharacterType = PlayableCharacter.Fu;
-        
+        [SerializeField] private bool isInitFixed;
         [SerializeField] private SpriteRenderer fadeInSpriteRenderersAtFix;
         [SerializeField] private SpriteRenderer fadeOutSpriteRenderersAtFix;
         [SerializeField] private Transform particleInstanceTransform;
@@ -31,10 +31,10 @@ namespace InGame.Stage.View
         public void Init()
         {
             cancellationToken = this.GetCancellationTokenOnDestroy();
-            _fadeInTransitionAtFix = new Transition(fadeInSpriteRenderersAtFix.material, this,1);
-            _fadeOutTransitionAtFix = new Transition(fadeOutSpriteRenderersAtFix.material, this,0);
-            fixState = FixState.Broken;
-            onFix = new ReactiveProperty<bool>();
+            fixState = isInitFixed ? FixState.Fixed : FixState.Broken;
+            _fadeInTransitionAtFix = new Transition(fadeInSpriteRenderersAtFix.material, this,Convert.ToInt32(!isInitFixed));
+            _fadeOutTransitionAtFix = new Transition(fadeOutSpriteRenderersAtFix.material, this,Convert.ToInt32(isInitFixed));
+            onFix = new ReactiveProperty<bool>(isInitFixed);
         }
 
         public async UniTask FixSweets(float duration,CancellationToken token)
@@ -81,7 +81,7 @@ namespace InGame.Stage.View
                 return;
             }
             fixState = FixState.Broken;
-            onFix.Value = true;
+            onFix.Value = false;
             Debug.Log($"BrokenSweets!");
         }
 

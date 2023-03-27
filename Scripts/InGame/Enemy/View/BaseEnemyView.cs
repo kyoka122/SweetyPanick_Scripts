@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using InGame.Enemy.Interface;
+using InGame.Colate.View;
 using InGame.Stage.View;
 using InGame.Player.View;
 using MyApplication;
@@ -16,7 +16,7 @@ namespace InGame.Enemy.View
 {
     [RequireComponent(typeof(Rigidbody2D),typeof(EnemyChildComponents)),]
     public abstract class BaseEnemyView:MonoBehaviour,IEnemyDamageAble,IEnemyBindable,IEnemyDecoyAble,IEnemyPullAble,
-        ICollideAbleToPlayer,IColateOrderAble
+        ICollideAbleToPlayer,IColateOrderAble,ICollideAbleToColate
     {
         public IObservable<Collision2D> SearchedCollisionObject => _searchedCollisionObject;
         public IObservable<Collision2D> OnHitFlyingCollider => hitFlyingCollider;
@@ -31,7 +31,7 @@ namespace InGame.Enemy.View
         public CancellationToken ChangeDirectionToken => _changeDirectionTaskSource.Token;
         public CancellationToken ReleaseGumReactionToken => _releaseGumReactionTokenSource.Token;
         public CancellationToken EatSweetsToken => _eatSweetsTokenSource.Token;
-        
+
         public CancellationToken thisToken { get; private set; }
         public EnemyState state { get; private set; } = EnemyState.Walk;
         public bool inScreen { get; private set; } = true;
@@ -58,7 +58,7 @@ namespace InGame.Enemy.View
         [SerializeField] private EnemyChildComponents enemyChildComponents;
         [SerializeField] private bool onDrawRay;
         
-        private Rigidbody2D _rigidbody2D;
+        protected Rigidbody2D rigidbody2D;
         private Animator _animator;
         private CancellationTokenSource _changeDirectionTaskSource;
         private CancellationTokenSource _releaseGumReactionTokenSource;
@@ -76,7 +76,7 @@ namespace InGame.Enemy.View
 
         public void Init()
         {
-            _rigidbody2D = GetComponent<Rigidbody2D>();
+            rigidbody2D = GetComponent<Rigidbody2D>();
             _animator = enemyChildComponents.Animator;
             _changeDirectionTaskSource = new CancellationTokenSource();
             _releaseGumReactionTokenSource = new CancellationTokenSource();
@@ -91,7 +91,7 @@ namespace InGame.Enemy.View
             hitFlyingCollider = new Subject<Collision2D>();
             enemyDirectionX = isRightMoveFirst ? 1 : -1;
             thisToken = this.GetCancellationTokenOnDestroy();
-            
+
             this.OnCollisionEnter2DAsObservable()
                 .Subscribe(collision2D =>
                 {
@@ -180,22 +180,22 @@ namespace InGame.Enemy.View
         
         public Vector2 GetVelocity()
         {
-            return _rigidbody2D.velocity;
+            return rigidbody2D.velocity;
         }
 
         public void AddVelocity(Vector2 velocity)
         {
-            _rigidbody2D.velocity += velocity;
+            rigidbody2D.velocity += velocity;
         }
 
         public void SetVelocity(Vector2 velocity)
         {
-            _rigidbody2D.velocity = velocity;
+            rigidbody2D.velocity = velocity;
         }
 
         public void SetAngularVelocity(float rotVelocity)
         {
-            _rigidbody2D.angularVelocity = rotVelocity;
+            rigidbody2D.angularVelocity = rotVelocity;
         }
 
         public void SetEatingSweets(ISweets sweets)
@@ -205,7 +205,7 @@ namespace InGame.Enemy.View
 
         public void SetFreezeRotation(bool on)
         {
-            _rigidbody2D.constraints = on ? RigidbodyConstraints2D.FreezeRotation : RigidbodyConstraints2D.None;
+            rigidbody2D.constraints = on ? RigidbodyConstraints2D.FreezeRotation : RigidbodyConstraints2D.None;
         }
 
         public void SetCurrentEatingTime(float newTime)
@@ -240,7 +240,7 @@ namespace InGame.Enemy.View
 
         public void SetGravity(float scale)
         {
-            _rigidbody2D.gravityScale = scale;
+            rigidbody2D.gravityScale = scale;
         }
 
         public void SetChangeDirectionTokenSource(CancellationTokenSource newTokenSource)
@@ -373,6 +373,11 @@ namespace InGame.Enemy.View
             {
                 transform.rotation = TowardLeftRot;
             }
+        }
+
+        public void SetActiveAnimator(bool active)
+        {
+            _animator.enabled = active;
         }
     }
 }

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using InGame.Colate.Entity;
 using InGame.Colate.View;
-using InGame.Enemy.Interface;
 using MyApplication;
-using UniRx;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using Random = UnityEngine.Random;
 
 namespace InGame.Colate.Logic
 {
@@ -31,17 +30,19 @@ namespace InGame.Colate.Logic
         protected BaseColateStateLogic nextStateInstance;
         protected readonly Func<Vector2, IColateOrderAble> spawnEnemyEvent;
         protected readonly List<IDisposable> disposables;
+        protected readonly DefaultSweetsLiftView[] sweetsLiftViews;
         protected bool isTalking { get; private set; }
 
         protected Event stage;
 
         protected BaseColateStateLogic(ColateEntity colateEntity, ColateView colateView,ColateStatusView colateStatusView,
-            Func<Vector2, IColateOrderAble> spawnEnemyEvent)
+            Func<Vector2, IColateOrderAble> spawnEnemyEvent,DefaultSweetsLiftView[] sweetsLiftViews)
         {
             this.colateEntity = colateEntity;
             this.colateView = colateView;
             this.colateStatusView = colateStatusView;
             this.spawnEnemyEvent = spawnEnemyEvent;
+            this.sweetsLiftViews = sweetsLiftViews;
             nextStateInstance = this;
             stage = Event.Enter;
             disposables = new List<IDisposable>();
@@ -103,6 +104,9 @@ namespace InGame.Colate.Logic
         
         #region ステート間共通メソッド
         
+        /// <summary>
+        /// 左右に浮遊する
+        /// </summary>
         protected virtual void Drift()
         {
             colateView.SetVelocity(new Vector2(colateEntity.MoveSpeed * colateView.GetDirectionX(), 0));
@@ -137,9 +141,41 @@ namespace InGame.Colate.Logic
         {
             if (colateEntity.CurrentColateHp==0&&state!=ColateState.Dead)
             {
-                nextStateInstance = new DeadState(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
+                nextStateInstance = new DeadState(colateEntity, colateView, colateStatusView, spawnEnemyEvent,sweetsLiftViews);
                 stage = Event.Exit;
             }
+        }
+        
+        protected BaseColateStateLogic GetNextAttackColateState()
+        {
+            BaseColateStateLogic nextState;
+            if (colateEntity.prevAttackState==ColateState.SweetsLift)
+            {
+                nextState= new ThrowEnemiesState(colateEntity, colateView,colateStatusView,spawnEnemyEvent,sweetsLiftViews);
+            }
+            else
+            {
+                nextState= new SweetsLiftState(colateEntity, colateView,colateStatusView,spawnEnemyEvent,sweetsLiftViews);
+            }
+            colateEntity.SetPrevAttackState(nextState.state);
+            return nextState;
+        }
+        
+        protected BaseColateStateLogic GetRandomAttackColateState()
+        {
+            BaseColateStateLogic nextState;
+            int randomIndex=Random.Range(0, 2);
+            if (randomIndex == 0)
+            {
+                nextState = new ThrowEnemiesState(colateEntity, colateView, colateStatusView, spawnEnemyEvent,
+                    sweetsLiftViews);
+            }
+            else
+            {
+                nextState = new SweetsLiftState(colateEntity, colateView,colateStatusView,spawnEnemyEvent,sweetsLiftViews);
+            }
+            colateEntity.SetPrevAttackState(nextState.state);
+            return nextState;
         }
 
         public bool CanDamage()

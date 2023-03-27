@@ -38,8 +38,9 @@ namespace Utility.PanelAnimation
                 .Join(_downTarget.DOLocalMove(_downTargetEnterEndPos, _enterDuration).SetEase(Ease.OutBack))
                 .OnPlay(() =>
                 {
-                    _upTarget.gameObject.SetActive(true);
-                    _downTarget.gameObject.SetActive(true);
+                    //MEMO: アニメーターがリセットされてしまうためアクティブの変更を削除
+                    //_upTarget.gameObject.SetActive(true);
+                    //_downTarget.gameObject.SetActive(true);
                 })
                 .ToUniTask(cancellationToken:token);
         }
@@ -51,8 +52,9 @@ namespace Utility.PanelAnimation
                 .Join(_downTarget.DOLocalMove(_downTargetExitEndPos, _exitDuration).SetEase(Ease.InBack))
                 .OnComplete(() =>
                 {
-                    _upTarget.gameObject.SetActive(false);
-                    _downTarget.gameObject.SetActive(false);
+                    //MEMO: アニメーターがリセットされてしまうためアクティブの変更を削除
+                    //_upTarget.gameObject.SetActive(false);
+                    //_downTarget.gameObject.SetActive(false);
                 })
                 .ToUniTask(cancellationToken:token);
         }

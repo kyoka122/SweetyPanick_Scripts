@@ -1,10 +1,9 @@
-﻿using System;
+﻿//MEMO: 参考：https://unitech.hatenablog.com/entry/2017/11/18/183658
+
+using System;
 using UnityEngine;
 using TMPro;
 using UnityEditor;
-
-//MEMO: 参考：https://unitech.hatenablog.com/entry/2017/11/18/183658
-
 
 #if UNITY_EDITOR
 

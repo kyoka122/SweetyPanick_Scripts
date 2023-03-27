@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace MyApplication
 {
@@ -10,7 +11,6 @@ namespace MyApplication
         
         [SerializeField] private Transform toGroundRayTransform;
         [SerializeField] private Transform toSideWallRayTransform;
-        [SerializeField] private Collider2D groundLayerColliderOnBoard2D;
         [SerializeField] private Animator explosionAnimator;
     }
 }

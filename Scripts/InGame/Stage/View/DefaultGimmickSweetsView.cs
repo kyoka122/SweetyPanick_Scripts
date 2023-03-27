@@ -7,7 +7,6 @@ using DG.Tweening.Plugins.Options;
 using MyApplication;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UI;
 using Utility;
 using Utility.TransitionFade;
 
@@ -17,26 +16,33 @@ namespace InGame.Stage.View
     {
         public CancellationToken cancellationToken { get; private set; }
         public SweetsType type { get; } = SweetsType.GimmickSweets;
-        public FixState fixState { get; private set; }
+        public PlayableCharacter Specialist => specialist;
+        public FixState fixState { get; protected set; }
         public ReactiveProperty<bool> onFix { get; private set; }
-        
-        
 
+        [SerializeField] private PlayableCharacter specialist;
         [SerializeField] private SpriteRenderer fadeSpriteRenderers;
-        [SerializeField] private PlayableCharacter editableCharacterType;
         [SerializeField] private Transform particleInstanceTransform;
         [SerializeField] private GameObject fixGaugeObj;
         [SerializeField] private SpriteRenderer fixGaugeSlider;
+
+        private bool Fading =>  transition.IsActiveFadeIn() ||  transition.IsActiveFadeOut();
         
-        private bool Fading =>  _transition.IsActiveFadeIn() ||  _transition.IsActiveFadeOut();
-        private Transition _transition;
-        private CutOffTransition _cutOffTransition;
+        /// <summary>
+        /// お菓子用Transition
+        /// </summary>
+        protected Transition transition;
+        
+        /// <summary>
+        /// 修復ゲージ用Transition
+        /// </summary>
+        protected CutOffTransition cutOffTransition;
         
         public virtual void Init()
         {
             cancellationToken = this.GetCancellationTokenOnDestroy();
-            _transition = new Transition(fadeSpriteRenderers.material, this,1);
-            _cutOffTransition = new CutOffTransition(fixGaugeSlider.material,1,0);
+            transition = new Transition(fadeSpriteRenderers.material, this,1);
+            cutOffTransition = new CutOffTransition(fixGaugeSlider.material,1,0);
             fixState = FixState.Broken;
             onFix = new ReactiveProperty<bool>();
         }
@@ -45,31 +51,31 @@ namespace InGame.Stage.View
         {
             fixState = FixState.Fixing;
             fixGaugeObj.gameObject.SetActive(true);
-            _cutOffTransition.SetCutOffY(0);
+            cutOffTransition.SetCutOffY(0);
             float countUp = 0;
             TweenerCore<float, float, FloatOptions> tweenCore = DOTween.To(() => countUp, 
-                n => _cutOffTransition.SetCutOffY(n), 1, duration);
+                n => cutOffTransition.SetCutOffY(n), 1, duration);
             
             try
             {
-                _transition.FadeIn(duration);
-                await UniTask.WaitWhile(() => _transition.IsActiveFadeIn(),
+                transition.FadeIn(duration);
+                await UniTask.WaitWhile(() => transition.IsActiveFadeIn(),
                     cancellationToken: token);
             }
             catch (OperationCanceledException)
             {
                 Debug.Log($"SweetsFixCanceled");
                 tweenCore.Kill();
-                _transition.fadeTween.Kill();
+                transition.fadeTween.Kill();
                 fixGaugeObj.SetActive(false);
-                _transition.TransitionFadeOutCondition();
+                transition.TransitionFadeOutCondition();
                 fixState = FixState.Broken;
                 return;
             }
 
             EachSweetsEvent();
             fixGaugeObj.SetActive(false);
-            _cutOffTransition.SetCutOffY(0);
+            cutOffTransition.SetCutOffY(0);
             fixState = FixState.Fixed;
             onFix.Value = true;
             Debug.Log($"FixedGimmickSweets!");
@@ -100,9 +106,9 @@ namespace InGame.Stage.View
         }
 
         
-        public bool CanFixSweets(PlayableCharacter editCharacterType)
+        public virtual bool CanFixSweets(PlayableCharacter editCharacterType)
         {
-            if (_transition==null)
+            if (transition==null)
             {
                 Debug.LogWarning($"Had Not Instance _transition", gameObject);
                 return false;
@@ -120,9 +126,9 @@ namespace InGame.Stage.View
             return true;
         }
 
-        public bool CanBreakSweets()
+        public virtual bool CanBreakSweets()
         {
-            if (_transition==null)
+            if (transition==null)
             {
                 Debug.LogWarning($"Had Not Instance _transition", gameObject);
                 return false;
@@ -139,15 +145,16 @@ namespace InGame.Stage.View
             return particleInstanceTransform.position;
         }
 
-        public void OnDestroy()
+        protected virtual void OnDestroy()
         {
-            if (_cutOffTransition.GetDisposeMaterial()!=null)
+            onFix?.Dispose();
+            if (cutOffTransition.GetDisposeMaterial()!=null)
             {
-                Destroy(_cutOffTransition.GetDisposeMaterial());
+                Destroy(cutOffTransition.GetDisposeMaterial());
             }
-            if (_transition.GetDisposeMaterial() != null)
+            if (transition.GetDisposeMaterial() != null)
             {
-                Destroy(_transition.GetDisposeMaterial());
+                Destroy(transition.GetDisposeMaterial());
             }
         }
     }

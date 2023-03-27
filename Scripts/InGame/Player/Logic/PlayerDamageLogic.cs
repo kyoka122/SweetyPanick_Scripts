@@ -89,13 +89,13 @@ namespace InGame.Player.Logic
         private void Damage()
         {
             _playerCommonUpdateableEntity.DamageDefault();
-            _playerStatusView.Damage(_playerCommonUpdateableEntity.CurrentHp);
+            _playerStatusView.SetHpValue(_playerCommonUpdateableEntity.CurrentHp);
         }
 
         private async void WaitDamageAnimation()
         {
             _playerCommonUpdateableEntity.SetCanDamageFlag(false);
-            _playerView.SetLayer(LayerInfo.NotCollideEnemyPlayerNum);
+            _playerView.SetLayer(LayerInfo.NotCollideEnemyNum);
             string damaged=PlayerAnimationName.GetEachName(_playerView.type, PlayerAnimationName.Damaged);
 
             await UniTask.WaitUntil(()=>IsPlayingThisAnimation(damaged), 

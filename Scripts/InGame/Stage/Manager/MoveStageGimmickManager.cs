@@ -13,17 +13,19 @@ namespace InGame.Stage.Manager
         private readonly MoveFloorLogic[] _moveFloorLogics;
         private readonly BackgroundLogic _backgroundLogic;
         private readonly AnimationEventLogic _animationEventLogic;
+        private readonly CandyLightsLogic _candyLightsLogic;
         private readonly List<IDisposable> _disposables;
 
         public MoveStageGimmickManager(HealAnimationLogic healAnimationLogic, DoorLogic doorLogic,
             MoveFloorLogic[] moveFloorLogics, BackgroundLogic backgroundLogic,AnimationEventLogic animationEventLogic,
-            List<IDisposable> disposables)
+            CandyLightsLogic candyLightsLogic, List<IDisposable> disposables)
         {
             _healAnimationLogic = healAnimationLogic;
             _doorLogic = doorLogic;
             _moveFloorLogics = moveFloorLogics;
             _backgroundLogic = backgroundLogic;
             _animationEventLogic = animationEventLogic;
+            _candyLightsLogic = candyLightsLogic;
             _disposables = disposables;
         }
 
@@ -45,6 +47,11 @@ namespace InGame.Stage.Manager
             _backgroundLogic.LateUpdateBackGround();
         }
 
+        public void UnsetBackGround()
+        {
+            _backgroundLogic.UnsetBackGroundParent();
+        }
+        
         public void InitAtStageMove(StageArea newStageArea)
         {
             _doorLogic.InitAtStageMove();

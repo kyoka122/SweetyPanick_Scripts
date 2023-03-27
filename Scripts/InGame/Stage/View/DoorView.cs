@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using KanKikuchi.AudioManager;
 using MyApplication;
 using UniRx;
 using UnityEngine;
@@ -50,6 +51,7 @@ namespace InGame.Stage.View
 
             _isDoorOpen = true;
             _animator.SetTrigger(StageAnimatorParameter.OnOpen);
+            SEManager.Instance.Play(SEPath.DOOR_OPEN);
             CancellationToken token = this.GetCancellationTokenOnDestroy();
             Debug.Log($"WaitStart");
             await UniTask.WaitUntil(HadFinishedOpenAnimation , cancellationToken:token);

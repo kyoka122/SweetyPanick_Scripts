@@ -13,10 +13,5 @@ namespace OutGame.PlayerCustom.Installer
             instance.ChangePlayerNumText(playerNum);
             return instance;
         }
-
-        public void DestroyCursor(CharacterSelectCursorView characterSelectCursorView)
-        {
-            Destroy(characterSelectCursorView.gameObject);
-        }
     }
 }

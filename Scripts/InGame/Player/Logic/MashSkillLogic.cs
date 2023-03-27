@@ -45,6 +45,8 @@ namespace InGame.Player.Logic
             }
      
             playerAnimatorView.PlayTriggerAnimation(PlayerAnimatorParameter.OnSkill);
+            playerCommonInStageEntity.SetIsUsingSkill(true);
+            CheckSkillFlagByAnimator();
             InstallMashNeko();
             RegisterMashNekoObserver();
             

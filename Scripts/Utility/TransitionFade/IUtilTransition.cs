@@ -1,8 +1,8 @@
-﻿using DG.Tweening;
+﻿//MEMO: 参考：https://github.com/TripleAt/ShaderFade
+using DG.Tweening;
 
 namespace Utility.TransitionFade
 {
-    //MEMO: 参考：https://github.com/TripleAt/ShaderFade
     public interface IUtilTransition
     {
         bool IsActiveFadeIn();

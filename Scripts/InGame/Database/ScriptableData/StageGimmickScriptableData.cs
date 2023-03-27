@@ -7,12 +7,14 @@ namespace InGame.Database.ScriptableData
     {
         public int GimmickSweetsScore => gimmickSweetsScore;
         public int NormalSweetsScore => normalSweetsScore;
+        public float CandyLightsParticleDuration=>candyLightsParticleDuration;
         public float MoveFloorSpeed=>moveFloorSpeed;
         public Vector3 CrepeCameraShakeVelocity=>crepeCameraShakeVelocity;
 
-        [SerializeField,Tooltip("ガムを修復したら動く台")] private int gimmickSweetsScore=3000;
-        [SerializeField,Tooltip("ガムを修復したら動く台")] private int normalSweetsScore=1000;
-        [SerializeField,Tooltip("ガムを修復したら動く台")] private float moveFloorSpeed;
+        [SerializeField] private int gimmickSweetsScore=3000;
+        [SerializeField] private int normalSweetsScore=1000;
+        [SerializeField] private float candyLightsParticleDuration=1;
+        [SerializeField,Tooltip("ガムを修復したら動く台のスピード")] private float moveFloorSpeed;
         [SerializeField] private Vector3 crepeCameraShakeVelocity;
     }
 }

@@ -35,27 +35,31 @@ namespace InGame.Player.Installer
         private BasePlayerController Install(int playerNum,StageArea stageArea,InGameDatabase inGameDatabase,
             OutGameDatabase outGameDatabase,CommonDatabase commonDatabase,PlayerInputEntity playerInputEntity)
         {
-            var candyStatus = inGameDatabase.GetCandyStatus();
-            inGameDatabase.SetCandyStatus(candyStatus);
+            if (inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Candy)==null)
+            {
+                inGameDatabase.SetPlayerUpdateableData(PlayableCharacter.Candy, new PlayerUpdateableData(playerNum,
+                    inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Candy).MaxHp,true,false));
+            }
+            
             var candyView = viewGenerator.GenerateCandy(inGameDatabase.GetCandyConstData().Prefab);
             candyView.Init();
-            candyView.transform.position = inGameDatabase.GetPlayerInstancePositions(stageArea)
-                .CandyInstancePos;
+            Debug.Log($"StageArea:{stageArea}");
+            candyView.transform.position = inGameDatabase.GetPlayerInstanceData(stageArea)
+                .GetPosition(PlayableCharacter.Candy);
             var weaponView = candyView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
             var playerAnimatorView = candyView.GetAnimatorObject().GetComponent<PlayerAnimatorView>();
-            playerAnimatorView.Init();
-            UIData uiData = inGameDatabase.GetUIData();
-            
-            
-            var playerStatusView = viewGenerator.GeneratePlayerStatusView(uiData.PlayerStatusView,
-                uiData.Canvas.transform,uiData.PlayerStatusDataPos[playerNum-1]);
-            playerStatusView.Init(PlayableCharacterIndex.Candy,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Candy).MaxHp);
+            playerAnimatorView.Init(PlayableCharacter.Candy);
+            StageUIData stageUIData = inGameDatabase.GetUIData();
+            var playerStatusView = viewGenerator.GeneratePlayerStatusView(stageUIData.PlayerStatusView,
+                stageUIData.Canvas.transform,stageUIData.PlayerStatusDataPos[playerNum-1]);
+            playerStatusView.Init(PlayableCharacterIndex.Candy,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Candy).MaxHp,
+                inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Candy).currentHp);
             
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Candy);
             var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Candy,inGameDatabase);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, commonDatabase,
-                PlayableCharacter.Candy,playerNum,candyView.GetTransform());
+                PlayableCharacter.Candy,playerNum,candyView.GetTransform());//MEMO: PlayerUpdateableDataが存在する事を確認してから実行
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
             
             
@@ -81,16 +85,18 @@ namespace InGame.Player.Installer
             var playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity
                 , playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Candy);
             var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, candyView,playerStatusView);
-
+            var playerGetKeyLogic = new PlayerGetKeyLogic(playerCommonUpdateableEntity,playerConstEntity,
+                playerCommonInStageEntity,candyView, inGameDatabase.GetUIData().Key);
+            
             var disposables = new List<IDisposable>
             {
                 playerInputEntity, playerCommonUpdateableEntity,playerCommonInStageEntity,playerAnimatorView
-                
             };
             
             return new CandyController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, candySkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
-                playerEnterDoorLogic,playableCharacterSelectLogic,playerTalkLogic,disposables,playerCommonUpdateableEntity.OnUse);
+                playerEnterDoorLogic,playableCharacterSelectLogic,playerTalkLogic,playerGetKeyLogic,disposables,
+                playerCommonUpdateableEntity.OnUse);
         }
 
         

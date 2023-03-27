@@ -12,11 +12,12 @@ namespace InGame.Player.View
         [SerializeField,EnumIndex(typeof(PlayableCharacterIndex))]private GameObject [] characterSelectorIcons;
         [SerializeField] private Slider hpSlider;
         
-        public void Init(PlayableCharacterIndex character,int maxHp)
+        public void Init(PlayableCharacterIndex character,int maxHp,int currentHp)
         {
             SetCharacterSelectPanel(false);
             ChangeCharacterIcon(character);
             hpSlider.maxValue = maxHp;
+            hpSlider.value = currentHp;
         }
         
         public void SetActive(bool active)
@@ -49,7 +50,7 @@ namespace InGame.Player.View
         
         }
 
-        public void Damage(int currentHp)
+        public void SetHpValue(int currentHp)
         {
             hpSlider.value = currentHp;
         }

@@ -7,30 +7,30 @@ namespace Utility
     {
         public static bool InSquareRange(Vector2 viewPortPos,SquareRange range)
         {
-            bool inSquareRangeX = range.canExistRangeXMin < viewPortPos.x && viewPortPos.x < range.canExistRangeXMax;
-            bool inSquareRangeY = range.canExistRangeYMin < viewPortPos.y && viewPortPos.y < range.canExistRangeYMax;
+            bool inSquareRangeX = range.xMin < viewPortPos.x && viewPortPos.x < range.xMax;
+            bool inSquareRangeY = range.yMin < viewPortPos.y && viewPortPos.y < range.yMax;
             
             return inSquareRangeX && inSquareRangeY;
         }
         
         public static bool InRangeWithOutBottom(Vector2 viewPortPos,SquareRange range)
         {
-            bool inSquareRangeX = range.canExistRangeXMin < viewPortPos.x && viewPortPos.x < range.canExistRangeXMax;
-            bool inUpRange =  viewPortPos.y < range.canExistRangeYMax;
+            bool inSquareRangeX = range.xMin < viewPortPos.x && viewPortPos.x < range.xMax;
+            bool inUpRange =  viewPortPos.y < range.yMax;
             
             return inSquareRangeX && inUpRange;
         }
 
         public static bool InYRange(Vector2 viewPortPos,SquareRange range)
         {
-            bool inSquareRangeY = range.canExistRangeYMin < viewPortPos.y && viewPortPos.y < range.canExistRangeYMax;
+            bool inSquareRangeY = range.yMin < viewPortPos.y && viewPortPos.y < range.yMax;
             
             return inSquareRangeY;
         }
         
         public static bool InXRange(Vector2 viewPortPos,SquareRange range)
         {
-            bool inSquareRangeX = range.canExistRangeXMin < viewPortPos.x && viewPortPos.x < range.canExistRangeXMax;
+            bool inSquareRangeX = range.xMin < viewPortPos.x && viewPortPos.x < range.xMax;
             
             return inSquareRangeX ;
         }
@@ -44,23 +44,23 @@ namespace Utility
 
             float xRate=1;
          
-            if (viewPortPos.x<=range.canExistRangeXMin)
+            if (viewPortPos.x<=range.xMin)
             {
-                xRate = viewPortPos.x / range.canExistRangeXMin;
+                xRate = viewPortPos.x / range.xMin;
             }
-            else if(viewPortPos.x>=range.canExistRangeXMax)
+            else if(viewPortPos.x>=range.xMax)
             {
-                xRate = (1 - viewPortPos.x) / (1 - range.canExistRangeXMax);
+                xRate = (1 - viewPortPos.x) / (1 - range.xMax);
             }
 
             float yRate=1;
-            if (viewPortPos.y<=range.canExistRangeYMin)
+            if (viewPortPos.y<=range.yMin)
             {
-                yRate = viewPortPos.y / range.canExistRangeYMin;
+                yRate = viewPortPos.y / range.yMin;
             }
-            else if (viewPortPos.y>=range.canExistRangeYMax)
+            else if (viewPortPos.y>=range.yMax)
             {
-                xRate = (1 - viewPortPos.y) / (1 - range.canExistRangeYMax);
+                xRate = (1 - viewPortPos.y) / (1 - range.yMax);
             }
 
             return (xRate + yRate) / 2f;

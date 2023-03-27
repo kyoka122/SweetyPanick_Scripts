@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using InGame.Common.Interface;
+using MyApplication;
 using UniRx;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace InGame.Player.View
     [RequireComponent(typeof(Animator))]
     public class PlayerAnimatorView:MonoBehaviour,IAnimationCallback,IDisposable
     {
+        public PlayableCharacter type { get; private set; }
         public IObservable<string> OnAnimationEvent=>_animationEventSubject;
         
         public CancellationToken thisToken { get; private set; }
@@ -18,8 +20,9 @@ namespace InGame.Player.View
         private Subject<string> _animationEventSubject;
         private Animator _animator;
 
-        public void Init()
+        public void Init(PlayableCharacter type)
         {
+            this.type = type;
             _animationEventSubject = new Subject<string>();
             _animator = GetComponent<Animator>();
             thisToken = this.GetCancellationTokenOnDestroy();
@@ -42,7 +45,26 @@ namespace InGame.Player.View
         {
             return _animator.GetCurrentAnimatorStateInfo(0);
         }
-        
+
+        public bool IsPunching()
+        {
+            return GetCurrentAnimationName()== PlayerAnimationName.GetEachName(type,PlayerAnimationName.Punch);
+        }
+
+        public bool IsFixing()
+        {
+            string animationName= GetCurrentAnimationName();
+            return animationName == PlayerAnimationName.GetEachName(type, PlayerAnimationName.Fix) ||
+                   animationName == PlayerAnimationName.GetEachName(type, PlayerAnimationName.OnFix) ||
+                   animationName == PlayerAnimationName.GetEachName(type, PlayerAnimationName.Fixing) ||
+                   animationName == PlayerAnimationName.GetEachName(type, PlayerAnimationName.Fixed);
+        }
+
+        public bool IsUsingSkill()
+        {
+            return GetCurrentAnimationName()== PlayerAnimationName.GetEachName(type,PlayerAnimationName.Skill);
+        }
+
         public void PlayFloatAnimation(string animationName, float value)
         {
             _animator.SetFloat(animationName, value);
@@ -60,7 +82,7 @@ namespace InGame.Player.View
 
         public void ResetAllParameter()
         {
-            
+            //TODO: Resetが必要であれば実装
         }
         
         public void CallbackAnimation(string animationClipName)

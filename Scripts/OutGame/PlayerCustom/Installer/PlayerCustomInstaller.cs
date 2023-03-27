@@ -25,6 +25,7 @@ namespace OutGame.PlayerCustom.Installer
         {
             playerCountView.Init();
             controllersPanelView.Init();
+            characterSelectPanelView.Init();
             var inputCaseUnknownControllerEntity = new InputEntity();
             var inSceneDataEntity = new InSceneDataEntity(outGameDatabase, commonDatabase);
             var constDataEntity = new ConstDataEntity(outGameDatabase, commonDatabase);

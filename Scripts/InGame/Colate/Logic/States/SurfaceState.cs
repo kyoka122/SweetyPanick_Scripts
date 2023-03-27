@@ -1,11 +1,8 @@
 ﻿using System;
 using InGame.Colate.Entity;
 using InGame.Colate.View;
-using InGame.Enemy.Interface;
-using InGame.Enemy.Logic;
 using MyApplication;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace InGame.Colate.Logic
 {
@@ -14,7 +11,8 @@ namespace InGame.Colate.Logic
         public override ColateState state => ColateState.Surface;
         
         public SurfaceState(ColateEntity colateEntity, ColateView colateView,ColateStatusView colateStatusView,
-            Func<Vector2, IColateOrderAble> spawnEnemyEvent) : base(colateEntity, colateView,colateStatusView,spawnEnemyEvent)
+            Func<Vector2, IColateOrderAble> spawnEnemyEvent,DefaultSweetsLiftView[] sweetsLiftViews)
+            : base(colateEntity, colateView,colateStatusView,spawnEnemyEvent,sweetsLiftViews)
         {
         }
 
@@ -33,23 +31,11 @@ namespace InGame.Colate.Logic
             if (colateView.GetPosition().y>colateEntity.ColateFlyHeight)
             {
                 colateView.SetVelocity(Vector2.zero);
-                nextStateInstance=GetRandomColateState();
+                nextStateInstance=GetRandomAttackColateState();
                 stage = Event.Exit;
                 return;
             }
             base.Update();
-        }
-
-        private BaseColateStateLogic GetRandomColateState()
-        {
-            int randomIndex=Random.Range(0, 2);
-            if (randomIndex==0)
-            {
-                //TODO: Driftを実装したらコメントアウト解除
-                //return new DriftState(colateEntity, colateView,colateStatusView,spawnEnemyEvent);
-            }
-
-            return new ThrowEnemiesState(colateEntity, colateView,colateStatusView,spawnEnemyEvent);
         }
     }
 }

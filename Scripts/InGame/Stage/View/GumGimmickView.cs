@@ -16,11 +16,10 @@ namespace InGame.Stage.View
     {
         public CancellationToken cancellationToken { get; private set; }
         public SweetsType type => SweetsType.GimmickSweets;
+        public PlayableCharacter Specialist => PlayableCharacter.Fu;
         public FixState fixState { get; private set; }
         public ReactiveProperty<bool> onFix { get; private set; }
-
-        private const PlayableCharacter EditableCharacterType = PlayableCharacter.Fu;
-
+        
         private bool Fading => _fadeOutTransitionAtFix.IsActiveFadeIn() || _fadeOutTransitionAtFix.IsActiveFadeOut() ||
                                _fadeInTransitionAtFix.IsActiveFadeIn() || _fadeInTransitionAtFix.IsActiveFadeOut();
         
@@ -29,7 +28,7 @@ namespace InGame.Stage.View
         [SerializeField] private Transform particleInstanceTransform;
         [SerializeField] private GameObject fixGaugeObj;
         [SerializeField] private SpriteRenderer fixGaugeSlider;
-        
+
         private Transition _fadeInTransitionAtFix;
         private Transition _fadeOutTransitionAtFix;
         private CutOffTransition _cutOffTransition;

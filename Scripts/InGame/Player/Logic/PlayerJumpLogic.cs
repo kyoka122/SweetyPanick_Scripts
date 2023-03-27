@@ -42,9 +42,6 @@ namespace InGame.Player.Logic
             SetGroundType();
             SetIsJumping();
             TryOnJump();
-            TryOnMarshmallowBound();
-            float ySpeed = _playerView.GetVelocity().y;
-            UpdateJumpAnimation(ySpeed);
         }
 
         public void UpdateStopping()
@@ -55,9 +52,9 @@ namespace InGame.Player.Logic
         private void SetGroundType()
         {
             float rayDistance = _playerConstEntity.ToGroundDistance;
-            RaycastHit2D downRaycastHit2D = Physics2D.Raycast(_playerView.GetToGroundRayPos(), Vector2.down,
+            RaycastHit2D downRaycastHit2D = Physics2D.Raycast(_playerView.GetDownToGroundRayPos(), Vector2.down,
                 rayDistance, LayerInfo.GroundMask);
-            RaycastHit2D upRaycastHit2D = Physics2D.Raycast(_playerView.GetToGroundRayPos(), Vector2.up,
+            RaycastHit2D upRaycastHit2D = Physics2D.Raycast(_playerView.GetUpGroundRayPos(), Vector2.up,
                 rayDistance, LayerInfo.GroundMask);
 #if UNITY_EDITOR
             if (_playerView.OnDrawRay)
@@ -69,7 +66,6 @@ namespace InGame.Player.Logic
             {
                 _playerCommonInStageEntity.SetPrevStandPos(downRaycastHit2D.point);
                 _playerCommonInStageEntity.SetHighJumpAbleStand(highJumpAbleStand);
-                
                 _playerCommonInStageEntity.SetGroundType(GroundType.Trampoline);
                 return;
             }
@@ -123,7 +119,7 @@ namespace InGame.Player.Logic
         }
 
         /// <summary>
-        /// 着地した際にジャンプを解除する
+        /// 床に地面があったらジャンプを終了する
         /// </summary>
         private void SetIsJumping()
         {
@@ -134,14 +130,16 @@ namespace InGame.Player.Logic
                     SEManager.Instance.Play(SEPath.JUMP_LANDING);
                 }
                 _playerCommonInStageEntity.SetIsJumping(false);
+                _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.IsVerticalMove,false);
                 return;
             }
+            _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.IsVerticalMove,true);
             _playerCommonInStageEntity.SetIsJumping(true);
         }
 
         private void TryOnJump()
         {
-            if (!_playerCommonInStageEntity.IsGround||_playerView.GetVelocity().y>0)
+            if (!_playerCommonInStageEntity.IsGround)
             {
                 _playerInputEntity.OffJumpFlag();
                 return;
@@ -169,10 +167,9 @@ namespace InGame.Player.Logic
             
             if (_playerCommonInStageEntity.onGroundType==GroundType.Trampoline&&isMaxDelayCount)
             {
-                float ySpeed = _playerConstEntity.BoundValue * DefaultJumpValue;
                 //_playerCommonInStageEntity.highJumpAbleStand?.PlayPressAnimation(); //MEMO: バウンド時はアニメーションしないように変更
                 SEManager.Instance.Play(SEPath.TRAMPOLINE);
-                SetJumpCommonData(ySpeed);
+                Jump(_playerConstEntity.BoundValue);
                 _playerCommonInStageEntity.ClearCurrentDelayCount();
                 return true;
             }
@@ -183,10 +180,9 @@ namespace InGame.Player.Logic
         {
             if (_playerCommonInStageEntity.onGroundType==GroundType.Trampoline)
             {
-                float ySpeed = _playerConstEntity.HighJumpValue * DefaultJumpValue;
-                _playerCommonInStageEntity.BoundAble?.PlayPressAnimation();
+                _playerCommonInStageEntity.boundAble?.PlayPressAnimation();
                 SEManager.Instance.Play(SEPath.TRAMPOLINE);
-                SetJumpCommonData(ySpeed);
+                Jump(_playerConstEntity.HighJumpValue);
                 return true;
             }
             return false;
@@ -196,9 +192,8 @@ namespace InGame.Player.Logic
         {
             if(_playerCommonInStageEntity.onGroundType==GroundType.Default)
             {
-                float ySpeed = _playerConstEntity.JumpValue * DefaultJumpValue;
                 SEManager.Instance.Play(SEPath.JUMP);
-                SetJumpCommonData(ySpeed);
+                Jump(_playerConstEntity.JumpValue);
                 return true;
             }
             return false;
@@ -208,35 +203,14 @@ namespace InGame.Player.Logic
         /// ジャンプ全種共通処理
         /// </summary>
         /// <param name="ySpeed"></param>
-        private void SetJumpCommonData(float ySpeed)
+        private void Jump(float ySpeed)
         {
-            _playerView.AddYVelocity(ySpeed);
+            _playerView.SetYVelocity(ySpeed);
             PlayOnJumpAnimation(ySpeed);
             _playerCommonInStageEntity.OnJumpTrigger();
             _playerInputEntity.OffJumpFlag();
         }
-
         
-        private void TryOnMarshmallowBound()
-        {
-            if (_playerView.GetVelocity().y>0)
-            {
-                return;
-            }
-            
-        }
-        private void UpdateJumpAnimation(float yParamValue)
-        {
-            _playerAnimatorView.PlayFloatAnimation(PlayerAnimatorParameter.VerticalMove,Mathf.Abs(yParamValue));
-            if (yParamValue==0)
-            {
-                _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.IsVerticalMove,false);
-                return;
-            }
-            _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.IsVerticalMove,true);
-        }
-        
-
         //MEMO: ジャンプの予備動作があった場合に必要
         private void PlayOnJumpAnimation(float yParamValue)
         {
@@ -258,8 +232,8 @@ namespace InGame.Player.Logic
         [Conditional("UNITY_EDITOR")]
         private void DrawGroundRay(float rayDistance)
         {
-            Debug.DrawRay(_playerView.GetToGroundRayPos(),Vector3.down*rayDistance,Color.blue,0.5f);
-            Debug.DrawRay(_playerView.GetToGroundRayPos(),Vector3.up*rayDistance,Color.red,0.5f);
+            Debug.DrawRay(_playerView.GetDownToGroundRayPos(),Vector3.down*rayDistance,Color.blue,0.5f);
+            Debug.DrawRay(_playerView.GetUpGroundRayPos(),Vector3.up*rayDistance,Color.red,0.5f);
         }
 
     }

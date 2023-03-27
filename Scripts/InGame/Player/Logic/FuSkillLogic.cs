@@ -152,6 +152,8 @@ namespace InGame.Player.Logic
                 .OnComplete(() =>
                 {
                     _bindGumView.SetState(GumState.Caught);
+                    playerCommonInStageEntity.SetIsUsingSkill(true);
+                    CheckSkillFlagByAnimator();
                     TimeBindEnemy(_bindGumView, _bindGumView.thisToken).Forget();
                 });
             

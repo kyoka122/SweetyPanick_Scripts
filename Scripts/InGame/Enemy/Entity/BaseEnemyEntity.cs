@@ -11,25 +11,26 @@ namespace InGame.Enemy.Entity
     public abstract class BaseEnemyEntity
     {
         public Func<Vector2, Vector2> WorldToViewPortPoint => _commonDatabase.GetReadOnlyCameraController().WorldToViewPortPoint;
-        public SquareRange ObjectInScreenRange => _inGameDatabase.GetStageSettings().ObjectInScreenRange;
-        public float StageBottom => _inGameDatabase.GetStageSettings().StageBottom;
+        public SquareRange ObjectInScreenRange => inGameDatabase.GetStageSettings().ObjectInScreenRange;
+        public float StageBottom => inGameDatabase.GetStageSettings().StageBottom;
         
-        public SpriteEffectView shockSprite { get; private set; }
-        public float moveSpeed { get; private set; }
-        public float flyAwaySpeed { get; private set; }
-        public float changeDirectionTime { get; private set; }
-        public float toSweetsDistance { get; private set; }
-        public float toWallDistance { get; private set; }
-        public float eatUpTime { get; private set; }
-        public float flyMaxAngle { get; private set; }
-        public float flyMinAngle { get; private set; }
-        public float flyRotateAnimationAngle { get; private set; }
-        public float originGravityScele { get; private set; }
-        public float gumReleaseReactionTime { get; private set; }
-        public float shockSpriteDuration { get; private set; }
+        public SpriteEffectView shockSprite { get; }
+        public virtual float moveSpeed { get; }
+        public float flyAwaySpeed { get; }
+        public float changeDirectionTime { get; }
+        public float toSweetsDistance { get; }
+        public float toWallDistance { get; }
+        public float eatUpTime { get; }
+        public float flyMaxAngle { get; }
+        public float flyMinAngle { get; }
+        public float flyRotateAnimationAngle { get; }
+        public float originGravityScele { get; }
+        public float gumReleaseReactionTime { get; }
+        public float shockSpriteDuration { get; }
         
-        
-        private readonly InGameDatabase _inGameDatabase;
+        public bool hadMoved { get; private set; }
+
+        protected readonly InGameDatabase inGameDatabase;
         private readonly CommonDatabase _commonDatabase;
         
         public BaseEnemyEntity(InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
@@ -48,8 +49,13 @@ namespace InGame.Enemy.Entity
             originGravityScele = data.GravityScale;
             gumReleaseReactionTime = data.GumReleaseReactionTime;
             shockSpriteDuration = data.ShockSpriteDuration;
-            _inGameDatabase = inGameDatabase;
+            this.inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
+        }
+        
+        public void SetHadMoved()
+        {
+            hadMoved = true;
         }
     }
 }

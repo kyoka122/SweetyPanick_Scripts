@@ -10,15 +10,21 @@ namespace InGame.Stage.Entity
         public IReadOnlyReactiveProperty<int> Score => _score;
         private readonly ReactiveProperty<int> _score ;
         private readonly InGameDatabase _inGameDatabase;
+        private readonly bool _isLimitedAddScore;
 
-        public ScoreEntity(InGameDatabase inGameDatabase)
+        public ScoreEntity(InGameDatabase inGameDatabase,StageArea stageArea)
         {
             _inGameDatabase = inGameDatabase;
             _score = new ReactiveProperty<int>();
+            _isLimitedAddScore = stageArea == StageArea.ColateStageFirst;
         }
 
         public void AddSweetsScore(SweetsType type)
         {
+            if (_isLimitedAddScore)
+            {
+                return;
+            }
             AllStageData data = _inGameDatabase.GetAllStageData();
             switch (type)
             {

@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using InGame.Colate.Entity;
 using InGame.Colate.View;
-using InGame.Enemy.Interface;
 using MyApplication;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -14,8 +13,8 @@ namespace InGame.Colate.Logic
         public override ColateState state => ColateState.Dropping;
         
         public DroppingState(ColateEntity colateEntity, ColateView colateView,ColateStatusView colateStatusView,
-            Func<Vector2, IColateOrderAble> spawnEnemyEvent) 
-            : base(colateEntity, colateView,colateStatusView,spawnEnemyEvent)
+            Func<Vector2, IColateOrderAble> spawnEnemyEvent,DefaultSweetsLiftView[] sweetsLiftViews) 
+            : base(colateEntity, colateView,colateStatusView,spawnEnemyEvent,sweetsLiftViews)
         {
 
         }
@@ -32,7 +31,8 @@ namespace InGame.Colate.Logic
         {
             if (IsGround())
             {
-                nextStateInstance = new IsGroundState(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
+                nextStateInstance = new IsGroundState(colateEntity, colateView, colateStatusView, spawnEnemyEvent,
+                    sweetsLiftViews);
                 stage = Event.Exit;
             }
         }

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using InGame.Database;
-using InGame.Player.Entity;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.PlayerCustom.Data;
 using OutGame.PlayerCustom.Entity;
-using OutGame.PlayerCustom.Installer;
 using OutGame.PlayerCustom.View;
 using UniRx;
 using UniRx.Triggers;
@@ -22,11 +19,10 @@ namespace OutGame.PlayerCustom.Logic
         private readonly ConstDataEntity _constDataEntity;
         private readonly ToMessageWindowSenderView _toMessageWindowSenderView;
         private readonly CharacterSelectPanelView _characterSelectPanelView;
-        //private List<PlayerInputEntity> _playerInputEntities; //MEMO: キャラクターチェンジの度にリセット
-        //private List<CharacterSelectCursorView> _characterSelectCursorViews; //MEMO: キャラクターチェンジの度にリセット
         private List<PlayerCursorData> _playerCursorData; //MEMO: キャラクターチェンジの度にリセット
         private readonly List<IDisposable> _disposables;
         private readonly List<IDisposable> _onCancelControllerDisposables;
+
         public CharacterSelectLogic(InSceneDataEntity inSceneDataEntity, ConstDataEntity constDataEntity,
             ToMessageWindowSenderView toMessageWindowSenderView, CharacterSelectPanelView characterSelectPanelView)
         {
@@ -53,12 +49,22 @@ namespace OutGame.PlayerCustom.Logic
                 .Where(state => state == PlayerCustomState.Character)
                 .Subscribe(_ =>
                 {
-                    InstallPlayerInputEntity();
+                    SetKeyConfigInfoAnimator();
+                    InitPlayerInputEntity();
+                    RegisterInputObserver();
+                })
+                .AddTo(_characterSelectPanelView);
+                
+            _inSceneDataEntity.ChangedSettingsState
+                .Where(state => state != PlayerCustomState.Character)
+                .Subscribe(_ =>
+                {
+                    _characterSelectPanelView.SetEnableAnimator(false);
                 })
                 .AddTo(_characterSelectPanelView);
         }
 
-        private void InstallPlayerInputEntity()
+        private void InitPlayerInputEntity()
         {
             //MEMO: 違う画面から戻ってきたときに必ずリストを初期化したいため、ここでインスタンス。
             _playerCursorData = new List<PlayerCursorData>();
@@ -68,13 +74,11 @@ namespace OutGame.PlayerCustom.Logic
                 var playerInputEntity = new CharacterSelectInputEntity(_inSceneDataEntity.RegisteredPlayerSelectController[i]);
                 var playerCursorData = new PlayerCursorData(i+1, playerInputEntity,
                     _constDataEntity.CharacterSelectCursorInstaller.Install(_constDataEntity.CharacterSelectCursorPrefab,
-                        i+1,_characterSelectPanelView.UpPanelRectTransform.transform,150f*i));
+                        i+1,_characterSelectPanelView.UpPanelRectTransform.transform,_constDataEntity.CursorInterval*i));
 
                 _playerCursorData.Add(playerCursorData);
                 _disposables.Add(playerInputEntity);
             }
-            
-            RegisterInputObserver();
         }
 
         private void RegisterInputObserver()
@@ -189,6 +193,23 @@ namespace OutGame.PlayerCustom.Logic
             
             currentPos += moveDirection * 3;
             data.characterSelectCursorView.SetRectAnchorPosition(currentPos);
+        }
+        
+        private void SetKeyConfigInfoAnimator()
+        {
+            _characterSelectPanelView.InActiveAllKeyConfigAnimatorParameter();
+            if (_inSceneDataEntity.RegisteredPlayerSelectController.Count!=1)
+            {
+                _characterSelectPanelView.SetChangeAnimationParameter(true);
+            }
+            
+            foreach (var playerCustomInput in _inSceneDataEntity.RegisteredPlayerSelectController)
+            {
+                Debug.Log($"playerCustomInput.DeviceType:{playerCustomInput.DeviceType}");
+                _characterSelectPanelView.SetBoolKeyConfigAnimator(
+                    UIAnimatorParameter.GetKeyConfigAnimatorParameter(playerCustomInput.DeviceType),true);
+            }
+            _characterSelectPanelView.SetEnableAnimator(true);
         }
 
         private void DestroyCursor()

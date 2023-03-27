@@ -11,6 +11,12 @@ namespace InGame.Enemy.Logic
     {
         public NotMoveLimitEnemyLogic(BaseEnemyEntity enemyEntity, BaseEnemyView enemyView) : base(enemyEntity, enemyView)
         {
+            Init();
+        }
+        
+        private void Init()
+        {
+            enemyView.SetActiveAnimator(false);
         }
 
         public override void UpdateEnemies()
@@ -30,9 +36,14 @@ namespace InGame.Enemy.Logic
             {
                 return;
             }
-            if (!enemyView.inScreenX)
+            if (!(enemyEntity.hadMoved||enemyView.inScreenX))//MEMO: 一度動き出したら画面外でも止まらない
             {
                 return;
+            }
+            if (!enemyEntity.hadMoved)//MEMO: 初めて画面内に入ったら
+            {
+                enemyEntity.SetHadMoved();//MEMO: 一度でも画面内に入って動き出したかどうかを保持するフラグを設定
+                enemyView.SetActiveAnimator(true);
             }
             if (enemyView.state==EnemyState.ChangeDirection)
             {

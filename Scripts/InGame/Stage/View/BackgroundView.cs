@@ -6,8 +6,13 @@ namespace InGame.Stage.View
     [RequireComponent(typeof(Rigidbody2D),typeof(BoxCollider2D))]
     public class BackgroundView:MonoBehaviour
     {
+        public float MinSize => minSize;
+        public float MaxSize => maxSize;
         public BoxCollider2D backGroundCollider2D { get; private set; }
 
+        [SerializeField] private float minSize;
+        [SerializeField] private float maxSize;
+        
         private Rigidbody2D _rigidbody2D;
         
         public void Init()
@@ -47,6 +52,11 @@ namespace InGame.Stage.View
         public void SetParent(Transform cameraTransform)
         {
             transform.SetParent(cameraTransform);
+        }
+
+        public void SetSize(float size)
+        {
+            transform.localScale = new Vector2(size,size);
         }
     }
 }

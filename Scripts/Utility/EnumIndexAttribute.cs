@@ -1,4 +1,6 @@
-﻿using System;
+﻿//MEMO: 参考：https://goropocha.hatenablog.com/entry/2021/02/11/232617
+
+using System;
 using System.Linq;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -7,7 +9,6 @@ using UnityEditor;
 
 namespace Utility
 {
-    //MEMO: 参考：https://goropocha.hatenablog.com/entry/2021/02/11/232617
     /// <summary>
     /// Showing an array with Enum as keys in the property inspector. (Supported children)
     /// </summary>

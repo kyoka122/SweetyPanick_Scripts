@@ -1,4 +1,6 @@
-﻿using System;
+﻿//MEMO: 参考：https://github.com/TripleAt/ShaderFade
+
+using System;
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
@@ -7,8 +9,6 @@ using UnityEngine;
 
 namespace Utility.TransitionFade
 {
-    //MEMO: 参考：https://github.com/TripleAt/ShaderFade
-
     [Serializable]
     public class Transition : IUtilTransition
     {

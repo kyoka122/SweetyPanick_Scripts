@@ -17,13 +17,14 @@ namespace InGame.Player.Entity
         public bool canAttackedByEnemy { get; private set; } = true;
         public int PlayerNum => _inGameDatabase.GetPlayerUpdateableData(_type).playerNum;
         public int CurrentHp=> _inGameDatabase.GetPlayerUpdateableData(_type).currentHp;
+        public bool HavingKey=> _inGameDatabase.GetAllStageData().havingKey;
 
         public float NearnessFromTargetView => _inGameDatabase.GetCharacterInStageData(_type).nearnessFromTargetView;
         public bool IsWarping => _inGameDatabase.GetCharacterInStageData(_type).isWarping;
 
         public int LivingPlayerCount => Mathf.Min(
             _commonDatabase.GetMaxPlayerCount(),
-            _inGameDatabase.GetAllPlayerUpdateableData().Count(data => data.isDead == false));
+            _inGameDatabase.GetAllPlayerUpdateableData().Where(data=>data!=null).Count(data => data.isDead == false));
         
         public int LivingCharacterCount => _inGameDatabase.GetAllPlayerUpdateableData()
             .Count(data => data.isDead == false);
@@ -53,8 +54,6 @@ namespace InGame.Player.Entity
         private void InitDatabase(int playerNum,Transform playerTransform)
         {
             _inGameDatabase.SetCharacterInStageData(_type,new CharacterUpdateableInStageData(playerTransform));
-            _inGameDatabase.SetPlayerUpdateableData(_type, new PlayerUpdateableData(playerNum,
-                _inGameDatabase.GetCharacterCommonStatus(_type).MaxHp,true,false));//TODO:キャラ全インスタンスに切り替えたらisUsedを場合分け
         }
 
 
@@ -86,7 +85,7 @@ namespace InGame.Player.Entity
                 _onDeadSubject.Value = true;
                 Debug.Log($"Dead!!!!!");
             }
-            updateableData.isDead = IsDead;
+            updateableData.isDead = true;
             _inGameDatabase.SetPlayerUpdateableData(_type,updateableData);
         }
 
@@ -128,6 +127,13 @@ namespace InGame.Player.Entity
             _onUseSubject.Value = use;
         }
 
+        public void SetHavingKey()
+        {
+            var data = _inGameDatabase.GetAllStageData();
+            data.havingKey = true;
+            _inGameDatabase.SetAllStageData(data);
+        }
+        
         public void Dispose()
         {
             _onDeadSubject?.Dispose();

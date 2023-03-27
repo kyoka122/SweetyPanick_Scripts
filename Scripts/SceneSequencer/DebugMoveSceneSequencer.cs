@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using DebugInput;
 using InGame.Common.Database;
 using InGame.Database;
+using InGame.Database.Installer;
 using InGame.Stage.Installer;
 using MyApplication;
 using InGame.Database.ScriptableData;
@@ -26,19 +27,19 @@ namespace SceneSequencer
         
         [SerializeField] private int currentMovePlayer;
         
-        [SerializeField] private PlayerScriptableData playerScriptableData;
-        [SerializeField] private EnemyScriptableData enemyScriptableData;
         [SerializeField] private StageUIScriptableData stageUIScriptableData;
-        [SerializeField] private PlayerInstancePositions playerInstancePositions;
+        [SerializeField] private PlayerInstanceData playerInstanceData;
         [SerializeField] private MoveStageGimmickInstaller moveStageGimmickInstaller;
         [SerializeField] private CinemachineTargetGroup targetGroup;
         [SerializeField] private CinemachineImpulseSource cinemachineImpulseSource;
         [SerializeField] private Canvas canvas;
         [SerializeField] private StageSettingsScriptableData stageSettingsScriptableData;
+        [SerializeField] private CameraInitData cameraData;
         [SerializeField] private Camera camera;
 
         private DebugStageManager _debugStageManager;
         private DebugCharacterChanger _debugCharacterChanger;
+        private CommonInGameDatabaseInstaller _commonInGameDatabaseInstaller;
         private InGameDatabase _inGameDatabase;
         private OutGameDatabase _outGameDatabase;
         private CommonDatabase _commonDatabase;
@@ -48,7 +49,10 @@ namespace SceneSequencer
             _inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
             _outGameDatabase = outGameDatabase;
+            
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
             SetDatabase();
+
             var cameraController = inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveCamera(inGameDatabase, commonDatabase, targetGroup,
                 cinemachineImpulseSource, camera);
             _debugCharacterChanger = new DebugCharacterChanger();
@@ -82,57 +86,11 @@ namespace SceneSequencer
         
         private void SetDatabase()
         {
-            _inGameDatabase.AddPlayerInstancePositions(StageArea.FirstStageFirst,playerInstancePositions);
-            _inGameDatabase.SetUIData(new UIData(stageUIScriptableData,canvas));
-            _inGameDatabase.SetStageSettings(stageSettingsScriptableData);
-            _inGameDatabase.SetEnemyData(enemyScriptableData);
-            SetCharacterDatabase();
-        }
-
-        private void SetCharacterDatabase()
-        {
-     
-            var candyCommonParameter = playerScriptableData.GetCommonParameter(PlayableCharacter.Candy);
-            var mashCommonParameter = playerScriptableData.GetCommonParameter(PlayableCharacter.Mash);
-            var fuCommonParameter = playerScriptableData.GetCommonParameter(PlayableCharacter.Fu);
-            var kureCommonParameter = playerScriptableData.GetCommonParameter(PlayableCharacter.Kure);
-
-            var candyParameter = playerScriptableData.GetCandyParameter();
-            var mashParameter = playerScriptableData.GetMashParameter();
-            var fuParameter = playerScriptableData.GetFuParameter();
-            var kureParameter = playerScriptableData.GetKureParameter();
-
-            if (candyCommonParameter != null)
-            {
-                _inGameDatabase.SetCandyStatus(new CandyStatus(candyCommonParameter,
-                    playerScriptableData.GetCandyParameter(),
-                    0));
-                _inGameDatabase.SetCommonCandyConstData(new CharacterCommonConstData(candyCommonParameter));
-                _inGameDatabase.SetCandyConstData(new CandyConstData(candyParameter));
-            }
-
-            if (mashCommonParameter != null)
-            {
-                _inGameDatabase.SetMashStatus(new MashStatus(mashCommonParameter,
-                    playerScriptableData.GetMashParameter()));
-                _inGameDatabase.SetCommonMashConstData(new CharacterCommonConstData(mashCommonParameter));
-                _inGameDatabase.SetMashConstData(new MashConstData(mashParameter));
-            }
-
-            if (fuCommonParameter != null)
-            {
-                _inGameDatabase.SetFuStatus(new FuStatus(fuCommonParameter, playerScriptableData.GetFuParameter()));
-                _inGameDatabase.SetCommonFuConstData(new CharacterCommonConstData(fuCommonParameter));
-                _inGameDatabase.SetFuConstData(new FuConstData(fuParameter));
-            }
-
-            if (kureCommonParameter != null)
-            {
-                _inGameDatabase.SetKureStatus(new KureStatus(kureCommonParameter,
-                    playerScriptableData.GetKureParameter()));
-                _inGameDatabase.SetCommonKureConstData(new CharacterCommonConstData(kureCommonParameter));
-                _inGameDatabase.SetKureConstData(new KureConstData(kureParameter));
-            }
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            var uiData = new StageUIData(stageUIScriptableData, canvas, null,null);
+            _commonInGameDatabaseInstaller.SetInGameDatabase(uiData, stageSettingsScriptableData,
+                new[] { new EachStagePlayerInstanceData(StageArea.FirstStageFirst, playerInstanceData)},
+                new[]{cameraData});
         }
 
         private void TryInstancePlayer()

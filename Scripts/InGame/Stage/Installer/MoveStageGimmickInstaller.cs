@@ -19,13 +19,14 @@ namespace InGame.Stage.Installer
         [SerializeField] private HealAnimationView healAnimationView;
         [SerializeField] private StageObjectsView stageObjectsView;
 
-        public MoveStageGimmickManager Install(Action<StageEvent> stageEvent,InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
+        public MoveStageGimmickManager Install(Action<StageEvent> stageEvent,StageArea stageArea,
+            InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
         {
             var healAnimationLogic = new HealAnimationLogic(healAnimationView);
             var doorLogic = new DoorLogic(stageObjectsView,stageEvent);
             var stageGimmickEntity = new StageGimmickEntity(inGameDatabase,commonDatabase);
             var stageBaseEntity = new StageBaseEntity(inGameDatabase,commonDatabase);
-            var scoreEntity = new ScoreEntity(inGameDatabase);
+            var scoreEntity = new ScoreEntity(inGameDatabase,stageArea);
 
             var scoreView = FindObjectOfType<ScoreView>();
             foreach (var backgroundView in FindObjectsOfType<BackgroundView>())
@@ -56,6 +57,8 @@ namespace InGame.Stage.Installer
             {
                 gumGimmickView.Init();
             }
+            
+            var candyLightsGimmickViews = FindObjectsOfType<CandyLightsGimmickView>();
 
             var moveFloorViews = FindObjectsOfType<MoveFloorView>();
             var moveFloorLogics = new List<MoveFloorLogic>();
@@ -64,6 +67,7 @@ namespace InGame.Stage.Installer
                 moveFloorView.Init();
                 moveFloorLogics.Add(new MoveFloorLogic(moveFloorView,stageGimmickEntity));
             }
+            var candyLightsLogic = new CandyLightsLogic(stageGimmickEntity,candyLightsGimmickViews);
 
             var backgroundLogic = new BackgroundLogic(stageBaseEntity);
             var animationEventLogic = new AnimationEventLogic(GameObjectExtensions
@@ -78,7 +82,8 @@ namespace InGame.Stage.Installer
             
             List<IDisposable> disposables = new List<IDisposable>{scoreLogic};
             
-            return new MoveStageGimmickManager(healAnimationLogic, doorLogic,moveFloorLogics.ToArray(),backgroundLogic,animationEventLogic,disposables);
+            return new MoveStageGimmickManager(healAnimationLogic, doorLogic,moveFloorLogics.ToArray(),backgroundLogic,
+                animationEventLogic,candyLightsLogic,disposables);
         }
     }
 }

@@ -34,9 +34,9 @@ namespace InGame.MyCamera.View
             return _cameraTransform.position;
         }
 
-        public Vector2 GetSize()
+        public float GetSize()
         {
-            return _cameraTransform.localScale;
+            return _camera.orthographicSize;
         }
 
         public Vector2 WorldToViewPortPoint(Vector2 position)
@@ -47,6 +47,11 @@ namespace InGame.MyCamera.View
         public Vector2 WorldToScreenPoint(Vector2 position)
         {
             return _camera.WorldToScreenPoint(position);
+        }
+
+        public Vector2 ScreenToWorldPoint(Vector2 position)
+        {
+            return _camera.ScreenToWorldPoint(position);
         }
 
         public bool TryAddTargetGroup(Transform characterTransform)

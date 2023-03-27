@@ -18,12 +18,19 @@ namespace InGame.Database.ScriptableData
         public float ToSideWallDistance => toSideWallDistance;
         public float ToSideWallDistanceAtThrowEnemy => toSideWallDistanceAtThrowEnemy;
         public float ToGroundDistance => toGroundDistance;
-        public float ColateFlyHeight => colateFlyHeight;
+        public float ColateFlyPosY => colateFlyPosY;
 
         public Vector2 ThrowEnemyPower => throwEnemyPower;
         public Vector2 ThrowEnemyPivot => throwEnemyPivot;
         public Vector2 NockBackPower => nockBackPower;
-        
+        public float SweetBoardMoveSpeed => sweetBoardMoveSpeed;
+        public float SweetBoardMaxPosY => sweetBoardMaxPosY;
+        public float SweetBoardMinPosY => sweetBoardMinPosY;
+        public float SweetBoardMoveStayDuration => sweetBoardMoveStayDuration;
+        public float SweetBoardInitPosY => sweetBoardInitPosY;
+        public float DamagedRumbleDuration => damagedRumbleDuration;
+        public float DamagedRumbleStrength => damagedRumbleStrength;
+        public int DamagedRumbleVibrato => damagedRumbleVibrato;
 
 
         [SerializeField] private ColateView prefab;
@@ -38,10 +45,18 @@ namespace InGame.Database.ScriptableData
         [SerializeField] private float toSideWallDistance=3f;
         [SerializeField] private float toSideWallDistanceAtThrowEnemy = 1f;
         [SerializeField] private float toGroundDistance=1f;
-        [SerializeField] private float colateFlyHeight = 10f;
+        [SerializeField] private float colateFlyPosY = 0.31f;
 
         [SerializeField] private Vector2 throwEnemyPower = new(1,1);
         [SerializeField] private Vector2 throwEnemyPivot = new(2,1);
         [SerializeField] private Vector2 nockBackPower = new(1,0);
+        [SerializeField] private float sweetBoardMoveSpeed = 3;
+        [SerializeField] private float sweetBoardMaxPosY = 0.27f;
+        [SerializeField] private float sweetBoardMinPosY = -7.9f;
+        [SerializeField] private float sweetBoardInitPosY=-8.16f;
+        [SerializeField] private float sweetBoardMoveStayDuration = 2;
+        [SerializeField] private float damagedRumbleDuration=0.2f;
+        [SerializeField] private float damagedRumbleStrength = 0.5f;
+        [SerializeField] private int damagedRumbleVibrato = 2;
     }
 }

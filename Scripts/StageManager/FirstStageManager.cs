@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace StageManager
 {
-    public class FirstStageManager:IDisposable
+    public class FirstStageManager:IManagerInitAble,IDisposable
     {
         public IReadOnlyList<BasePlayerController> Controllers=>_controllers;
         
@@ -30,13 +30,14 @@ namespace StageManager
         public FirstStageManager(MoveStageGimmickInstaller moveStageGimmickInstaller,CameraController cameraController,
             InGameDatabase inGameDatabase,CommonDatabase commonDatabase,Action<string> moveNextSceneEvent)
         {
-            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, inGameDatabase,commonDatabase);
+            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, StageArea.FirstStageFirst,
+                inGameDatabase,commonDatabase);
 
             _cameraController = cameraController;
             _moveNextSceneEvent = moveNextSceneEvent;
             _controllers = new List<BasePlayerController>();
             _enemyManager = inGameDatabase.GetEnemyData().EnemyInstaller.InstallWithStageEnemies();
-            InitAtStageMove(StageArea.FirstStageFirst);
+            InitByStageMove(StageArea.FirstStageFirst);
         }
         
 
@@ -165,7 +166,7 @@ namespace StageManager
                 Debug.Log($"Cancel Loading");
             }
 
-            InitAtStageMove(nextStageArea);
+            InitByStageMove(nextStageArea);
             
             try
             {
@@ -180,13 +181,15 @@ namespace StageManager
             SetAllPlayerReStart();
         }
 
-        private void InitAtStageMove(StageArea nextStageArea)
+        private void InitByStageMove(StageArea nextStageArea)
         {
-            _cameraController.SetCameraMoveState(nextStageArea);
+            _stageGimmickManager.UnsetBackGround();
+            
             foreach (var controller in _controllers)
             {
                 controller.MoveStage(nextStageArea);
             }
+            _cameraController.SetCameraMoveState(nextStageArea);
             _stageGimmickManager.InitAtStageMove(nextStageArea);
         }
 

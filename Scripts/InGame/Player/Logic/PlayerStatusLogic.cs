@@ -30,15 +30,7 @@ namespace InGame.Player.Logic
         {
             return _playerCommonUpdateableEntity.PlayerNum;
         }
-
-
-        //TODO: これ廃止する。Viewから直接参照させる
-        public void UpdateAnimationStatus()
-        {
-            string animationName=_playerAnimatorView.GetCurrentAnimationName();
-            _playerCommonInStageEntity.SetCurrentAnimation(animationName,_playerCommonInStageEntity.CharacterType);
-        }
-
+        
         public void SetInstalled()
         {
             //MEMO: カメラのターゲットに登録するため

@@ -13,22 +13,24 @@ namespace InGame.Stage.View
     {
         public CancellationToken cancellationToken { get; private set; }
         public SweetsType type => SweetsType.Sweets;
+        public PlayableCharacter Specialist => specialist;
         public FixState fixState { get; private set; }
         public ReactiveProperty<bool> onFix { get; private set; }
 
-        [SerializeField]private SpriteRenderer fadeSpriteRenderers;
-        [SerializeField] private PlayableCharacter editableCharacterType;
+        [SerializeField] private SpriteRenderer fadeSpriteRenderers;
         [SerializeField] private Transform particleInstanceTransform;
+        [SerializeField] private PlayableCharacter specialist;
+        [SerializeField] private bool isInitFixed;
         
         private bool Fading => _transition.IsActiveFadeIn() || _transition.IsActiveFadeOut();
         private Transition _transition;
 
         public void Init()
         {
-            _transition = new Transition(fadeSpriteRenderers.material,this,1);
             cancellationToken = this.GetCancellationTokenOnDestroy();
-            fixState = FixState.Broken;
-            onFix = new ReactiveProperty<bool>();
+            fixState = isInitFixed ? FixState.Fixed : FixState.Broken;
+            _transition = new Transition(fadeSpriteRenderers.material,this,Convert.ToInt32(!isInitFixed));
+            onFix = new ReactiveProperty<bool>(isInitFixed);
         }
         
         public async UniTask FixSweets(float duration,CancellationToken token)

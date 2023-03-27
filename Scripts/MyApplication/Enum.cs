@@ -137,6 +137,7 @@
         IsGround,//地面に落下した時
         ThrowEnemies,//ステージに敵を投げ入れているとき
         Drift,//空中を左右に漂っているとき
+        SweetsLift,//お菓子の板を出現させているとき
         Dead,//HPが0のとき
     }
 
@@ -267,5 +268,13 @@
         Giliri,
         Angry,
         Cry
+    }
+
+    public enum LiftState
+    {
+        Up,
+        Down,
+        UpStay,
+        DownStay
     }
 }

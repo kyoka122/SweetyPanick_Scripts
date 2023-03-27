@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using Cinemachine;
-using DebugInput;
 using InGame.Common.Database;
 using InGame.Database;
+using InGame.Database.Installer;
 using InGame.Database.ScriptableData;
-using InGame.Player.Installer;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
 using KanKikuchi.AudioManager;
@@ -27,9 +25,9 @@ namespace SceneSequencer
         [SerializeField] private int currentMovePlayer;
         
         [SerializeField] private StageUIScriptableData stageUIScriptableData;
-        [SerializeField] private PlayerInstancePositions secondStageStartInstancePositions;
-        [SerializeField] private PlayerInstancePositions secondStageMiddleInstancePositions;
-        [SerializeField] private PlayerInstancePositions secondHiddenStageInstancePositions;
+        [SerializeField] private PlayerInstanceData secondStageStartInstanceData;
+        [SerializeField] private PlayerInstanceData secondStageMiddleInstanceData;
+        [SerializeField] private PlayerInstanceData secondHiddenStageInstanceData;
         [SerializeField] private StageSettingsScriptableData stageSettingsScriptableData;
         [SerializeField] private CameraInitData secondStageCameraData;
         [SerializeField] private CameraInitData secondHiddenStageCameraData;
@@ -39,11 +37,16 @@ namespace SceneSequencer
         [SerializeField] private CinemachineTargetGroup targetGroup;
         [SerializeField] private CinemachineImpulseSource cinemachineImpulseSource;
         [SerializeField] private CinemachineConfiner2D cinemachineConfiner2D;
+        
         [SerializeField] private Canvas canvas;
+        [SerializeField] private GameObject key;
+        [SerializeField] private GameObject trailEffect;
+        
         [SerializeField] private Camera camera;
 
         private SecondStageManager _secondStageManager;
-        private DebugCharacterChanger _debugCharacterChanger;
+        private CommonInGameDatabaseInstaller _commonInGameDatabaseInstaller;
+        
         private InGameDatabase _inGameDatabase;
         private OutGameDatabase _outGameDatabase;
         private CommonDatabase _commonDatabase;
@@ -51,22 +54,18 @@ namespace SceneSequencer
 
         protected override void Init(InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
-            Debug.Log($"Init SecondStage!!",gameObject);
             _inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
             _outGameDatabase = outGameDatabase;
-            SetInGameDatabase();
-            commonDatabase.AddCameraInitData(secondStageCameraData);
-            commonDatabase.AddCameraInitData(secondHiddenStageCameraData);
-            commonDatabase.AddCameraInitData(secondStageMiddleCameraData);
             
-            var cameraController = _inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveAndMultiStageCamera(inGameDatabase, commonDatabase, targetGroup,
+            SetDatabase();
+            var cameraController = _inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveAndMultiStageCamera
+            (_inGameDatabase, _commonDatabase, targetGroup,
                 cinemachineImpulseSource, camera,cinemachineConfiner2D);
-            //_debugCharacterChanger = new DebugCharacterChanger();
-            _secondStageManager=new SecondStageManager(moveStageGimmickInstaller,cameraController,_inGameDatabase,_commonDatabase,
-                MoveNextScene);
-            
-            InstallAllPlayer();
+            _secondStageManager=new SecondStageManager(moveStageGimmickInstaller,cameraController,_inGameDatabase,
+                _commonDatabase, MoveNextScene);
+
+            _commonInGameDatabaseInstaller.InstallAllPlayer(_secondStageManager,StageArea.SecondStageFirst);
             _secondStageManager.LateInit();
         }
 
@@ -127,42 +126,22 @@ namespace SceneSequencer
             SceneManager.LoadScene(nextSceneName);
         }
         
-        private void SetInGameDatabase()
+        private void SetDatabase()
         {
-            _inGameDatabase.SetUIData(new UIData(stageUIScriptableData,canvas));
-            _inGameDatabase.AddPlayerInstancePositions(StageArea.SecondStageFirst,secondStageStartInstancePositions);
-            _inGameDatabase.AddPlayerInstancePositions(StageArea.SecondHiddenStage,secondHiddenStageInstancePositions);
-            _inGameDatabase.AddPlayerInstancePositions(StageArea.SecondStageMiddle,secondStageMiddleInstancePositions);
-            _inGameDatabase.SetStageSettings(stageSettingsScriptableData);
-        }
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            
+            EachStagePlayerInstanceData[] eachStagePlayerInstanceData =
+            {
+                new(StageArea.SecondStageFirst, secondStageStartInstanceData),
+                new(StageArea.SecondHiddenStage,secondHiddenStageInstanceData),
+                new(StageArea.SecondStageMiddle,secondStageMiddleInstanceData)
+            };
+            CameraInitData[] cameraInitData = 
+                {secondStageCameraData,secondHiddenStageCameraData,secondStageMiddleCameraData};
 
-        private void InstallAllPlayer()
-        {
-            CharacterCommonConstData[] allCharacterConstData = _inGameDatabase.GetAllCharacterConstData();
-            var characterData=_commonDatabase.GetUseCharacterData();
-            
-            //MEMO: Player設定シーンを飛ばした場合、仮でキーボード、Candyのデータを追加する
-            if (characterData == null)
-            {
-                new DebugInputInstaller().Install(_commonDatabase);
-            }
-            characterData=_commonDatabase.GetUseCharacterData();
-            
-            for (int i = 1; i <= characterData.Count; i++)
-            {
-                UseCharacterData useCharacterData = characterData.FirstOrDefault(data => data.playerNum == i);
-                if (useCharacterData==null)
-                {
-                    Debug.LogError($"Coldn`t Find UseCharacterData");
-                    return;
-                }
-                var playerController = allCharacterConstData
-                        .FirstOrDefault(data => data.CharacterType == useCharacterData.playableCharacter)?
-                        .Installer.Install(i,StageArea.SecondStageFirst, _inGameDatabase,_outGameDatabase, _commonDatabase);
-               
-                _secondStageManager.AddController(playerController);
-                _secondStageManager.RegisterPlayerEvent(playerController);
-            }
+            var uiData = new StageUIData(stageUIScriptableData, canvas, key,trailEffect);
+            _commonInGameDatabaseInstaller.SetInGameDatabase(uiData,stageSettingsScriptableData,
+                eachStagePlayerInstanceData,cameraInitData);
         }
 
         private void MoveNextScene(string sceneName)
@@ -175,6 +154,5 @@ namespace SceneSequencer
         {
             _secondStageManager?.Dispose();
         }
-
     }
 }

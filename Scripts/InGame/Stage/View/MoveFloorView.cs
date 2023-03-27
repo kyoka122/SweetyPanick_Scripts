@@ -12,7 +12,7 @@ namespace InGame.Stage.View
         public Vector2 InitPos { get; private set; }
         
         [SerializeField] private GumGimmickView rightGum;
-        [SerializeField] private GumGimmickView leftGum;
+        [SerializeField] private GumGimmickView leftGum;//MEMO: 抽象化すべき？？
         [SerializeField] private Vector2 moveDestination;
         
 

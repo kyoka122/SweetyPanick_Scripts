@@ -33,6 +33,5 @@ namespace InGame.Player.Installer
             return instance;
         }
         
-        
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using InGame.Colate.View;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Enemy.Entity;
-using InGame.Enemy.Interface;
 using InGame.Enemy.Logic;
 using InGame.Enemy.View;
 using UnityEngine;
@@ -34,35 +34,47 @@ namespace InGame.Enemy.Installer
             DefaultEnemyView[] defaultEnemyViews = GetDefaultEnemyViews(enemyViews);
             EternitySleepEnemyView[] eternitySleepEnemyViews = GetEternitySleepEnemyViews(enemyViews);
             StationaryEnemyView[] stationaryEnemyViews = GetStationaryEnemyViews(enemyViews);
+            HavingKeyEnemyView[] havingKeyEnemyViews = GetHavingKeyEnemyViews(enemyViews);
 
             var defaultEnemyLogics = new List<DefaultEnemyLogic>();
             var eternitySleepEnemyLogics = new List<EternitySleepEnemyLogic>();
             var stationaryEnemyLogics = new List<StationaryEnemyLogic>();
+            var havingKeyEnemyLogics = new List<HavingKeyEnemyLogic>();
             
             foreach (var defaultEnemyView in defaultEnemyViews)
             {
                 defaultEnemyLogics.Add(new DefaultEnemyLogic(new DefaultEnemyEntity(_inGameDatabase, _commonDatabase),
                     defaultEnemyView));
             }
-            foreach (var eternitySleepEnemy in eternitySleepEnemyViews)
+            foreach (var eternitySleepEnemyView in eternitySleepEnemyViews)
             {
                 eternitySleepEnemyLogics.Add(new EternitySleepEnemyLogic(
-                    new EternitySleepEnemyEntity(_inGameDatabase, _commonDatabase), eternitySleepEnemy));
+                    new EternitySleepEnemyEntity(_inGameDatabase, _commonDatabase), eternitySleepEnemyView));
             }
             foreach (var stationaryEnemyView in stationaryEnemyViews)
             {
                 stationaryEnemyLogics.Add(new StationaryEnemyLogic(new StationaryEnemyEntity(
                     _inGameDatabase,_commonDatabase),stationaryEnemyView));
             }
-            
-            List<BaseEnemyLogic> enemyLogics = new List<BaseEnemyLogic>(defaultEnemyLogics);
+
+            foreach (var havingKeyEnemyView in havingKeyEnemyViews)
+            {
+                havingKeyEnemyLogics.Add(new HavingKeyEnemyLogic(
+                    new HavingKeyEnemyEntity(_inGameDatabase, _commonDatabase), havingKeyEnemyView));
+            }
+
+            List<BaseEnemyLogic> enemyLogics =
+                new List<BaseEnemyLogic>(defaultEnemyLogics.Count + eternitySleepEnemyLogics.Count +
+                                         stationaryEnemyLogics.Count + havingKeyEnemyLogics.Count);
+            enemyLogics.AddRange(defaultEnemyLogics);
             enemyLogics.AddRange(eternitySleepEnemyLogics);
             enemyLogics.AddRange(stationaryEnemyLogics);
+            enemyLogics.AddRange(havingKeyEnemyLogics);
             var enemyController = new EnemyManager(enemyLogics);
 
             return enemyController;
         }
-
+        
         private DefaultEnemyView[] GetDefaultEnemyViews(BaseEnemyView[] enemyViews)
         {
             List<DefaultEnemyView> defaultEnemyViewEntities = new List<DefaultEnemyView>();
@@ -92,6 +104,22 @@ namespace InGame.Enemy.Installer
 
             return eternitySleepEnemyViewEntities.ToArray();
         }
+        
+        private HavingKeyEnemyView[] GetHavingKeyEnemyViews(BaseEnemyView[] enemyViews)
+        {
+            List<HavingKeyEnemyView> havingKeyEnemyLogics = new List<HavingKeyEnemyView>();
+            foreach (var enemyView in enemyViews)
+            {
+                if (enemyView.TryGetComponent(out HavingKeyEnemyView havingKeyEnemyLogic))
+                {
+                    havingKeyEnemyLogics.Add(havingKeyEnemyLogic);
+                    enemyView.Init();
+                }
+            }
+
+            return havingKeyEnemyLogics.ToArray();
+        }
+
         
         public IColateOrderAble InstallDefaultEnemyByColate(EnemyManager enemyManager,Vector2 spawnPos)
         {

@@ -16,21 +16,26 @@ namespace InGame.Player.Installer
     {
         public override BasePlayerController Install(int playerNum,StageArea stageArea, InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
         {
-            var mashStatus = inGameDatabase.GetMashStatus();
-            inGameDatabase.SetMashStatus(mashStatus);
+            if (inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Mash)==null)
+            {
+                inGameDatabase.SetPlayerUpdateableData(PlayableCharacter.Mash, new PlayerUpdateableData(playerNum,
+                    inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Mash).MaxHp,true,false));
+            }
+            
             var mashView = viewGenerator.GenerateMash(inGameDatabase.GetMashConstData().Prefab);
             mashView.Init();
-            mashView.transform.position = inGameDatabase.GetPlayerInstancePositions(stageArea)
-                .MashInstancePos;
+            mashView.transform.position = inGameDatabase.GetPlayerInstanceData(stageArea)
+                .GetPosition(PlayableCharacter.Mash);
             var weaponView = mashView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
             var playerAnimatorView = mashView.GetAnimatorObject().GetComponent<PlayerAnimatorView>();
-            playerAnimatorView.Init();
-            UIData uiData = inGameDatabase.GetUIData();
+            playerAnimatorView.Init(PlayableCharacter.Mash);
+            StageUIData stageUIData = inGameDatabase.GetUIData();
             
             var playerStatusView =
-                viewGenerator.GeneratePlayerStatusView(uiData.PlayerStatusView, uiData.Canvas.transform,uiData.PlayerStatusDataPos[playerNum-1]);
-            playerStatusView.Init(PlayableCharacterIndex.Mash,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Mash).MaxHp);
+                viewGenerator.GeneratePlayerStatusView(stageUIData.PlayerStatusView, stageUIData.Canvas.transform,stageUIData.PlayerStatusDataPos[playerNum-1]);
+            playerStatusView.Init(PlayableCharacterIndex.Mash,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Mash).MaxHp,
+                inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Mash).currentHp);
             
             
             var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
@@ -38,7 +43,7 @@ namespace InGame.Player.Installer
             var mashConstEntity = new MashConstEntity(inGameDatabase);
             var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Mash,inGameDatabase);
             var playerCommonUpdateableEntity = new PlayerCommonUpdateableEntity(inGameDatabase, commonDatabase,
-                PlayableCharacter.Mash,playerNum,mashView.GetTransform());
+                PlayableCharacter.Mash,playerNum,mashView.GetTransform());//MEMO: PlayerUpdateableDataが存在する事を確認してから実行
             var playerTalkEntity = new PlayerTalkEntity(outGameDatabase);
             
             
@@ -64,6 +69,8 @@ namespace InGame.Player.Installer
             var playableCharacterSelectLogic = new PlayableCharacterSelectLogic(playerInputEntity, playerCommonInStageEntity,
                 playerCommonUpdateableEntity,playerStatusView, PlayableCharacterIndex.Mash);
             var playerTalkLogic = new PlayerTalkLogic(playerTalkEntity, playerAnimatorView, mashView,playerStatusView);
+            var playerGetKeyLogic = new PlayerGetKeyLogic(playerCommonUpdateableEntity,playerConstEntity,
+                playerCommonInStageEntity,mashView, inGameDatabase.GetUIData().Key);
             
             var disposables = new List<IDisposable>
             {
@@ -72,7 +79,8 @@ namespace InGame.Player.Installer
             
             return new MashController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, mashSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
-                playerEnterDoorLogic, playableCharacterSelectLogic,playerTalkLogic,disposables,playerCommonUpdateableEntity.OnUse);
+                playerEnterDoorLogic, playableCharacterSelectLogic,playerTalkLogic,playerGetKeyLogic, disposables,
+                playerCommonUpdateableEntity.OnUse);
         }
     }
 }

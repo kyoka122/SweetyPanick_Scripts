@@ -50,7 +50,7 @@ namespace InGame.Stage.View
             _animationEventSubject.OnNext(animationClipName);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             _animationEventSubject?.Dispose();
         }

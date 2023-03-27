@@ -1,7 +1,6 @@
 ﻿using System;
 using InGame.Colate.Entity;
 using InGame.Colate.View;
-using InGame.Enemy.Interface;
 using MyApplication;
 using UniRx;
 using UnityEngine;
@@ -13,8 +12,8 @@ namespace InGame.Colate.Logic
         public override ColateState state => ColateState.Drift;
 
         public DriftState(ColateEntity colateEntity, ColateView colateView, ColateStatusView colateStatusView,
-            Func<Vector2, IColateOrderAble> spawnEnemyEvent)
-            : base(colateEntity, colateView, colateStatusView, spawnEnemyEvent)
+            Func<Vector2, IColateOrderAble> spawnEnemyEvent,DefaultSweetsLiftView[] sweetsLiftViews)
+            : base(colateEntity, colateView, colateStatusView, spawnEnemyEvent,sweetsLiftViews)
         {
         }
 
@@ -28,7 +27,7 @@ namespace InGame.Colate.Logic
         protected override void Update()
         {
             Drift();
-            if (nextStateInstance!=null)
+            if (nextStateInstance.state!=ColateState.Drift)
             {
                 stage = Event.Exit;
                 return;
@@ -42,7 +41,7 @@ namespace InGame.Colate.Logic
                 colateView.Attacked.Subscribe(_ =>
                     {
                         nextStateInstance =
-                            new DroppingState(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
+                            new DroppingState(colateEntity, colateView, colateStatusView, spawnEnemyEvent,sweetsLiftViews);
                     }
                 ).AddTo(colateView));
         }

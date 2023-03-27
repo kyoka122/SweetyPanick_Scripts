@@ -29,7 +29,8 @@ namespace StageManager
         public DebugStageManager(MoveStageGimmickInstaller moveStageGimmickInstaller,CameraController cameraController,
             InGameDatabase inGameDatabase, CommonDatabase commonDatabase,Action<string> moveNextSceneEvent)
         {
-            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, inGameDatabase,commonDatabase);
+            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent,StageArea.FirstStageFirst,
+                inGameDatabase,commonDatabase);
             _cameraController = cameraController;
             _moveNextSceneEvent = moveNextSceneEvent;
             _controllers = new List<BasePlayerController>();

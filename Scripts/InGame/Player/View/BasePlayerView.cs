@@ -84,9 +84,14 @@ namespace InGame.Player.View
             return _playerChildComponents.ModelTransform;
         }
 
-        public Vector2 GetToGroundRayPos()
+        public Vector2 GetDownToGroundRayPos()
         {
-            return _playerChildComponents.ToGroundRayPos;
+            return _playerChildComponents.DownGroundRayPos;
+        }
+        
+        public Vector2 GetUpGroundRayPos()
+        {
+            return _playerChildComponents.UpGroundRayPos;
         }
 
         public Vector2 GetToSweetsRayPos()
@@ -232,6 +237,11 @@ namespace InGame.Player.View
         public void SetLayer(int layerNum)
         {
             gameObject.layer = layerNum;
+        }
+
+        private void OnDestroy()
+        {
+            _onCollisionEnterObjSubject.Dispose();
         }
     }
 }

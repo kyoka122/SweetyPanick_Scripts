@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using DG.Tweening;
 using InGame.Enemy.View;
 using MyApplication;
 using UniRx;
@@ -9,29 +10,31 @@ using UnityEngine;
 namespace InGame.Colate.View
 {
     [RequireComponent(typeof(Rigidbody2D),typeof(ColateChildComponents),typeof(Animator))]
-    public class ColateView:MonoBehaviour,IEnemyDamageAble,IDisposable
+    public class ColateView:MonoBehaviour,IDisposable
     {
         public bool OnDrawRay => onDrawRay;
-        public IObservable<Collider2D> OnTriggerEnterEvent=>_onTriggerEnterSubject;
+        public IObservable<Collision2D> OnCollisionEnterEvent=>_onCollisionEnterSubject;
         public IObservable<bool> Attacked=>_attackedSubject;
         
         [SerializeField] private bool onDrawRay;
         [SerializeField] private ColateSprite[] _colateSprites;
+        [SerializeField] private PlayerDamageAbleComponent[] playerDamageAbleComponents;
         
         private ColateChildComponents _colateChildComponents;
         private Rigidbody2D _rigidbody;
         private Animator _animator;
 
         private GameObject _currentSpriteObj;
-        private Subject<Collider2D> _onTriggerEnterSubject;
+        private Subject<Collision2D> _onCollisionEnterSubject;
         private Subject<bool> _attackedSubject;
+        
         private float _defaultGravityScale;
 
         private int _prevDirection;
         
         public void Init()
         {
-            _onTriggerEnterSubject = new Subject<Collider2D>();
+            _onCollisionEnterSubject = new Subject<Collision2D>();
             _attackedSubject = new Subject<bool>();
             _rigidbody = GetComponent<Rigidbody2D>();
             _colateChildComponents = GetComponent<ColateChildComponents>();
@@ -49,8 +52,18 @@ namespace InGame.Colate.View
 
         private void RegisterObserver()
         {
-            this.OnTriggerEnter2DAsObservable()
-                .Subscribe(collider2D => _onTriggerEnterSubject.OnNext(collider2D));
+            this.OnCollisionEnter2DAsObservable()
+                .Subscribe(collision2D => _onCollisionEnterSubject.OnNext(collision2D))
+                .AddTo(this);
+
+            foreach (var damageAbleComponent in playerDamageAbleComponents)
+            {
+                damageAbleComponent.Init();
+                damageAbleComponent.Attacked.Subscribe(_ =>
+                {
+                    _attackedSubject.OnNext(true);
+                }).AddTo(damageAbleComponent);
+            }
         }
         
         public int GetDirectionX()
@@ -67,16 +80,7 @@ namespace InGame.Colate.View
         {
             return new(Mathf.Abs(origin.x)*_prevDirection, origin.y);
         }
-
-        public void OnDamaged(Struct.DamagedInfo info)
-        {
-            Debug.Log($"Attacked!!!!! Attacker:{info.attacker}");
-            if (info.attacker==Attacker.Player)
-            {
-                _attackedSubject.OnNext(true);
-            }
-        }
-
+        
         public Vector2 GetPosition()
         {
             return transform.position;
@@ -140,7 +144,7 @@ namespace InGame.Colate.View
 
         public void Dispose()
         {
-            _onTriggerEnterSubject?.Dispose();
+            _onCollisionEnterSubject.Dispose();
             _attackedSubject?.Dispose();
         }
 
@@ -166,6 +170,11 @@ namespace InGame.Colate.View
         public void SetBoolAnimation(string animationName,bool on)
         {
             _animator.SetBool(animationName,on);
+        }
+
+        public void Rumble(float duration,float strength,int vibrato)
+        {
+            transform.DOShakePosition(duration, strength, vibrato, 1);
         }
     }
 }

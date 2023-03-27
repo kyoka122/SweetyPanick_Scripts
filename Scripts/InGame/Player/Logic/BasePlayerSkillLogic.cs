@@ -1,4 +1,5 @@
-﻿using InGame.Player.Entity;
+﻿using Cysharp.Threading.Tasks;
+using InGame.Player.Entity;
 using InGame.Player.View;
 
 namespace InGame.Player.Logic
@@ -29,6 +30,18 @@ namespace InGame.Player.Logic
         public void UpdateStopping()
         {
             playerInputEntity.OffSkillFlag();
+        }
+        
+        protected async void CheckSkillFlagByAnimator()
+        {
+            if (!playerAnimatorView.IsUsingSkill())
+            {
+                await UniTask.WaitUntil(() => playerAnimatorView.IsUsingSkill(),
+                    cancellationToken: playerAnimatorView.thisToken);
+            }
+            await UniTask.WaitWhile(() => playerAnimatorView.IsUsingSkill(),
+                cancellationToken: playerAnimatorView.thisToken);
+            playerCommonInStageEntity.SetIsUsingSkill(false);
         }
     }
 }

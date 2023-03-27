@@ -70,7 +70,7 @@ namespace MyApplication
     
     //MEMO: Serializableすると、[SerializeField]がついたPlayerStatus型の変数がインスペクターに表示できるようになる。
     [Serializable]
-    public class CharacterBaseParameter
+    public class CharacterBaseParameter//TODO:structに変更
     {
         public PlayableCharacter characterType=PlayableCharacter.None;
         public BasePlayerInstaller installer;
@@ -92,12 +92,13 @@ namespace MyApplication
         public float toSweetsDistance=1;
         public float toSlopeDistance=1;
         public float normalSweetsFixingTime=1;
-        public float gimmickSweetsFixingTime=1;
+        public float gimmickSweetsFixingTime=3;
+        public float normalSweetsSpecialistFixingTime = 1;
+        public float gimmickSweetsSpecialistFixingTime=3;
         public float knockBackValue=1;
         public float warpDuration=1;
         public float warpPoaOffsetY=1;
         public float maxColliderSizeX=1.3f;
-
 
         public CharacterBaseParameter Clone()
         {
@@ -118,10 +119,20 @@ namespace MyApplication
     [Serializable]
     public struct SquareRange
     {
-        public float canExistRangeXMin;
-        public float canExistRangeXMax;
-        public float canExistRangeYMin;
-        public float canExistRangeYMax;
+        public float xMin;
+        public float xMax;
+        public float yMin;
+        public float yMax;
+    }
+
+    [Serializable]
+    public class PlayerPosition
+    {
+        public PlayableCharacter Type => type;
+        public Vector2 Pos =>pos;
+
+        [SerializeField] private PlayableCharacter type;
+        [SerializeField] private Vector2 pos;
     }
 
     [Serializable]

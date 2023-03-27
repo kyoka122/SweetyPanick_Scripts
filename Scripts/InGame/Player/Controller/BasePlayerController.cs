@@ -24,6 +24,7 @@ namespace InGame.Player.Controller
         protected readonly PlayerEnterDoorLogic playerEnterDoorLogic;
         protected readonly PlayableCharacterSelectLogic playableCharacterSelectLogic;
         protected readonly PlayerTalkLogic playerTalkLogic;
+        protected readonly PlayerGetKeyLogic playerGetKeyLogic;
         protected readonly List<IDisposable> disposables;
         private readonly ReactiveProperty<bool> _moveStateChanged;
         
@@ -33,12 +34,11 @@ namespace InGame.Player.Controller
         public readonly IObservable<bool> onChangedUseData;
 
         protected BasePlayerController(int playerNum,PlayerMoveLogic playerMoveLogic, PlayerJumpLogic playerJumpLogic,
-            PlayerPunchLogic playerPunchLogic,
-            BasePlayerSkillLogic playerSkillLogic, PlayerReShapeLogic playerReShapeLogic,
-            PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic,
-            PlayerParticleLogic playerParticleLogic, PlayerFixSweetsLogic playerFixSweetsLogic,
-            PlayerEnterDoorLogic playerEnterDoorLogic, PlayableCharacterSelectLogic playableCharacterSelectLogic,
-            PlayerTalkLogic playerTalkLogic, List<IDisposable> disposables,IObservable<bool> onChangedUseData)
+            PlayerPunchLogic playerPunchLogic, BasePlayerSkillLogic playerSkillLogic, PlayerReShapeLogic playerReShapeLogic,
+            PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic,
+            PlayerFixSweetsLogic playerFixSweetsLogic, PlayerEnterDoorLogic playerEnterDoorLogic,
+            PlayableCharacterSelectLogic playableCharacterSelectLogic, PlayerTalkLogic playerTalkLogic, 
+            PlayerGetKeyLogic playerGetKeyLogic, List<IDisposable> disposables,IObservable<bool> onChangedUseData)
         {
             this.playerMoveLogic = playerMoveLogic;
             this.playerJumpLogic = playerJumpLogic;
@@ -52,6 +52,7 @@ namespace InGame.Player.Controller
             this.playerEnterDoorLogic = playerEnterDoorLogic;
             this.playableCharacterSelectLogic = playableCharacterSelectLogic;
             this.playerTalkLogic = playerTalkLogic;
+            this.playerGetKeyLogic = playerGetKeyLogic;
             this.disposables = disposables;
             this.onChangedUseData = onChangedUseData;
             RegisterObserver();
@@ -90,12 +91,13 @@ namespace InGame.Player.Controller
                 playerReShapeLogic.UpdatePlayerDirection();
                 playerPunchLogic.UpdatePlayerPunch();
                 playerSkillLogic.UpdatePlayerSkill();
-                playerStatusLogic.UpdateAnimationStatus();
                 playerFixSweetsLogic.UpdatePlayerFixSweets();
                 playerEnterDoorLogic.UpdatePlayerEnterDoor();//MEMO: UpdatePlayerFixSweetsより前に実行しない
                 FixedUpdateEachPlayer();
                 return;
             }
+
+            Debug.Log($"Stopping");
             playerMoveLogic.UpdateStopping();
             playerJumpLogic.UpdateStopping();
             playerPunchLogic.UpdateStopping();

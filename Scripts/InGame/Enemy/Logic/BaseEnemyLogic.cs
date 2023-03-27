@@ -28,7 +28,17 @@ namespace InGame.Enemy.Logic
         {
             this.enemyEntity = enemyEntity;
             this.enemyView = enemyView;
+            CheckInitDirection();
             RegisterObserver();
+        }
+
+        private void CheckInitDirection()
+        {
+            bool outOfMoveLimit = enemyView.OutOfMoveLimit(enemyView.GetLocalPosition(), enemyView.enemyDirectionX);
+            if (outOfMoveLimit)
+            {
+                enemyView.SetDirection(-enemyView.enemyDirectionX);
+            }
         }
 
         private void RegisterObserver()
@@ -261,7 +271,7 @@ namespace InGame.Enemy.Logic
             ChangeState(EnemyState.Walk);
         }
 
-        private void HadPunched(Vector2 playerPos)
+        protected virtual void HadPunched(Vector2 playerPos)
         {
             enemyView.SetTakeOffCollider();
             enemyView.SetCollidersCaseFlying();
@@ -444,7 +454,7 @@ namespace InGame.Enemy.Logic
             enemyView.CancelEatSweetsTokenSource();
             enemyView.SetState(state);
         }
-
+        
         [Conditional("UNITY_EDITOR")]
         protected void DrawRay(Vector2 rayStartPos,Vector2 vector,Color rayColor)
         {

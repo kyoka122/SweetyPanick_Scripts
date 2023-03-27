@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using InGame.Player.Installer;
-using InGame.Player.View;
 using MyApplication;
 using UnityEngine;
 

@@ -6,7 +6,8 @@ namespace MyApplication
     {
         public GameObject Animator => animator;
         public Transform ModelTransform => modelTransform;
-        public Vector2 ToGroundRayPos => toGroundRayTransform.position;
+        public Vector2 UpGroundRayPos => upGroundRayTransform.position;
+        public Vector2 DownGroundRayPos => downGroundRayTransform.position;
         public Vector2 ToSweetsRayPos => toSweetsRayTransform.position;
         public Vector2 ToSlopeRayPos => toSlopeRayTransform.position;
         public Vector2 AttackParticlePos => attackParticleTransform.position;
@@ -16,7 +17,8 @@ namespace MyApplication
         
         [SerializeField] private GameObject animator;
         [SerializeField] private Transform modelTransform;
-        [SerializeField] private Transform toGroundRayTransform;
+        [SerializeField] private Transform upGroundRayTransform;
+        [SerializeField] private Transform downGroundRayTransform;
         [SerializeField] private Transform toSweetsRayTransform;
         [SerializeField] private Transform toSlopeRayTransform;
         [SerializeField] private Transform attackParticleTransform;

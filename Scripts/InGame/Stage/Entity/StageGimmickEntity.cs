@@ -9,6 +9,7 @@ namespace InGame.Stage.Entity
     public class StageGimmickEntity
     {
         public float MoveFloorSpeed => _inGameDatabase.GetStageGimmickData().MoveFloorSpeed;
+        public float CandyLightsParticleDuration => _inGameDatabase.GetStageGimmickData().CandyLightsParticleDuration;
         public Vector3 CrepeCameraShakeVelocity => _inGameDatabase.GetStageGimmickData().CrepeCameraShakeVelocity;
         public Action<Vector3> CameraShakeEvent => _commonDatabase.GetCameraEvent().ShakeWithVelocity;
    

@@ -17,7 +17,7 @@ namespace InGame.Player.Logic
     {
         private readonly List<IEnemyPullAble> _pullAbleEnemies;
         private readonly CandyView _candyView;
-        private bool _usingSkill;
+        private bool _isCatching;
         
         public CandySkillLogic(PlayerInputEntity playerInputEntity, PlayerConstEntity playerConstEntity,
             PlayerCommonInStageEntity playerCommonInStageEntity, CandyView candyView, PlayerAnimatorView playerAnimatorView,
@@ -32,12 +32,7 @@ namespace InGame.Player.Logic
         public override void UpdatePlayerSkill()
         {
             TryOnSkill();
-            
-            if (_usingSkill)
-            {
-                CheckEnemyBindable();
-            }
-            
+            CheckEnemyBindable();
         }
 
         private void RegisterObserver()
@@ -46,7 +41,10 @@ namespace InGame.Player.Logic
                 .Where(on => on)
                 .Subscribe(_ =>
                 {
+                    playerCommonInStageEntity.SetIsUsingSkill(true);
+                    CheckSkillFlagByAnimator();
                     TimePullEnemy(weaponView.cancellationToken).Forget();
+
                 }).AddTo(playerView);
             
             playerCommonInStageEntity.OnSkill
@@ -54,7 +52,7 @@ namespace InGame.Player.Logic
                 .Subscribe(_ =>
                 {
                     _pullAbleEnemies.Clear();
-                    _usingSkill = false;
+                    _isCatching = false;
                 }).AddTo(playerView);
             
             playerAnimatorView.OnAnimationEvent
@@ -90,11 +88,12 @@ namespace InGame.Player.Logic
                     SEManager.Instance.Play(SEPath.CANDY_SKILL);
                 }
             }
-            _usingSkill = true;
+            _isCatching = true;
         }
 
         private async UniTask TimePullEnemy(CancellationToken token)
         {
+            CheckSkillFlagByAnimator();
             try
             {
                 await UniTask.WaitWhile(

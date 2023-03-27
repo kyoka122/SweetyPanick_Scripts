@@ -44,6 +44,7 @@ namespace InGame.Player.Logic
         {
             if (_playerCommonUpdateableEntity.IsDead)
             {
+                Reset();
                 return;
             }
             if (!_playerInputEntity.fixFlag)
@@ -52,7 +53,7 @@ namespace InGame.Player.Logic
                 return;
             }
             
-            if (_playerCommonInStageEntity.currentFixingSweets!=null||_playerCommonInStageEntity.IsFixing)
+            if (_playerCommonInStageEntity.currentFixingSweets!=null||_playerCommonInStageEntity.isFixing)
             {
                 if (FacedFixingGimmickSweets())
                 {
@@ -99,10 +100,15 @@ namespace InGame.Player.Logic
                     FixGimmickSweets(fixingSweets);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    Debug.LogError($"Unknown SweetType");
+                    return;
             }
         }
 
+        /// <summary>
+        /// 直してる最中のお菓子が目の前にあるかどうか
+        /// </summary>
+        /// <returns></returns>
         private bool FacedFixingGimmickSweets()
         {
             ISweets[] fixableSweets=GetFacedFixableSweets();
@@ -143,9 +149,20 @@ namespace InGame.Player.Logic
             var particle = _fixSweetsParticlePool.GetObject(sweets.GetPlayParticlePos(),
                 _playerConstEntity.FixSweetsParticleSize(sweets.type));
             _playerCommonInStageEntity.SetFixingSweets(sweets);
+            _playerCommonInStageEntity.SetIsFixing(true);
             _playerAnimatorView.PlayTriggerAnimation(PlayerAnimatorParameter.OnFix);
             SEManager.Instance.Play(SEPath.FIX_SWEETS);
             particle.Play();
+            
+            //MEMO: ↓プレイヤー切り替えが実装されたら解除+パラメータ修正
+            /*if (sweets.Specialist==_playerView.type)//MEMO: 担当お菓子の時
+            {
+                await sweets.FixSweets(_playerConstEntity.NormalSweetsSpecialistFixingTime,_playerView.GetCancellationTokenOnDestroy());
+            }
+            else
+            {
+                await sweets.FixSweets(_playerConstEntity.NormalSweetsFixingTime,_playerView.GetCancellationTokenOnDestroy());
+            }*/
             await sweets.FixSweets(_playerConstEntity.NormalSweetsFixingTime,_playerView.GetCancellationTokenOnDestroy());
             
             _playerCommonInStageEntity.SetFixingSweets(null);
@@ -161,21 +178,30 @@ namespace InGame.Player.Logic
             OnFixGimmickSweets(sweets,particle);
 
             var fixSweetsTokenSource = new CancellationTokenSource();
-            _playerCommonInStageEntity.SetFixingSweetsTokenSource(fixSweetsTokenSource);
+            _playerCommonInStageEntity.SetFixingSweetsTokenSource(fixSweetsTokenSource);//MEMO: 途中キャンセルをするため
             CancellationTokenSource tokenSource = CancellationTokenSource.CreateLinkedTokenSource(
                 fixSweetsTokenSource.Token, sweets.cancellationToken);
             
             Debug.Log($"FixStart!");
-            var fixSweetsTask = sweets.FixSweets(_playerConstEntity.GimmickSweetsFixingTime, tokenSource.Token);
-            await fixSweetsTask;
+            //MEMO: ↓プレイヤー切り替えが実装されたら解除+パラメータ修正
+            /*if (sweets.Specialist==_playerView.type)//MEMO: 担当お菓子の時
+            {
+                await sweets.FixSweets(_playerConstEntity.GimmickSweetsSpecialistFixingTime, tokenSource.Token);
+            }
+            else
+            {
+                await sweets.FixSweets(_playerConstEntity.GimmickSweetsFixingTime, tokenSource.Token);
+            }*/
+            await sweets.FixSweets(_playerConstEntity.GimmickSweetsFixingTime, tokenSource.Token);
+            
             Debug.Log($"TimeOver");
-
             OffFixGimmickSweets(tokenSource, particle);
         }
 
         private void OnFixGimmickSweets(ISweets sweets,ParticleSystem particle)
         {
             _playerCommonInStageEntity.SetFixingSweets(sweets);
+            _playerCommonInStageEntity.SetIsFixing(true);
             _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.Fixing, true);
             SEManager.Instance.Play(SEPath.FIX_SWEETS,isLoop:true);
             particle.Play();
@@ -201,6 +227,7 @@ namespace InGame.Player.Logic
                 _playerCommonInStageEntity.fixingSweetsTokenSource.Cancel();
                 _playerCommonInStageEntity.SetFixingSweetsTokenSource(null);
             }
+            _playerCommonInStageEntity.SetIsFixing(false);
             _playerCommonInStageEntity.SetFixingSweets(null);
             _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.Fixing,false);
             _playerInputEntity.OffFixFlag();

@@ -11,10 +11,10 @@ namespace InGame.Stage.Entity
     public class StageBaseEntity
     {
         public Vector2 CameraPos => _commonDatabase.GetReadOnlyCameraController().GetPosition();
-        public Vector2 CameraSize => _commonDatabase.GetReadOnlyCameraController().GetSize();
+        public float CameraSize => _commonDatabase.GetReadOnlyCameraController().GetSize();
         public Transform CameraTransform => _commonDatabase.GetCameraEvent().GetCameraTransform();
-        public float BackGroundMoveRateX => _inGameDatabase.GetStageSettings().BackGroundMoveRateX;
-        public float BackGroundMoveRateY => _inGameDatabase.GetStageSettings().BackGroundMoveRateY;
+        public float CameraMaxSize => _inGameDatabase.GetStageSettings().CameraMaxSize;
+        public float CameraMinSize => _inGameDatabase.GetStageSettings().CameraMinSize;
         public BoxCollider2D GetStageAreaCollider2D(StageArea area) => _commonDatabase.GetCameraInitData(area)
             .StageAreaCollider;
         
@@ -29,6 +29,7 @@ namespace InGame.Stage.Entity
         public Rect stageRangeRect{ get; private set; }
         public Rect backGroundRangeRect{ get; private set; }
         public Rect cameraRangeRect { get; private set; }
+        public float backGroundSizeRate { get; private set; }
         
         private readonly InGameDatabase _inGameDatabase;
         private readonly CommonDatabase _commonDatabase;
@@ -67,6 +68,14 @@ namespace InGame.Stage.Entity
         public void SetStageRangeCollider(BoxCollider2D collider2D)
         {
             stageRangeCollider2D = collider2D;
+        }
+
+        /// <summary>
+        /// カメラのSizeに対する背景のSize拡張度を設定
+        /// </summary>
+        public void SetBackGroundSizeRate(float rate)
+        {
+            backGroundSizeRate = rate;
         }
     }
 }

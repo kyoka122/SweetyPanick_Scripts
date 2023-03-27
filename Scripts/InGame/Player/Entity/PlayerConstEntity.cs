@@ -13,6 +13,10 @@ namespace InGame.Player.Entity
         public readonly PlayableCharacter Type;
         public Func<Vector2, Vector2> WorldToViewPortPoint => _commonDatabase.GetReadOnlyCameraController()
             .WorldToViewPortPoint;
+        
+        public Func<Vector2, Vector2> WorldToScreenPoint => _commonDatabase.GetReadOnlyCameraController()
+            .WorldToScreenPoint;
+        
         public SquareRange ObjectInScreenRange => _inGameDatabase.GetStageSettings().ObjectInScreenRange;
         public SquareRange InPlayerGroupRange => _inGameDatabase.GetStageSettings().InPlayerGroupRange;
         public ParticleSystem PunchParticle => GetCommonCharacterConstData().PunchParticle;
@@ -20,6 +24,8 @@ namespace InGame.Player.Entity
         public ParticleSystem OnJumpParticle => GetCommonCharacterConstData().OnJumpParticle;
         public ParticleSystem OffJumpParticle => GetCommonCharacterConstData().OffJumpParticle;
         public ParticleSystem RunParticle => GetCommonCharacterConstData().RunParticle;
+        public GameObject TrailEffect => _inGameDatabase.GetUIData().TrailEffect;
+        public float ActiveKeyEffectDuration => _inGameDatabase.GetUIData().ActiveKeyEffectDuration;
 
         public float MaxSpeed => GetCharacterCommonStatus().MaxSpeed;
         public float AccelerateRateX => GetCharacterCommonStatus().AccelerateRateX;
@@ -32,7 +38,9 @@ namespace InGame.Player.Entity
         public float ToSweetsDistance => GetCharacterCommonStatus().ToSweetsDistance;
         public float ToSlopeDistance => GetCharacterCommonStatus().ToSlopeDistance;
         public float GimmickSweetsFixingTime => GetCharacterCommonStatus().GimmickSweetsFixingTime;
+        public float GimmickSweetsSpecialistFixingTime => GetCharacterCommonStatus().GimmickSweetsSpecialistFixingTime;
         public float NormalSweetsFixingTime => GetCharacterCommonStatus().NormalSweetsFixingTime;
+        public float NormalSweetsSpecialistFixingTime => GetCharacterCommonStatus().NormalSweetsSpecialistFixingTime;
         public float KnockBackValue => GetCharacterCommonStatus().KnockBackValue;
         public float WarpDuration => GetCharacterCommonStatus().WarpDuration;
         public float WarpPosOffsetY => GetCharacterCommonStatus().WarpPosOffsetY;
@@ -41,7 +49,6 @@ namespace InGame.Player.Entity
         public int HealValue => _inGameDatabase.GetKureStatus().healValue;
         public float StageBottom => _inGameDatabase.GetStageSettings().StageBottom;
 
-
         public Vector2 FixSweetsParticleSize(SweetsType type)
         {
             return type==SweetsType.Sweets ? _inGameDatabase.GetStageSettings().FixNormalSweetsParticleSize : 
@@ -49,7 +56,7 @@ namespace InGame.Player.Entity
         }
 
         public Vector2 GetInstancePositionCaseMoveStage(StageArea type, PlayableCharacter character) =>
-            _inGameDatabase.GetPlayerInstancePositions(type).GetPosition(character);
+            _inGameDatabase.GetPlayerInstanceData(type).GetPosition(character);
 
         private BaseCharacterCommonStatus GetCharacterCommonStatus()=>_inGameDatabase.GetCharacterCommonStatus(Type);
         private CharacterCommonConstData GetCommonCharacterConstData()=>_inGameDatabase.GetCharacterConstData(Type);

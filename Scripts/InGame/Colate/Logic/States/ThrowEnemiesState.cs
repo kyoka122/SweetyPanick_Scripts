@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks.Linq;
+using Cysharp.Threading.Tasks.Triggers;
 using InGame.Colate.Entity;
 using InGame.Colate.View;
-using InGame.Enemy.Interface;
 using MyApplication;
 using UniRx;
 using UnityEngine;
@@ -12,17 +14,19 @@ namespace InGame.Colate.Logic
     {
         public override ColateState state => ColateState.ThrowEnemies;
         private float _passedInterval;
-        
+        private readonly List<IColateOrderAble> _enemies;
 
         public ThrowEnemiesState(ColateEntity colateEntity, ColateView colateView, ColateStatusView colateStatusView,
-            Func<Vector2, IColateOrderAble> spawnEnemyEvent)
-            : base(colateEntity, colateView, colateStatusView,spawnEnemyEvent)
+            Func<Vector2, IColateOrderAble> spawnEnemyEvent,DefaultSweetsLiftView[] sweetsLiftViews)
+            : base(colateEntity, colateView, colateStatusView,spawnEnemyEvent,sweetsLiftViews)
         {
+            _enemies = new List<IColateOrderAble>();
         }
 
         protected override void Enter()
         {
             colateView.SetSprite(ColateSpriteType.RideChocolate);
+            //colateView.SetActiveGroundColliderWhenRidingBoardState(true);
             colateView.FreezeConstrainsY();
             RegisterObserver();
             base.Enter();
@@ -49,6 +53,7 @@ namespace InGame.Colate.Logic
         protected override void Exit()
         {
             colateView.FreePositionConstrain();
+            DestroyEnemies();
         }
 
         private void RegisterObserver()
@@ -59,18 +64,19 @@ namespace InGame.Colate.Logic
         private void RegisterAttackedByEnemyObserver()
         {
             disposables.Add(
-                colateView.OnTriggerEnterEvent
+                colateView.OnCollisionEnterEvent
                     .Subscribe(collision =>
                     {
-                        if (collision.gameObject.TryGetComponent(out IColateOrderAble colateOrderAble))
+                        if (collision.gameObject.TryGetComponent(out ICollideAbleToColate colateOrderAble))
                         {
-                            if (colateOrderAble.state!=EnemyState.Fly)
+                            if (colateOrderAble.state!=EnemyState.Fly&&colateOrderAble.state!=EnemyState.Death)
                             {
                                 return;
                             }
 
                             colateView.AddVelocity(colateView.AdjustModelDirectionX(colateEntity.NockBackPower));
-                            nextStateInstance = new DroppingState(colateEntity, colateView, colateStatusView, spawnEnemyEvent);
+                            nextStateInstance = new DroppingState(colateEntity, colateView, colateStatusView, 
+                                spawnEnemyEvent,sweetsLiftViews);
                         }
                     }).AddTo(colateView));
         }
@@ -78,10 +84,33 @@ namespace InGame.Colate.Logic
         private void ThrowEnemy()
         {
             colateView.OnExplosionEffect();
-            var colateOrderAble=spawnEnemyEvent.Invoke(colateView.GetPosition()+colateView.AdjustModelDirectionX(colateEntity.ThrowEnemyPivot));
+            var colateOrderAble=spawnEnemyEvent.Invoke(
+                colateView.GetPosition()+colateView.AdjustModelDirectionX(colateEntity.ThrowEnemyPivot));
             float xVelocity=colateView.GetDirectionX() * colateEntity.ThrowEnemyPower.x;
-            Debug.Log($"throwPower:{new Vector2(xVelocity, colateEntity.ThrowEnemyPower.y)}");
             colateOrderAble.AddVelocity(new Vector2(xVelocity, colateEntity.ThrowEnemyPower.y));
+            _enemies.Add(colateOrderAble);
+        }
+
+        private void DestroyEnemies()
+        {
+            foreach (var enemy in _enemies)
+            {
+                if (enemy==null||enemy.state is EnemyState.Fly or EnemyState.Death)
+                {
+                    continue;
+                }
+                ParticleSystem particle =
+                    colateEntity.smallMiscParticle.GetObject(enemy.CenterPos);
+                particle.Play();
+                particle.GetAsyncParticleSystemStoppedTrigger()
+                    .ToObservable().FirstOrDefault()
+                    .Subscribe(_ =>
+                    {
+                        Debug.Log($"particle:{particle}",particle);
+                        colateEntity.smallMiscParticle.ReleaseObject(particle);                        
+                    }).AddTo(particle);
+                enemy.Destroy();
+            }
         }
     }
 }

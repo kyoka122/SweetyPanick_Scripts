@@ -9,8 +9,8 @@ namespace InGame.MyCamera.View
         public float LeftEdge => leftEdge;
         public float RightEdge => rightEdge;
         
-        [SerializeField,Tooltip("このカメラが優先される範囲（左端）")] private float leftEdge;
-        [SerializeField,Tooltip("このカメラが優先される範囲（右端）")] private float rightEdge;
+        [SerializeField,Tooltip("適応範囲(左端)(world座標)")] private float leftEdge;
+        [SerializeField,Tooltip("適応範囲(右端)(world座標)")] private float rightEdge;
         
         private CinemachineVirtualCamera _cinemachineVirtualCamera;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Cinemachine;
+using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Enemy;
@@ -17,28 +17,28 @@ using UnityEngine;
 
 namespace StageManager
 {
-    public class SecondStageManager:IDisposable
+    public class SecondStageManager:IManagerInitAble,IDisposable
     {
         public IReadOnlyList<BasePlayerController> Controllers=>_controllers;
         
+        private const float MoveStageDuration = 1f;
         private readonly List<BasePlayerController> _controllers;
         private readonly EnemyManager _enemyManager;
         private readonly MoveStageGimmickManager _stageGimmickManager;
         private readonly CameraController _cameraController;
         private readonly Action<string> _moveNextSceneEvent;
         private CancellationTokenSource _blackFadeInTokenSource;
-        private readonly CommonDatabase _commonDatabase;
-        
+
         public SecondStageManager(MoveStageGimmickInstaller moveStageGimmickInstaller,CameraController cameraController,
             InGameDatabase inGameDatabase,CommonDatabase commonDatabase, Action<string> moveNextSceneEvent)
         {
-            _commonDatabase = commonDatabase;
-            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, inGameDatabase,_commonDatabase);
+            _stageGimmickManager = moveStageGimmickInstaller.Install(SwitchStageEvent, StageArea.SecondStageFirst,
+                inGameDatabase,commonDatabase);
             _cameraController = cameraController;
             _moveNextSceneEvent = moveNextSceneEvent;
             _controllers = new List<BasePlayerController>();
             _enemyManager = inGameDatabase.GetEnemyData().EnemyInstaller.InstallWithStageEnemies();
-            InitAtStageMove(StageArea.SecondStageFirst);
+            InitByStageMove(StageArea.SecondStageFirst);
         }
         
 
@@ -171,9 +171,10 @@ namespace StageManager
                 Debug.Log($"Cancel Loading");
             }
 
-            InitAtStageMove(nextStageArea);
+            InitByStageMove(nextStageArea);
             try
             {
+                await UniTask.Delay(TimeSpan.FromSeconds(MoveStageDuration));
                 await LoadManager.Instance.TryPlayFadeOut();
             }
             catch (OperationCanceledException)
@@ -184,9 +185,9 @@ namespace StageManager
             SetAllPlayerReStart();
         }
         
-        private void InitAtStageMove(StageArea nextStageArea)
+        private void InitByStageMove(StageArea nextStageArea)
         {
-            Debug.Log($"CameraInit");
+            _stageGimmickManager.UnsetBackGround();
             foreach (var controller in _controllers)
             {
                 controller.MoveStage(nextStageArea);

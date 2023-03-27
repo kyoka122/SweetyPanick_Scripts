@@ -10,6 +10,7 @@ namespace OutGame.Database.ScriptableData
     {
         public float PanelPopUpDuration => panelPopUpDuration;
         public float PanelPopDownDuration => panelPopDownDuration;
+        public float CursorInterval => cursorInterval;
         
         public CharacterSelectCursorInstaller CharacterSelectCursorInstaller=>characterSelectCursorInstaller;
         public CharacterSelectCursorView CharacterSelectCursorView => characterSelectCursorView;
@@ -17,6 +18,7 @@ namespace OutGame.Database.ScriptableData
         
         [SerializeField] private float panelPopUpDuration;
         [SerializeField] private float panelPopDownDuration;
+        [SerializeField] private float cursorInterval = 200;
         [SerializeField] private CharacterSelectCursorInstaller characterSelectCursorInstaller;
         [SerializeField] private CharacterSelectCursorView characterSelectCursorView;
         [SerializeField] private SquareRange characterSelectCursorRange;

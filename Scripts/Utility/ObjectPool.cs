@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Utility
 {
+    //MEMO: ComponentのインスタンスはMonoBehaviour継承が必要 → Instance部分だけObjectPool切り離すため
     public interface IPoolObjectGenerator<T> where T : Component
     {
         public T Generate();
@@ -45,6 +46,15 @@ namespace Utility
             obj.transform.position = pos;
             return obj;
         }
+        
+        public T GetObject(Transform transform)
+        {
+            T obj=GetObject();
+            obj.transform.position = transform.position;
+            obj.transform.localScale = transform.localScale;
+            obj.transform.rotation = transform.rotation;
+            return obj;
+        }
 
         public T GetObject()
         {
@@ -73,10 +83,10 @@ namespace Utility
         public void ReleaseObject(T obj)
         {
             obj.gameObject.SetActive(false);
-            ObjectPoolData releaseObjInData=_poolObjectsData.Find(x=>x.obj==obj);
+            ObjectPoolData releaseObjInData=_poolObjectsData.Find(data=>data.obj==obj);
             if (releaseObjInData==null)
             {
-                Debug.LogError($"Not Found Match PoolObject");
+                Debug.LogError($"Not Found Match PoolObject. CurrentDataLength:{_poolObjectsData.Count}");
                 return;
             }
             releaseObjInData.isUsing = false;

@@ -19,8 +19,7 @@ namespace InGame.Database
             _fuInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
             _mashInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
             _kureInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
-            _playerInstancePositions = new Dictionary<StageArea, PlayerInstancePositions>();
-            _allStageData = new AllStageData();
+            _eachStagePlayerInstanceData = new List<EachStagePlayerInstanceData>();
         }
         
         ///////////////////////////////////////////////////////////////////////////
@@ -30,22 +29,19 @@ namespace InGame.Database
         
         #region CharacterInstancePosition
         
-        private readonly Dictionary<StageArea,PlayerInstancePositions> _playerInstancePositions;
+        private readonly List<EachStagePlayerInstanceData> _eachStagePlayerInstanceData;
 
-        public void AddPlayerInstancePositions(StageArea type,PlayerInstancePositions instancePositions)
+        public void AddPlayerInstanceData(EachStagePlayerInstanceData data)
         {
-            Debug.Log($"AddType:{type}",instancePositions);
-            _playerInstancePositions.Add(type,instancePositions);
+            Debug.Log($"AddInstanceDataType:{data}, area:{data.StageArea}");
+            _eachStagePlayerInstanceData.Add(data);
         }
 
-        public PlayerInstancePositions GetPlayerInstancePositions(StageArea type)
+        public PlayerInstanceData GetPlayerInstanceData(StageArea type)
         {
-            Debug.Log($"GetType:{type}");
-            return _playerInstancePositions
-                .FirstOrDefault(data=>data.Key==type).Value;
+            return _eachStagePlayerInstanceData
+                .FirstOrDefault(data=>data.StageArea==type)?.PlayerInstanceData;
         }
-        
-        
 
         #endregion
         
@@ -99,12 +95,11 @@ namespace InGame.Database
         
         public BaseCharacterCommonStatus[] GetAllCharacterCommonStatus()
         {
-            var data = new List<BaseCharacterCommonStatus>();
-            data.Add(GetCandyStatus());
-            data.Add(GetMashStatus());
-            data.Add(GetFuStatus());
-            data.Add(GetKureStatus());
-            
+            var data = new BaseCharacterCommonStatus[]
+            {
+                GetCandyStatus(), GetMashStatus(), GetFuStatus(), GetKureStatus()
+            };
+
             return data.Where(characterCommonStatus => characterCommonStatus!= null)
                 .Where(registeredData => registeredData.characterType != PlayableCharacter.None)
                 .ToArray();
@@ -151,7 +146,7 @@ namespace InGame.Database
                     return _kureUpdateableData;
                 default:
                     Debug.LogError($"ArgumentOutOfRangeException. type{type}");
-                    return new PlayerUpdateableData();
+                    return null;
             }
         }
 
@@ -440,12 +435,12 @@ namespace InGame.Database
         
         public AllStageData GetAllStageData()
         {
-            return _allStageData.Clone();
+            return _allStageData;
         }
 
         public void SetAllStageData(AllStageData allStageData)
         {
-            _allStageData = allStageData.Clone();
+            _allStageData = allStageData;
         }
 
         
@@ -453,16 +448,16 @@ namespace InGame.Database
 
         #region UIData
 
-        private UIData _uiData;
+        private StageUIData _stageUIData;
         
-        public UIData GetUIData()
+        public StageUIData GetUIData()
         {
-            return _uiData;
+            return _stageUIData;
         }
 
-        public void SetUIData(UIData uiScriptableData)
+        public void SetUIData(StageUIData stageUIScriptableData)
         {
-            _uiData = uiScriptableData.Clone();
+            _stageUIData = stageUIScriptableData.Clone();
         }
         
         #endregion

@@ -133,6 +133,5 @@ namespace OutGame.PlayerCustom.Logic
                 _inSceneDataEntity.SetSettingsState(PlayerCustomState.Character);
             }
         }
-
     }
 }

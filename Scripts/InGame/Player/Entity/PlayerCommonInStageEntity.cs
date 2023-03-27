@@ -27,17 +27,17 @@ namespace InGame.Player.Entity
         public ParticleSystem onPunchParticle{ get; private set; }
         public ParticleSystem onSkillParticle{ get; private set; }
         public float playerDirection { get; private set; }
-        public bool IsUsingSkill { get; private set; }
-        public bool IsFixing { get; private set; }
-        public bool IsPunching { get; private set; }
+        public bool isUsingSkill { get; private set; }
+        public bool isFixing { get; private set; }
+        public bool isPunching { get; private set; }
         public ISweets currentFixingSweets { get; private set; }
         public Vector2 prevStandPos { get; private set; }
         public bool isOpeningMenu { get; private set; }
         public GroundType onGroundType { get; private set; }
-        public IBoundAble BoundAble { get; private set; }
+        public IBoundAble boundAble { get; private set; }
         public CancellationTokenSource fixingSweetsTokenSource { get; private set; }
         public float currentBoundDelayCount { get; private set; }
-        
+
         public bool HavingKey => _inGameDatabase.GetAllStageData().havingKey;
         
         private readonly ReactiveProperty<bool> _isRunning;
@@ -92,12 +92,6 @@ namespace InGame.Player.Entity
             playerDirection = direction;
         }
         
-        public void SetCurrentAnimation(string newAnimationName,PlayableCharacter type)
-        {
-            SetRunning(newAnimationName);
-            CheckDoingAction(newAnimationName,type);
-        }
-
         public void SetIsJumping(bool isJumping)
         {
             _isJumping.Value = isJumping;
@@ -153,20 +147,24 @@ namespace InGame.Player.Entity
             isOpeningMenu = on;
         }
 
-        private void CheckDoingAction(string animationName,PlayableCharacter type)
+        public void SetIsPunching(bool on)
         {
-            IsPunching = animationName == PlayerAnimationName.GetEachName(type,PlayerAnimationName.Punch);
-            IsUsingSkill = animationName == PlayerAnimationName.GetEachName(type,PlayerAnimationName.Skill);
-            IsFixing = animationName == PlayerAnimationName.GetEachName(type, PlayerAnimationName.Fix)||
-                       animationName == PlayerAnimationName.GetEachName(type, PlayerAnimationName.OnFix)||
-                       animationName == PlayerAnimationName.GetEachName(type, PlayerAnimationName.Fixing)||
-                       animationName == PlayerAnimationName.GetEachName(type, PlayerAnimationName.Fixed);
-
+            isPunching = on;
         }
 
-        public void SetHighJumpAbleStand(IBoundAble @new)
+        public void SetIsFixing(bool on)
         {
-            BoundAble = @new;
+            isFixing = on;
+        }
+
+        public void SetIsUsingSkill(bool on)
+        {
+            isUsingSkill = on;
+        }
+        
+        public void SetHighJumpAbleStand(IBoundAble boundAble)
+        {
+            this.boundAble = boundAble;
         }
         
         public void SetGroundType(GroundType groundType)

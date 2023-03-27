@@ -1,6 +1,6 @@
 ﻿namespace InGame.Database
 {
-    public struct PlayerUpdateableData
+    public class PlayerUpdateableData
     {
         public int playerNum;
         public int currentHp;

@@ -20,6 +20,8 @@ namespace InGame.Database
         public float ToSlopeDistance{ get; }
         public float NormalSweetsFixingTime{ get; }
         public float GimmickSweetsFixingTime{ get; }
+        public float NormalSweetsSpecialistFixingTime { get; }
+        public float GimmickSweetsSpecialistFixingTime { get; }
         public float KnockBackValue{ get; }
         public float WarpDuration{ get; }
         public float WarpPosOffsetY{ get; }
@@ -42,6 +44,8 @@ namespace InGame.Database
             ToSlopeDistance = characterBaseParameter.toSlopeDistance;
             NormalSweetsFixingTime = characterBaseParameter.normalSweetsFixingTime;
             GimmickSweetsFixingTime = characterBaseParameter.gimmickSweetsFixingTime;
+            NormalSweetsSpecialistFixingTime = characterBaseParameter.normalSweetsSpecialistFixingTime;
+            GimmickSweetsSpecialistFixingTime = characterBaseParameter.gimmickSweetsSpecialistFixingTime;
             KnockBackValue = characterBaseParameter.knockBackValue*10;
             WarpDuration = characterBaseParameter.warpDuration;
             WarpPosOffsetY = characterBaseParameter.warpPoaOffsetY;

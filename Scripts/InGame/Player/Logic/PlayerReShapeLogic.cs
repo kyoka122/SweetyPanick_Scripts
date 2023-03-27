@@ -53,6 +53,7 @@ namespace InGame.Player.Logic
                 InvertModel(xMoveValue);
                 InvertRigidbody(xMoveValue);
             }
+
         }
         
         private void InvertModel(float inputValue)
