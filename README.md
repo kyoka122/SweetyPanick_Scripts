@@ -4,11 +4,11 @@
 [ゲームデモ動画](https://drive.google.com/file/d/1NRwR8zzAjPiQJP4uX30hk-wa03R6-PhX/view?usp=sharing) (制作途中のため、動画ではリポジトリ内のコードの内容と合わない挙動をする場合があります。)
 
 ## 担当箇所
-[Scripts/TalkSystem](https://github.com/kyoka122/SweetyPanick_Scripts/tree/main/Scripts/TalkSystem) 一部機能以外全て
+[Scripts/TalkSystem](https://github.com/kyoka122/SweetyPanick_Scripts/tree/main/Scripts/TalkSystem) の一部機能以外全て
 
 その他参考資料がある場合はスクリプトの上部に書いてあります。
 
-## 使用ライブラリ（ライブラリは同封しておりません）
+## 使用ライブラリ
 * [UniTask (ver.2.3.3)](https://github.com/Cysharp/UniTask)
 * [UniRx (ver.7.1.0)](https://assetstore.unity.com/packages/tools/integration/unirx-reactive-extensions-for-unity-17276?locale=ja-JP)
 * [DOTween (ver.1.2.705)](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676?locale=ja-JP)

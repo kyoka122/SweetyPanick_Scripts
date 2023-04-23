@@ -1,3 +1,9 @@
-Scripts/**/*.meta
+Assets/**/*.meta
+.idea
+
 **/JoyconLib_scripts
-Scripts/Test
+
+Assets/AudioManager_KanKikuchi/Resources
+Assets/AudioManager_KanKikuchi/Sample
+Assets/AudioManager_KanKikuchi/Editor
+Assets/Scripts/Test
