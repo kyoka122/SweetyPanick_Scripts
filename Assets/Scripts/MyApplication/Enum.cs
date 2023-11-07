@@ -100,7 +100,8 @@
         ChangeDirection,
         Punched,
         Fly,
-        Death
+        Death,
+        Bark
     }
 
     public enum GumState
@@ -200,6 +201,12 @@
         Mob,
         Colete
     }
+
+    public enum CharacterHpFaceSpriteType
+    {
+        Normal,
+        Death
+    }
     
     public enum CandyFaceSpriteType
     {
@@ -283,5 +290,32 @@
         Down,
         UpStay,
         DownStay
+    }
+
+    public enum Key
+    {
+        None,
+        Move,
+        Jump,
+        MarshmallowJump,
+        Punch,
+        Fix,
+        EnterDoor,
+        GimmickFix,
+    }
+    
+    public enum UISelectState
+    {
+        None,
+        Overlap,
+        Selected
+    }
+
+    public enum PlayingInfoType
+    {
+        None,
+        Fix,
+        Damage,
+        Punch
     }
 }

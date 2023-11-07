@@ -23,7 +23,7 @@ public class FuAnimatorView:PlayerAnimatorView
     {
         if (animationClipName==PlayerAnimationEventName.OnFixParticle)
         {
-            ParticleSystem particle = _fixedParticlePool.GetObjectParentSet(fixParticleParent,
+            ParticleSystem particle = _fixedParticlePool.GetObjectAndParentSet(fixParticleParent,
                 Vector3.zero, Quaternion.identity, fixedParticle.Prefab.transform.localScale);
             particle.GetAsyncParticleSystemStoppedTrigger()
                 .ToObservable()

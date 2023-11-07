@@ -170,8 +170,8 @@ namespace InGame.Enemy.Logic
             bool inScreenX = SquareRangeCalculator.InXRange(viewPortPos, enemyEntity.ObjectInScreenRange);
             bool inScreen = SquareRangeCalculator.InSquareRange(viewPortPos, enemyEntity.ObjectInScreenRange);
             
-            enemyView.SetInScreenX(inScreenX);
-            enemyView.SetInScreen(inScreen);
+            enemyEntity.SetInScreenX(inScreenX);
+            enemyEntity.SetInScreen(inScreen);
         }
         
         protected void CheckHadFallen()
@@ -407,7 +407,7 @@ namespace InGame.Enemy.Logic
             enemyView.SetAngularVelocity(enemyEntity.flyRotateAnimationAngle);
             enemyView.SetVelocity(enemyView.flyAwayDirection * enemyEntity.flyAwaySpeed);
             
-            if (!enemyView.inScreen)
+            if (!enemyEntity.inScreen)
             {
                 Debug.Log($"Death");
                 Destroy();

@@ -21,5 +21,9 @@
         public const string OnCrepeImpact = "OnCrepeImpact";
         public const string OnCrepeSoundLoop = "OnCrepeSoundLoop";
         public const string OffCrepeSoundLoop = "OffCrepeSoundLoop";
+        
+        public const string OnSmallCrepeImpact = "OnSmallCrepeImpact";
+        public const string OnSmallCrepeSoundLoop = "OnSmallCrepeSoundLoop";
+        public const string OffSmallCrepeSoundLoop = "OffSmallCrepeSoundLoop";
     }
 }

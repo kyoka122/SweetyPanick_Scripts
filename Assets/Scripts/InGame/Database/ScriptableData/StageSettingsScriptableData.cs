@@ -1,5 +1,5 @@
-﻿using InGame.MyCamera.Installer;
-using InGame.MyCamera.View;
+﻿using Common.MyCamera.Installer;
+using Common.MyCamera.View;
 using MyApplication;
 using Unity;
 using UnityEngine;
@@ -10,6 +10,7 @@ namespace InGame.Database.ScriptableData
     public class StageSettingsScriptableData:ScriptableObject
     {
         public SquareRange ObjectInScreenRange => objectInScreenRange;
+        public SquareRange ObjectInScreenRangeOfHavingKeyEnemy => objectInScreenRangeOfHavingKeyEnemy;
         public SquareRange InPlayerGroupRange => inPlayerGroupRange;
         public float StageBottom => stageBottom;
         public Vector2 FixNormalSweetsParticleSize => fixNormalSweetsParticleSize;
@@ -19,6 +20,7 @@ namespace InGame.Database.ScriptableData
         public CameraInstaller CameraInstallerPrefab => cameraInstallerPrefab;
 
         [SerializeField] private SquareRange objectInScreenRange;
+        [SerializeField] private SquareRange objectInScreenRangeOfHavingKeyEnemy;
         [SerializeField] private SquareRange inPlayerGroupRange;
         [SerializeField] private float stageBottom;
         [SerializeField] private Vector2 fixNormalSweetsParticleSize=new(1,1);

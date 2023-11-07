@@ -1,5 +1,6 @@
 ﻿using Audio;
 using Audio.ScriptableData;
+using Common.Database.ScriptableData;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Database.ScriptableData;
@@ -25,6 +26,7 @@ public class ScriptableDataInstaller : ScriptableObject
     [SerializeField] private ColateStageScriptableData colateStageScriptableData;
     [SerializeField] private DialogFaceSpriteScriptableData dialogFaceSpriteScriptableData;
     [SerializeField] private TalkPartUIScriptableData talkPartUIScriptableData;
+    //[SerializeField] private KeySpriteScriptableData keySpriteScriptableData;
     
     
     public void SetScriptableData(InGameDatabase inGameDatabase, OutGameDatabase outGameDatabase,
@@ -36,6 +38,7 @@ public class ScriptableDataInstaller : ScriptableObject
         enemyScriptableData.EnemyInstaller.Init(inGameDatabase, commonDatabase);
         inGameDatabase.SetStageGimmickData(stageGimmickScriptableData);
         commonDatabase.SetSceneLoadData(sceneLoadData);
+        //commonDatabase.SetKeySpriteScriptableData(keySpriteScriptableData);
         inGameDatabase.SetColateData(colateScriptableData);
         SetCharacterDatabase(inGameDatabase);
         outGameDatabase.SetTitleSceneScriptableData(titleSceneScriptableData);

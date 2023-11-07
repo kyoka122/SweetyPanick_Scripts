@@ -1,7 +1,7 @@
-﻿using InGame.MyCamera.View;
+﻿using Common.MyCamera.View;
 using UnityEngine;
 
-namespace InGame.MyCamera.Installer
+namespace Common.MyCamera.Installer
 {
     public class ViewGenerator:MonoBehaviour
     {

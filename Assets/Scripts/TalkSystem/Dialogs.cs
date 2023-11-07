@@ -50,6 +50,8 @@ namespace TalkSystem
         [SerializeField]
         private GameObject nextButtonImageObjCenter;
 
+        [SerializeField] private GameObject speechBalloonParentObj;
+        
         private int dialogNum;
         private int count;
         private float toDisplayNextCharacterDurationNormal;
@@ -166,6 +168,11 @@ namespace TalkSystem
             StopCoroutine(_dialogCoroutine);
             InitNextDialogSettings();
             HideDialog();
+        }
+
+        public void DisposeDialog()
+        {
+            speechBalloonParentObj.SetActive(false);
         }
 
         public void SetFinishAction()
@@ -334,7 +341,7 @@ namespace TalkSystem
             characterImageLeft.sprite = GetEachCharacterSprite(_dialogData);
             characterImageLeft.enabled = true;
             nameTextBox[5].SetActive(true);
-            characterNameTextLeft.Text = "とある住民";
+            characterNameTextLeft.Text = "とある<r=じゅうみん>住民</r>";
             speechBalloons[6].SetActive(true);
             //dialogTextsCenter.text = _dialogData.dialog;
             _dialogCoroutine=StartCoroutine(DisplayDialogLeft(_dialogData));

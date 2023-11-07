@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Common.Database.ScriptableData;
 using InGame.Database;
 using InGame.Database.ScriptableData;
 using InGame.MyCamera.Interface;
@@ -116,6 +117,22 @@ namespace InGame.Common.Database
 
         #endregion
 
+        #region KeyData
+
+        private KeySpriteScriptableData _keySpriteScriptableData;
+        
+        public KeySpriteScriptableData GetKeySpriteScriptableData()
+        {
+            return _keySpriteScriptableData;
+        }
+
+        public void SetKeySpriteScriptableData(KeySpriteScriptableData keySpriteScriptableData)
+        {
+            _keySpriteScriptableData = keySpriteScriptableData;
+        }
+
+        #endregion
+
         #region Load
 
         private SceneLoadData _sceneLoadData;
@@ -138,5 +155,11 @@ namespace InGame.Common.Database
 
         }
 
+        public void Dispose()
+        {
+            StaticDatabase.input?.Clear();
+            _cameraData?.Clear();
+            _useCharacterData?.Clear();
+        }
     }
 }

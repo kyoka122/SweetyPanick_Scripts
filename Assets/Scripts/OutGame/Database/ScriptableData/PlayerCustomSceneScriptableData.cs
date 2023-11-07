@@ -15,10 +15,12 @@ namespace OutGame.Database.ScriptableData
         public CharacterSelectCursorInstaller CharacterSelectCursorInstaller=>characterSelectCursorInstaller;
         public CharacterSelectCursorView CharacterSelectCursorView => characterSelectCursorView;
         public SquareRange CharacterSelectCursorRange => characterSelectCursorRange;
-        
+        public Vector2 CursorRayRadius => cursorRayRadius;
+
         [SerializeField] private float panelPopUpDuration;
         [SerializeField] private float panelPopDownDuration;
         [SerializeField] private float cursorInterval = 200;
+        [SerializeField] private Vector2 cursorRayRadius = new(0.5f, 0.5f);
         [SerializeField] private CharacterSelectCursorInstaller characterSelectCursorInstaller;
         [SerializeField] private CharacterSelectCursorView characterSelectCursorView;
         [SerializeField] private SquareRange characterSelectCursorRange;

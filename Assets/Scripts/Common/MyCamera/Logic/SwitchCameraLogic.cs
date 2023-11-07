@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using InGame.Database;
-using InGame.MyCamera.Entity;
-using InGame.MyCamera.View;
+using Common.MyCamera.Entity;
+using Common.MyCamera.View;
 using MyApplication;
 using UnityEngine;
 
-namespace InGame.MyCamera.Logic
+namespace Common.MyCamera.Logic
 {
     public class SwitchCameraLogic
     {
@@ -28,6 +28,7 @@ namespace InGame.MyCamera.Logic
                 return;
             }
             var headPosX = characterUpdateableInStageData
+                .Where(data=>data.Value.canTargetCamera)
                 .Select(data => data.Value.transform)
                 .Where(transformData => transformData!=null)
                 .Max(transformData => transformData.position.x);

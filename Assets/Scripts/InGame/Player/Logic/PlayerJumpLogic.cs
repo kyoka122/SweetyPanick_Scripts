@@ -96,6 +96,7 @@ namespace InGame.Player.Logic
             }
             else if (downRaycastHit2D.collider != null)
             {
+                //Debug.Log($"groundObj:{downRaycastHit2D.collider.gameObject.name}",downRaycastHit2D.collider);
                 groundObj = downRaycastHit2D.collider.gameObject;
             }
             
@@ -123,6 +124,10 @@ namespace InGame.Player.Logic
         /// </summary>
         private void SetIsJumping()
         {
+            if (_playerCommonUpdateableEntity.IsWarping)
+            {
+                return;
+            }
             if (_playerCommonInStageEntity.IsGround)
             {
                 if (_playerCommonInStageEntity.IsJumping.Value)
@@ -168,7 +173,7 @@ namespace InGame.Player.Logic
             if (_playerCommonInStageEntity.onGroundType==GroundType.Trampoline&&isMaxDelayCount)
             {
                 //_playerCommonInStageEntity.highJumpAbleStand?.PlayPressAnimation(); //MEMO: バウンド時はアニメーションしないように変更
-                SEManager.Instance.Play(SEPath.TRAMPOLINE);
+                SEManager.Instance.Play(SEPath.TRAMPOLINE,volumeRate:0.8f,pitch:1.7f);
                 Jump(_playerConstEntity.BoundValue);
                 _playerCommonInStageEntity.ClearCurrentDelayCount();
                 return true;
@@ -180,9 +185,15 @@ namespace InGame.Player.Logic
         {
             if (_playerCommonInStageEntity.onGroundType==GroundType.Trampoline)
             {
-                _playerCommonInStageEntity.boundAble?.PlayPressAnimation();
+                float boundPower = _playerConstEntity.HighJumpValue;
+                IBoundAble boundAble = _playerCommonInStageEntity.boundAble;
+                if (boundAble!=null)
+                {
+                    boundPower *= boundAble.BoundPower;
+                    boundAble.PlayPressAnimation();
+                }
                 SEManager.Instance.Play(SEPath.TRAMPOLINE);
-                Jump(_playerConstEntity.HighJumpValue);
+                Jump(boundPower);
                 return true;
             }
             return false;

@@ -4,22 +4,36 @@ using DG.Tweening;
 using InGame.MyCamera.Interface;
 using UnityEngine;
 
-namespace InGame.MyCamera.View
+namespace Common.MyCamera.View
 {
     public class MainCameraView:MonoBehaviour,IReadOnlyCameraFunction,ICameraActionable
     {
+        public float CinemaChineMaxWeight => cinemaChineMaxWeight;
+        public float CinemaChineMinWeight => cinemaChineMinWeight;
+        public float CinemaChineWeightRate => cinemaChineMaxWeight - cinemaChineMinWeight;
+        
         private CinemachineTargetGroup _targetGroup;
         private CinemachineImpulseSource _cinemachineImpulseSource;
         private Camera _camera;
         private Transform _cameraTransform;
         
-        [SerializeField] private int cinemaChineWeight = 1;
-        [SerializeField] private int cinemaChineRadius = 1;
+        [SerializeField] private float cinemaChineMaxWeight = 1;
+        [SerializeField] private float cinemaChineMinWeight = 0.7f;
+        [SerializeField] private float cinemaChineMaxRadius = 1;
+        [SerializeField] private float cinemaChineMinRadius = 0.7f;
         
         public void Init(CinemachineTargetGroup targetGroup,CinemachineImpulseSource cinemachineImpulseSource,Camera camera)
         {
             _targetGroup = targetGroup;
             _cinemachineImpulseSource = cinemachineImpulseSource;
+            if (CinemaChineMaxWeight-CinemaChineMinWeight<0)
+            {
+                Debug.LogError($"Please Fix: CinemaChineMaxWeight < CinemaChineMinWeight");
+            }
+            if (cinemaChineMaxRadius-cinemaChineMinRadius<0)
+            {
+                Debug.LogError($"Please Fix: CinemaChineMaxRadius < CinemaChineMinRadius");
+            }
             Init(camera);
         }
         
@@ -63,7 +77,7 @@ namespace InGame.MyCamera.View
             if (_targetGroup.FindMember(characterTransform)==-1)
             {
                 Debug.Log($"AddTargetGroup");
-                _targetGroup.AddMember(characterTransform,cinemaChineWeight,cinemaChineRadius);
+                _targetGroup.AddMember(characterTransform,cinemaChineMinRadius,cinemaChineMaxRadius);
                 return true;
             }
 
@@ -80,6 +94,36 @@ namespace InGame.MyCamera.View
             }
 
             return false;
+        }
+
+        public void SetCameraTargetWeight(Transform characterTransform,float weight)
+        {
+            int index = _targetGroup.FindMember(characterTransform);
+            if (index!=-1)
+            {
+                _targetGroup.m_Targets[index].weight = weight;
+            }
+        }
+        
+        public float GetCameraTargetWeight(Transform characterTransform)
+        {
+            int index = _targetGroup.FindMember(characterTransform);
+            if (index!=-1)
+            {
+                return _targetGroup.m_Targets[index].weight;
+            }
+
+            Debug.LogError($"Not Found Transform :{characterTransform.gameObject.name}");
+            return 1;
+        }
+
+        public void SetCameraRange(Transform characterTransform, float range)
+        {
+            int index = _targetGroup.FindMember(characterTransform);
+            if (index != -1)
+            {
+                _targetGroup.m_Targets[index].radius = range;
+            }
         }
 
         public void Shake()
@@ -111,7 +155,7 @@ namespace InGame.MyCamera.View
             }
             
             var index = _targetGroup.FindMember(characterTransform);
-            if (index==-1)
+            if (index<=-1)
             {
                 return;
             }
@@ -120,8 +164,8 @@ namespace InGame.MyCamera.View
             {
                 return;
             }
-            _targetGroup.RemoveMember(characterTransform);
-            _targetGroup.AddMember(characterTransform,weight,cinemaChineRadius);
+            //_targetGroup.RemoveMember(characterTransform);
+            //_targetGroup.AddMember(characterTransform,weight,cinemaChineRadius);
         }
         
         public void SetPosition(Vector3 pos)

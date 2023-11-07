@@ -13,7 +13,7 @@ namespace OutGame.PlayerCustom.Entity
         public float PopUpDuration =>_outGameDatabase.GetPlayerCustomSceneData().PanelPopUpDuration;
         public float PopDownDuration =>_outGameDatabase.GetPlayerCustomSceneData().PanelPopDownDuration;
         public float CursorInterval =>_outGameDatabase.GetPlayerCustomSceneData().CursorInterval;
-
+        public Vector2 CursorRayRadius => _outGameDatabase.GetPlayerCustomSceneData().CursorRayRadius;
         public CharacterSelectCursorInstaller CharacterSelectCursorInstaller =>
             _outGameDatabase.GetPlayerCustomSceneData().CharacterSelectCursorInstaller;
         

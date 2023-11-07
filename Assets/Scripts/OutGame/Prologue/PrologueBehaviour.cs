@@ -112,6 +112,7 @@ namespace OutGame.Prologue
         public void MoveNextScene()
         {
             dialogs.ExitDialog();
+            dialogs.DisposeDialog();
             _toNextSceneEvent.Invoke();
         }
 

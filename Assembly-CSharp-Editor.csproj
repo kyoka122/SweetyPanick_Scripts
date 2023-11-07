@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Editor\DialogFaceSpriteDataEditor.cs" />
+     <Compile Include="Assets\Scripts\Editor\SweetsCountEditor.cs" />
      <Compile Include="Assets\AudioManager_KanKikuchi\Editor\AudioPathCreator.cs" />
      <Compile Include="Assets\AudioManager_KanKikuchi\Editor\ConstantsClassCreator.cs" />
      <Compile Include="Assets\AudioManager_KanKikuchi\Editor\AudioManagerSettingEditor.cs" />

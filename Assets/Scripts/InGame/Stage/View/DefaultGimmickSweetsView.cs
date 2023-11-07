@@ -20,14 +20,17 @@ namespace InGame.Stage.View
         public PlayableCharacter Specialist => specialist;
         public FixState fixState { get; protected set; }
         public ReactiveProperty<bool> onFix { get; private set; }
-
+        public bool isActive => gameObject.activeSelf;
+        public FixState IsInitState => isInitFixed ? FixState.Fixed : FixState.Broken;
+        
         [SerializeField] private PlayableCharacter specialist;
         [SerializeField] private SpriteRenderer fadeSpriteRenderers;
         [SerializeField] private Transform particleInstanceTransform;
         [SerializeField] private Transform scoreInstanceTransform;
         [SerializeField] private GameObject fixGaugeObj;
         [SerializeField] private SpriteRenderer fixGaugeSlider;
-
+        [SerializeField] private bool isInitFixed = false;
+        
         private bool Fading =>  transition.IsActiveFadeIn() ||  transition.IsActiveFadeOut();
         
         /// <summary>
@@ -46,8 +49,8 @@ namespace InGame.Stage.View
             cancellationToken = this.GetCancellationTokenOnDestroy();
             transition = new Transition(fadeSpriteRenderers.material, this,1);
             cutOffTransition = new CutOffTransition(fixGaugeSlider.material,1,0);
-            fixState = FixState.Broken;
-            onFix = new ReactiveProperty<bool>();
+            fixState = isInitFixed ? FixState.Fixed : FixState.Broken;
+            onFix = new ReactiveProperty<bool>(isInitFixed);
         }
         
         public async UniTask FixSweets(float duration,CancellationToken token)
@@ -153,7 +156,7 @@ namespace InGame.Stage.View
         {
             return scoreInstanceTransform.position;
         }
-
+        
         protected virtual void OnDestroy()
         {
             onFix?.Dispose();

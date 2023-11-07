@@ -18,7 +18,7 @@ namespace InGame.Colate.View
         
         [SerializeField] private bool onDrawRay;
         [SerializeField] private ColateSprite[] _colateSprites;
-        [SerializeField] private PlayerDamageAbleComponent[] playerDamageAbleComponents;
+        [SerializeField] private PlayerEndlessDamageAbleComponent[] playerDamageAbleComponents;
         
         private ColateChildComponents _colateChildComponents;
         private Rigidbody2D _rigidbody;

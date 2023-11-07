@@ -12,6 +12,8 @@ namespace InGame.Player.Installer
     {
         [SerializeField] protected ViewGenerator viewGenerator;
         [SerializeField] protected ParticleGeneratorView particleGeneratorView;
+        [SerializeField] protected ParticleGeneratorView healHpBarParticleGeneratorView;
+        [SerializeField] protected CallbackAnimatorGeneratorView reviveCharacterCallbackAnimatorView;
         
         
         public abstract BasePlayerController Install(int playerNum, StageArea stageArea,InGameDatabase inGameDatabase

@@ -1,11 +1,14 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using InGame.Colate.Logic;
 using InGame.Enemy.Entity;
 using InGame.Enemy.View;
 using InGame.Stage.View;
 using KanKikuchi.AudioManager;
 using MyApplication;
+using UniRx;
 using UnityEngine;
+using Utility;
 using Random = UnityEngine.Random;
 
 namespace InGame.Enemy.Logic
@@ -22,11 +25,24 @@ namespace InGame.Enemy.Logic
             _havingKeyEnemyEntity = enemyEntity;
             _havingKeyEnemyView = enemyView;
             Init();
+            RegisterObserver();
         }
 
         private void Init()
         {
             enemyView.SetActiveAnimator(false);
+        }
+
+        private void RegisterObserver()
+        {
+            _havingKeyEnemyView.OnAnimationEvent
+                .Subscribe(eventName =>
+                {
+                    if (eventName==EnemyAnimationCallbackName.TriggerBarkVoice)
+                    {
+                        SEManager.Instance.Play(SEPath.DOG_BARK,SEVolume.DOG_BARK);
+                    }
+                }).AddTo(_havingKeyEnemyView);
         }
 
         public override void UpdateEnemies()
@@ -37,34 +53,57 @@ namespace InGame.Enemy.Logic
             }
 
             CheckHadFallen();
-            CheckOutOfScreen();
+            //CheckOutOfScreen();
+            CheckSelfOutOfScreen();
             TryFly();
             if (TryUpdateFlyState())
             {
                 return;
             }
-            if (TryUpdateActionByPlayer())
+            if (enemyView.state == EnemyState.Punched)
             {
                 return;
             }
-
             RaycastHit2D hitGroundObj = GetGroundObject();
+
             if (IsStandDeadZone(hitGroundObj))
             {
                 DestroyWithEffect(enemyView.GetPosition());
                 _havingKeyEnemyView.SetActiveKey(false);
                 return;
             }
-            if (!(enemyEntity.hadMoved||enemyView.inScreenX))//MEMO: 一度動き出したら画面外でも止まらない
+            
+            if (TryUpdateActionByPlayer())
             {
                 return;
             }
-            if (!enemyEntity.hadMoved)//MEMO: 初めて画面内に入ったら
+
+            if (!enemyEntity.hadMoved)//MEMO: 一度動き出したら画面外でも止まらない
             {
-                enemyEntity.SetHadMoved();//MEMO: 一度でも画面内に入って動き出したかどうかを保持するフラグを設定
-                enemyView.SetActiveAnimator(true);
+                if (!_havingKeyEnemyEntity.hadInScreenX)
+                {
+                    if (!_havingKeyEnemyEntity.inScreenX)
+                    {
+                        return;
+                    }
+                    enemyView.SetActiveAnimator(true);
+                    _havingKeyEnemyEntity.SetHadInScreenX(true);
+                    return;
+                }
+
+                Vector2 viewPortPos = enemyEntity.WorldToViewPortPoint(enemyView.GetPosition());
+                if (!SquareRangeCalculator.InXRange(viewPortPos, _havingKeyEnemyEntity.CanMoveRange))
+                {
+                    return;
+                }
+                    
+                enemyEntity.SetHadMoved();//MEMO: 一度でも画面内に入ったかどうかを保持するフラグを設定
+                //MEMO: 動き始めは吠える。
+                enemyView.SetState(EnemyState.Bark);
+                Bark();
             }
 
+            //↓動き出してから
             if (CanTrampolineBound(hitGroundObj))
             {
                 TryBound();
@@ -79,13 +118,14 @@ namespace InGame.Enemy.Logic
                 return;
             }
             
-            Move();
-            CheckMoveLimit();
             TryUpdateEatState();
-            if (enemyView.state==EnemyState.Eat)
+            if (enemyView.state==EnemyState.Eat||enemyView.state==EnemyState.Idle||enemyView.state==EnemyState.Bark)
             {
                 enemyView.SetVelocity(Vector2.zero);
+                return;
             }
+            Move();
+            CheckMoveLimit();
         }
 
         private bool IsGround(RaycastHit2D hitGroundObj)
@@ -96,7 +136,7 @@ namespace InGame.Enemy.Logic
         private RaycastHit2D GetGroundObject()
         {
             return Physics2D.Raycast(_havingKeyEnemyView.GetToGroundRayPos(), Vector2.down,
-                _havingKeyEnemyEntity.ToGroundDistance, LayerInfo.GroundMask);
+                _havingKeyEnemyEntity.ToGroundDistance,LayerInfo.EnemyGroundMask);
         }
         
         private bool CanTrampolineBound(RaycastHit2D raycastHit2D)
@@ -118,6 +158,10 @@ namespace InGame.Enemy.Logic
         /// <returns></returns>
         private bool IsStandDeadZone(RaycastHit2D raycastHit2D)
         {
+            if (raycastHit2D.collider==null)
+            {
+                return false;
+            }
             Collider2D raycastHitCollider = raycastHit2D.collider;
             if (raycastHitCollider!=null&&raycastHitCollider.gameObject.layer==LayerInfo.KeyEnemyDeadZoneNum)
             {
@@ -182,5 +226,37 @@ namespace InGame.Enemy.Logic
             ChangeState(EnemyState.Punched);
         }
         
+        private void CheckSelfOutOfScreen()
+        {
+            Vector2 viewPortPos = enemyEntity.WorldToViewPortPoint(enemyView.GetPosition());
+            bool inScreenX = SquareRangeCalculator.InXRange(viewPortPos, _havingKeyEnemyEntity.ObjectInScreenRange);
+            bool inScreen = SquareRangeCalculator.InSquareRange(viewPortPos, enemyEntity.ObjectInScreenRange);
+            enemyEntity.SetInScreenX(inScreenX);
+            enemyEntity.SetInScreen(inScreen);
+            
+            
+        }
+
+        private async void Bark()
+        {
+            enemyView.PlayBoolAnimation(EnemyAnimatorStateName.Bark, true);
+            Debug.Log("WaitStart");
+            await UniTask.WaitUntil(HadFinishedBarkAnimation, cancellationToken: enemyView.thisToken);
+            Debug.Log($"WaitFinish");
+            enemyView.PlayBoolAnimation(EnemyAnimatorStateName.Bark, false);
+            enemyView.PlayBoolAnimation(EnemyAnimatorStateName.Walk, true);
+            enemyView.SetState(EnemyState.Walk);
+        }
+
+        private bool IsPlayingBarkAnimation()
+        {
+            return enemyView.GetCurrentAnimationName() == EnemyAnimationName.Bark;
+        }
+        
+        private bool HadFinishedBarkAnimation()
+        {
+            var stateInfo = enemyView.GetCurrentAnimatorStateInfo();
+            return stateInfo.normalizedTime >= 1 && stateInfo.IsName(EnemyAnimationName.Bark);
+        }
     }
 }

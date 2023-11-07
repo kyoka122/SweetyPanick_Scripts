@@ -5,11 +5,11 @@ namespace OutGame.PlayerCustom.Installer
 {
     public class CharacterSelectCursorInstaller:MonoBehaviour
     {
-        public CharacterSelectCursorView Install(CharacterSelectCursorView prefab,int playerNum,Transform parent,float addPosition)
+        public CharacterSelectCursorView Install(CharacterSelectCursorView prefab,int playerNum,Transform parent,Vector2 position)
         {
             var instance = Instantiate(prefab, parent);
             instance.Init();
-            instance.SetRectAnchorPosition(prefab.GetComponent<RectTransform>().position+new Vector3(addPosition,0,0));
+            instance.SetRectAnchorPosition(position);
             instance.ChangePlayerNumText(playerNum);
             return instance;
         }

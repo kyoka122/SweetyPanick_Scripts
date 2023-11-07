@@ -13,6 +13,8 @@ namespace Utility
         public CutOffTransition(Material material,float initX,float initY)
         {
             _material = material;
+            SetCutOffX(initX);
+            SetCutOffY(initY);
         }
 
         /// <summary>

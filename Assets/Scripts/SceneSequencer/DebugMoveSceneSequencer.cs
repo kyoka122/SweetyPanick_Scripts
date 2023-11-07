@@ -9,7 +9,7 @@ using InGame.Database.Installer;
 using InGame.Stage.Installer;
 using MyApplication;
 using InGame.Database.ScriptableData;
-using InGame.MyCamera.Installer;
+using Common.MyCamera.Installer;
 using InGame.SceneLoader;
 using OutGame.Database;
 using StageManager;
@@ -26,7 +26,8 @@ namespace SceneSequencer
         private const float ToMoveSceneFadeOutDurationMin = 5.0f;
         
         [SerializeField] private int currentMovePlayer;
-        
+        [SerializeField] private PlayableCharacter debugCharacter = PlayableCharacter.Candy;
+
         [SerializeField] private StageUIScriptableData stageUIScriptableData;
         [SerializeField] private PlayerInstanceData playerInstanceData;
         [SerializeField] private MoveStageGimmickInstaller moveStageGimmickInstaller;
@@ -50,7 +51,7 @@ namespace SceneSequencer
             _commonDatabase = commonDatabase;
             _outGameDatabase = outGameDatabase;
             
-            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase,debugCharacter);
             SetDatabase();
 
             var cameraController = inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveCamera(inGameDatabase, commonDatabase, targetGroup,
@@ -86,7 +87,7 @@ namespace SceneSequencer
         
         private void SetDatabase()
         {
-            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase,debugCharacter);
             var uiData = new StageUIData(stageUIScriptableData, canvas, null,null);
             _commonInGameDatabaseInstaller.SetInGameDatabase(uiData, stageSettingsScriptableData,
                 new[] { new EachStagePlayerInstanceData(StageArea.FirstStageFirst, playerInstanceData)},
@@ -107,8 +108,7 @@ namespace SceneSequencer
                 CharacterCommonConstData[] allCharacterConstData = _inGameDatabase.GetAllCharacterConstData();
                 int characterIndex = _debugStageManager.Controllers.Count % allCharacterConstData.Length;
                 var controller = allCharacterConstData[characterIndex].Installer.Install(currentMovePlayer,
-                    StageArea.FirstStageFirst,_inGameDatabase,
-                    _outGameDatabase,_commonDatabase);
+                    StageArea.FirstStageFirst,_inGameDatabase, _outGameDatabase,_commonDatabase);
                 _debugStageManager.AddController(controller);
                 //targetGroup.AddMember(controller.GetPlayerPrefabTransform(),cinemaChineWeight,cinemaChineRadius);
                 _debugStageManager.RegisterPlayerEvent(controller);

@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Enemy;
-using InGame.MyCamera.Controller;
+using Common.MyCamera.Controller;
 using InGame.Player.Controller;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
@@ -61,6 +61,7 @@ namespace StageManager
             {
                 playerController.LateInit();
             }
+            _cameraController.LateInit();
         }
         
         public void FixedUpdatePlayableCharacter(int currentMovePlayer)
@@ -91,13 +92,22 @@ namespace StageManager
         {
             foreach (var controller in _controllers)
             {
-                controller.onChangedUseData.Subscribe(_ =>
+                controller.onChangedInStageData.Subscribe(_ =>
                 {
-                    if (_controllers.Count(data=>data.inStage)==0)
+                    if (_controllers.Count(data=>data.isInStage)==0)
                     {
+                        OnGameOver();
                         LoadManager.Instance.TryPlayGameOverFadeIn();
                     }
                 });
+            }
+        }
+
+        private void OnGameOver()
+        {
+            foreach (var controller in _controllers)
+            {
+                controller.OnGameOver();
             }
         }
         
@@ -159,7 +169,11 @@ namespace StageManager
 
         private async void MoveStage(StageArea nextStageArea)
         {
-            SetAllPlayerStop();
+            foreach (var controller in _controllers)
+            {
+                controller.SetNoOperationPlayer();
+                controller.OnMoveScene();
+            }
             await UniTask.Delay(TimeSpan.FromSeconds(ToMoveStageTime),cancellationToken:_tokenSource.Token);
             try
             {
@@ -180,13 +194,17 @@ namespace StageManager
             {
                 Debug.Log($"Cancel Loading");
             }
-            
-            SetAllPlayerReStart();
+
+            SetAllPlayerResetAndStart();
         }
         
         private async void MoveScene(string sceneName)
         {
-            SetAllPlayerStop();
+            foreach (var controller in _controllers)
+            {
+                controller.SetNoOperationPlayer();
+            }
+            
             await UniTask.Delay(TimeSpan.FromSeconds(ToMoveStageTime),cancellationToken:_tokenSource.Token);
             _moveNextSceneEvent.Invoke(sceneName);
         }
@@ -197,7 +215,7 @@ namespace StageManager
             
             foreach (var controller in _controllers)
             {
-                controller.MoveStage(nextStageArea);
+                controller.OnMoveStageInScene(nextStageArea);
             }
             _cameraController.SetCameraMoveState(nextStageArea);
             _stageGimmickManager.InitAtStageMove(nextStageArea);
@@ -207,15 +225,15 @@ namespace StageManager
         {
             foreach (var controller in _controllers)
             {
-                controller.StopPlayer();
+                controller.SetNoOperationPlayer();
             }
         }
         
-        private void SetAllPlayerReStart()
+        private void SetAllPlayerResetAndStart()
         {
             foreach (var controller in _controllers)
             {
-                controller.ReStartPlayer();
+                controller.OnHadMovedStageInScene();
             }
         }
 

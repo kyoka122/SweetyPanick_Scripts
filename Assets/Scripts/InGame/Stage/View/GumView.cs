@@ -17,7 +17,9 @@ namespace InGame.Stage.View
         public PlayableCharacter Specialist => PlayableCharacter.Fu;
         public FixState fixState { get; private set; }
         public ReactiveProperty<bool> onFix { get; private set; }
-
+        public bool isActive => gameObject.activeSelf;
+        public FixState IsInitState => isInitFixed ? FixState.Fixed : FixState.Broken;
+        
         [SerializeField] private SweetsScoreType sweetsScoreType = SweetsScoreType.Normal;
         [SerializeField] private bool isInitFixed;
         [SerializeField] private SpriteRenderer fadeInSpriteRenderersAtFix;
@@ -150,7 +152,7 @@ namespace InGame.Stage.View
                 cancellationToken: token);
             await UniTask.WhenAll(fadeInTask,fadeOutTask);
         }
-        
+
         public void OnDestroy()
         {
             if (_fadeInTransitionAtFix.GetDisposeMaterial()!=null)

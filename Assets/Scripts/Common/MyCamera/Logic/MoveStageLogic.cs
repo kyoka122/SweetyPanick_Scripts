@@ -1,10 +1,10 @@
 ﻿using Cinemachine;
-using InGame.MyCamera.Entity;
-using InGame.MyCamera.View;
+using Common.MyCamera.Entity;
+using Common.MyCamera.View;
 using MyApplication;
 using UnityEngine;
 
-namespace InGame.MyCamera.Logic
+namespace Common.MyCamera.Logic
 {
     public class MoveStageLogic
     {

@@ -9,6 +9,8 @@ namespace InGame.Enemy.View
     /// </summary>
     public interface IEnemyDamageAble
     {
+        public bool canDamage { get; }
+        
         public void OnDamaged(Struct.DamagedInfo info);
     }
 }

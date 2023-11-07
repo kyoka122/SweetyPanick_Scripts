@@ -65,7 +65,7 @@ namespace OutGame.PlayerCustom.Logic
                 {
                     _playerCountView.ResetAllButton();
                     _inSceneDataEntity.SetMaxPlayerCount(1);
-                    PopUp(_playerCountView. GetViewTransform(_inSceneDataEntity.selectingViewNum));
+                    _playerCountView.PopUp(_inSceneDataEntity.selectingViewNum);
                 })
                 .AddTo(_playerCountView);
             
@@ -83,8 +83,8 @@ namespace OutGame.PlayerCustom.Logic
             _inSceneDataEntity.SetSelectingPlayerCountViewCache(_inSceneDataEntity.selectingViewNum);
             _inSceneDataEntity.SetSelectingPlayerCountView(JudgeNextViewNum(input));
             
-            PopDown(_playerCountView. GetViewTransform(_inSceneDataEntity.selectingViewNumCache));
-            PopUp(_playerCountView. GetViewTransform(_inSceneDataEntity.selectingViewNum));
+            _playerCountView.PopDown(_inSceneDataEntity.selectingViewNumCache);
+            _playerCountView.PopUp(_inSceneDataEntity.selectingViewNum);
         }
 
         private int JudgeNextViewNum(Vector2 input)
@@ -116,15 +116,6 @@ namespace OutGame.PlayerCustom.Logic
             SEManager.Instance.Play(SEPath.CLICK);
             _inSceneDataEntity.SetSettingsState(PlayerCustomState.Controller);
         }
-
-        private void PopUp(Transform popUpTarget)
-        {
-            popUpTarget.localScale *= 1.2f;//TODO: ScriptableObjectに移動
-        }
-
-        private void PopDown(Transform popDownTarget)
-        {
-            popDownTarget.localScale = Vector2.one;//TODO: ScriptableObjectに移動
-        }
+        
     }
 }

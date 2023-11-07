@@ -17,10 +17,10 @@ namespace InGame.Player.Logic
         private readonly PlayerConstEntity _playerConstEntity;
         private readonly PlayerCommonInStageEntity _playerCommonInStageEntity;
         private readonly PlayerCommonUpdateableEntity _playerCommonUpdateableEntity;
-        
+        private readonly ActionKeyView _actionKeyView;
         public PlayerDamageLogic(BasePlayerView playerView,PlayerAnimatorView playerAnimatorView,
             PlayerConstEntity playerConstEntity ,PlayerCommonInStageEntity playerCommonInStageEntity,
-            PlayerCommonUpdateableEntity playerCommonUpdateableEntity,PlayerStatusView playerStatusView)
+            PlayerCommonUpdateableEntity playerCommonUpdateableEntity,PlayerStatusView playerStatusView,ActionKeyView actionKeyView)
         {
             _playerView = playerView;
             _playerConstEntity = playerConstEntity;
@@ -28,6 +28,7 @@ namespace InGame.Player.Logic
             _playerStatusView = playerStatusView;
             _playerCommonInStageEntity = playerCommonInStageEntity;
             _playerCommonUpdateableEntity = playerCommonUpdateableEntity;
+            _actionKeyView = actionKeyView;
             RegisterObserver();
         }
 
@@ -86,7 +87,7 @@ namespace InGame.Player.Logic
         private void Damage()
         {
             _playerCommonUpdateableEntity.DamageDefault();
-            _playerStatusView.SetHpValue(_playerCommonUpdateableEntity.CurrentHp);
+            _playerStatusView.SetHpValue(_playerCommonUpdateableEntity.CurrentHp/_playerConstEntity.MaxHp);
         }
 
         private async void WaitDamageAnimation()
@@ -124,10 +125,14 @@ namespace InGame.Player.Logic
 
             await UniTask.WaitUntil(()=>IsFinishedThisAnimation(death), cancellationToken: _playerView.thisToken);
             _playerCommonUpdateableEntity.SetCanDamageFlag(false);
-            _playerCommonUpdateableEntity.SetOnUseCharacter(false);
+            _playerCommonUpdateableEntity.SetOnInStageCharacter(false);
+            _playerStatusView.SetSpritesByCharacterState(CharacterHpFaceSpriteType.Death);
             //MEMO: シーン上に他にプレイヤーがいたら
+            Debug.Log($"_playerCommonUpdateableEntity.LivingPlayerCount:{_playerCommonUpdateableEntity.LivingPlayerCount}");
             if (_playerCommonUpdateableEntity.LivingPlayerCount>=1)
             {
+                _playerAnimatorView.Rebind();
+                _actionKeyView.Rebind();
                 _playerView.gameObject.SetActive(false);
                 _playerCommonUpdateableEntity.SetCanTarget(false);
             }

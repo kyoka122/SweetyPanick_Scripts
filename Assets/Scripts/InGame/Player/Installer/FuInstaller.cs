@@ -13,8 +13,15 @@ namespace InGame.Player.Installer
 {
     public class FuInstaller : BasePlayerInstaller
     {
-        public override BasePlayerController Install(int playerNum, StageArea stageArea,InGameDatabase inGameDatabase,
+        public override BasePlayerController Install(int playerNum,StageArea stageArea,InGameDatabase inGameDatabase,
             OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
+        {
+            PlayerInputEntity playerInputEntity=new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
+            return Install(playerNum, stageArea, inGameDatabase, outGameDatabase, commonDatabase, playerInputEntity);
+        }
+        
+        private BasePlayerController Install(int playerNum,StageArea stageArea,InGameDatabase inGameDatabase,
+            OutGameDatabase outGameDatabase,CommonDatabase commonDatabase,PlayerInputEntity playerInputEntity)
         {
             bool isUsed = inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Fu).isUsed;
             
@@ -24,17 +31,24 @@ namespace InGame.Player.Installer
                 .GetPosition(PlayableCharacter.Fu);
             var weaponView = fuView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
+            var actionKeyView = fuView.GetFirstActionKeyObject().GetComponent<ActionKeyView>();
+            if (isUsed)
+            {
+                actionKeyView.Init(playerInputEntity.DeviceType);
+            }
             var playerAnimatorView = fuView.GetAnimatorObject().GetComponent<PlayerAnimatorView>();
             playerAnimatorView.Init(PlayableCharacter.Fu);
             StageUIData stageUIData = inGameDatabase.GetUIData();
             
+            var playerStatusView = viewGenerator.GeneratePlayerStatusView(stageUIData.PlayerStatusView, 
+                stageUIData.Canvas.transform,stageUIData.PlayerStatusDataPos[playerNum-1]);
             
-            var playerStatusView =
-                viewGenerator.GeneratePlayerStatusView(stageUIData.PlayerStatusView, stageUIData.Canvas.transform,stageUIData.PlayerStatusDataPos[playerNum-1]);
-            playerStatusView.Init(PlayableCharacterIndex.Fu,
-                inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Fu).MaxHp,
-                inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Fu).currentHp, isUsed);
-            var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
+            var playerUpdateableData = inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Fu);
+            var playerCommonStatusData = inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Fu);
+            playerStatusView.Init(PlayableCharacterIndex.Fu,playerCommonStatusData.MaxHp,
+                playerUpdateableData.currentHp,playerCommonStatusData.HealHpToRevive, isUsed, playerUpdateableData.isDead);
+            
+            
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Fu);
             var fuConstEntity = new FuConstEntity(inGameDatabase);
             var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Fu,inGameDatabase);
@@ -51,14 +65,15 @@ namespace InGame.Player.Installer
                 playerCommonUpdateableEntity,fuView,playerAnimatorView,weaponView);
             var fuSkillLogic = new FuSkillLogic(playerInputEntity, playerConstEntity,fuConstEntity, playerCommonInStageEntity,
                 fuView,playerAnimatorView,weaponView);
-            var playerReShapeLogic = new PlayerReShapeLogic(fuView, playerInputEntity, playerCommonInStageEntity);
-            var playerHealLogic = new PlayerHealLogic(playerConstEntity,playerCommonUpdateableEntity);
+            var playerReShapeLogic = new PlayerReShapeLogic(fuView, actionKeyView, playerInputEntity, playerCommonInStageEntity);
+            var playerHealLogic = new PlayerHealLogic(playerConstEntity, playerCommonUpdateableEntity,
+                playerCommonInStageEntity, playerStatusView);
             var playerDamageLogic = new PlayerDamageLogic(fuView,playerAnimatorView, playerConstEntity,playerCommonInStageEntity
-                ,playerCommonUpdateableEntity,playerStatusView);
+                ,playerCommonUpdateableEntity,playerStatusView,actionKeyView);
             var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity,
-                playerCommonUpdateableEntity, fuView,playerAnimatorView);
+                playerCommonUpdateableEntity, playerInputEntity, fuView,playerAnimatorView);
             var playerParticleLogic = new PlayerParticleLogic(playerConstEntity, fuView, playerCommonInStageEntity,
-                particleGeneratorView);
+                particleGeneratorView, healHpBarParticleGeneratorView);
             var playerFixSweetsLogic = new PlayerFixSweetsLogic(playerInputEntity, playerConstEntity,
                 playerCommonInStageEntity,playerCommonUpdateableEntity, fuView,playerAnimatorView);
             var playerEnterDoorLogic = new PlayerEnterDoorLogic(playerConstEntity, playerInputEntity,
@@ -69,6 +84,10 @@ namespace InGame.Player.Installer
                 fuView,playerStatusView);
             var playerGetKeyLogic = new PlayerGetKeyLogic(playerCommonUpdateableEntity,playerConstEntity,
                 playerCommonInStageEntity,fuView, inGameDatabase.GetUIData().Key);
+            var firstActionKeyLogic = new ActionKeyLogic(playerCommonInStageEntity, playerCommonUpdateableEntity,
+                playerConstEntity,playerInputEntity, fuView, weaponView, actionKeyView);
+            var playerReviveLogic = new PlayerReviveLogic(playerCommonUpdateableEntity, playerCommonInStageEntity,
+                fuView, playerStatusView, reviveCharacterCallbackAnimatorView,actionKeyView);
             
             var disposables = new List<IDisposable>
             {
@@ -78,7 +97,8 @@ namespace InGame.Player.Installer
 
             return new FuController(playerNum, playerMoveLogic, playerJumpLogic, playerPunchLogic, fuSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
-                playerEnterDoorLogic, playableCharacterSelectLogic, playerTalkLogic,playerGetKeyLogic,disposables, playerCommonUpdateableEntity.OnUse);
+                playerEnterDoorLogic, playableCharacterSelectLogic, playerTalkLogic,playerGetKeyLogic,firstActionKeyLogic,
+                playerReviveLogic, disposables, isUsed, playerCommonUpdateableEntity.IsInStage,playerCommonUpdateableEntity.OnIsInStage, playerCommonUpdateableEntity.OnReviving);
         }
     }
 }

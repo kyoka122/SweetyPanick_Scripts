@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using InGame.Common.Interface;
+using Common.Interface;
 using MyApplication;
 using UniRx;
 using UnityEngine;
@@ -90,9 +90,14 @@ namespace InGame.Player.View
             _animator.SetTrigger(animationName);
         }
 
-        public void ResetAllParameter()
+        public void Rebind()
         {
-            //TODO: Resetが必要であれば実装
+            _animator.Rebind();
+        }
+        
+        public void Pause()
+        {
+            _animator.speed = 0;
         }
         
         public virtual void CallbackAnimation(string animationClipName)

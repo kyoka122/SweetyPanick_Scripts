@@ -1,7 +1,7 @@
 ﻿using Cinemachine;
 using UnityEngine;
 
-namespace InGame.MyCamera.View
+namespace Common.MyCamera.View
 {
     [RequireComponent(typeof(CinemachineVirtualCamera))]
     public class SubCameraView:MonoBehaviour

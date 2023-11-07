@@ -29,6 +29,10 @@ namespace InGame.Enemy.Entity
         public float shockSpriteDuration { get; }
         
         public bool hadMoved { get; private set; }
+        public bool inScreen { get; private set; } = true;
+        public bool inScreenX { get; private set; } = true;
+        
+        
 
         protected readonly InGameDatabase inGameDatabase;
         private readonly CommonDatabase _commonDatabase;
@@ -56,6 +60,16 @@ namespace InGame.Enemy.Entity
         public void SetHadMoved()
         {
             hadMoved = true;
+        }
+        
+        public void SetInScreen(bool on)
+        {
+            inScreen = on;
+        } 
+        
+        public void SetInScreenX(bool on)
+        {
+            inScreenX = on;
         }
     }
 }

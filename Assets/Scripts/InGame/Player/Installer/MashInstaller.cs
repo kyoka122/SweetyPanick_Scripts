@@ -8,13 +8,20 @@ using InGame.Player.Controller;
 using InGame.Player.View;
 using MyApplication;
 using OutGame.Database;
-using UnityEngine;
 
 namespace InGame.Player.Installer
 {
     public class MashInstaller:BasePlayerInstaller
     {
-        public override BasePlayerController Install(int playerNum,StageArea stageArea, InGameDatabase inGameDatabase,OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
+        public override BasePlayerController Install(int playerNum,StageArea stageArea,InGameDatabase inGameDatabase,
+            OutGameDatabase outGameDatabase,CommonDatabase commonDatabase)
+        {
+            PlayerInputEntity playerInputEntity=new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
+            return Install(playerNum, stageArea, inGameDatabase, outGameDatabase, commonDatabase, playerInputEntity);
+        }
+        
+        private BasePlayerController Install(int playerNum,StageArea stageArea,InGameDatabase inGameDatabase,
+            OutGameDatabase outGameDatabase,CommonDatabase commonDatabase,PlayerInputEntity playerInputEntity)
         {
             bool isUsed = inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Mash).isUsed;
             
@@ -24,17 +31,25 @@ namespace InGame.Player.Installer
                 .GetPosition(PlayableCharacter.Mash);
             var weaponView = mashView.GetWeaponObject().GetComponent<WeaponView>();
             weaponView.Init();
+            var actionKeyView = mashView.GetFirstActionKeyObject().GetComponent<ActionKeyView>();
+            if (isUsed)
+            {
+                actionKeyView.Init(playerInputEntity.DeviceType);
+            }
             var playerAnimatorView = mashView.GetAnimatorObject().GetComponent<PlayerAnimatorView>();
             playerAnimatorView.Init(PlayableCharacter.Mash);
             StageUIData stageUIData = inGameDatabase.GetUIData();
             
             var playerStatusView =
-                viewGenerator.GeneratePlayerStatusView(stageUIData.PlayerStatusView, stageUIData.Canvas.transform,stageUIData.PlayerStatusDataPos[playerNum-1]);
-            playerStatusView.Init(PlayableCharacterIndex.Mash,inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Mash).MaxHp,
-                inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Mash).currentHp,isUsed);
+                viewGenerator.GeneratePlayerStatusView(stageUIData.PlayerStatusView, stageUIData.Canvas.transform,
+                    stageUIData.PlayerStatusDataPos[playerNum-1]);
+            
+            var playerUpdateableData = inGameDatabase.GetPlayerUpdateableData(PlayableCharacter.Mash);
+            var playerCommonStatusData = inGameDatabase.GetCharacterCommonStatus(PlayableCharacter.Mash);
+            playerStatusView.Init(PlayableCharacterIndex.Mash,playerCommonStatusData.MaxHp,
+                playerUpdateableData.currentHp,playerCommonStatusData.HealHpToRevive, isUsed, playerUpdateableData.isDead);
             
             
-            var playerInputEntity = new PlayerInputEntity(playerNum,inGameDatabase,commonDatabase);
             var playerConstEntity = new PlayerConstEntity(inGameDatabase,commonDatabase,PlayableCharacter.Mash);
             var mashConstEntity = new MashConstEntity(inGameDatabase);
             var playerCommonInStageEntity = new PlayerCommonInStageEntity(PlayableCharacter.Mash,inGameDatabase);
@@ -51,14 +66,15 @@ namespace InGame.Player.Installer
                 playerCommonUpdateableEntity, mashView,playerAnimatorView,weaponView);
             var mashSkillLogic = new MashSkillLogic(playerInputEntity, playerConstEntity, mashConstEntity,playerCommonInStageEntity,
                 mashView,playerAnimatorView,weaponView);
-            var playerReShapeLogic = new PlayerReShapeLogic(mashView, playerInputEntity, playerCommonInStageEntity);
-            var playerHealLogic = new PlayerHealLogic(playerConstEntity,playerCommonUpdateableEntity);
+            var playerReShapeLogic = new PlayerReShapeLogic(mashView, actionKeyView, playerInputEntity, playerCommonInStageEntity);
+            var playerHealLogic = new PlayerHealLogic(playerConstEntity, playerCommonUpdateableEntity,
+                playerCommonInStageEntity, playerStatusView);
             var playerDamageLogic = new PlayerDamageLogic(mashView,playerAnimatorView, playerConstEntity,playerCommonInStageEntity,
-                playerCommonUpdateableEntity,playerStatusView);
-            var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity, 
-                playerCommonUpdateableEntity,mashView,playerAnimatorView);
+                playerCommonUpdateableEntity,playerStatusView,actionKeyView);
+            var playerStatusLogic = new PlayerStatusLogic(playerConstEntity, playerCommonInStageEntity,
+                playerCommonUpdateableEntity, playerInputEntity, mashView, playerAnimatorView);
             var playerParticleLogic = new PlayerParticleLogic(playerConstEntity, mashView, playerCommonInStageEntity,
-                particleGeneratorView);
+                particleGeneratorView, healHpBarParticleGeneratorView);
             var playerFixSweetsLogic = new PlayerFixSweetsLogic(playerInputEntity, playerConstEntity,
                 playerCommonInStageEntity,playerCommonUpdateableEntity,  mashView,playerAnimatorView);
             var playerEnterDoorLogic = new PlayerEnterDoorLogic(playerConstEntity, playerInputEntity,
@@ -69,6 +85,10 @@ namespace InGame.Player.Installer
                 mashView,playerStatusView);
             var playerGetKeyLogic = new PlayerGetKeyLogic(playerCommonUpdateableEntity,playerConstEntity,
                 playerCommonInStageEntity,mashView, inGameDatabase.GetUIData().Key);
+            var firstActionKeyLogic = new ActionKeyLogic(playerCommonInStageEntity, playerCommonUpdateableEntity,
+                playerConstEntity,playerInputEntity, mashView, weaponView, actionKeyView);
+            var playerReviveLogic = new PlayerReviveLogic(playerCommonUpdateableEntity, playerCommonInStageEntity,
+                mashView, playerStatusView, reviveCharacterCallbackAnimatorView,actionKeyView);
             
             var disposables = new List<IDisposable>
             {
@@ -77,8 +97,8 @@ namespace InGame.Player.Installer
             
             return new MashController(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, mashSkillLogic,
                 playerReShapeLogic, playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic,
-                playerEnterDoorLogic, playableCharacterSelectLogic,playerTalkLogic,playerGetKeyLogic, disposables,
-                playerCommonUpdateableEntity.OnUse);
+                playerEnterDoorLogic, playableCharacterSelectLogic,playerTalkLogic,playerGetKeyLogic, firstActionKeyLogic,
+                playerReviveLogic, disposables, isUsed, playerCommonUpdateableEntity.IsInStage, playerCommonUpdateableEntity.OnIsInStage, playerCommonUpdateableEntity.OnReviving);
         }
     }
 }

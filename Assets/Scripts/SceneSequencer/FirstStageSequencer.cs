@@ -19,8 +19,11 @@ namespace SceneSequencer
 {
     public class FirstStageSequencer:BaseSceneSequencer
     {
-        [SerializeField] private int currentMovePlayer;
+        private const float PlayingInfoToFadeOutDurationMin = 4f;
         
+        [SerializeField] private int currentMovePlayer;
+        [SerializeField] private PlayableCharacter debugCharacter = PlayableCharacter.Candy;
+
         [SerializeField] private StageUIScriptableData stageUIScriptableData;
         [SerializeField] private PlayerInstanceData firstPlayerInstanceData;
         [SerializeField] private StageSettingsScriptableData stageSettingsScriptableData;
@@ -31,7 +34,7 @@ namespace SceneSequencer
         
         [SerializeField] private Canvas canvas;
         [SerializeField] private Camera camera;
-
+        
         private FirstStageStageManager _firstStageStageManager;
         private CommonInGameDatabaseInstaller _commonInGameDatabaseInstaller;
         private InGameDatabase _inGameDatabase;
@@ -53,7 +56,7 @@ namespace SceneSequencer
             _commonDatabase = commonDatabase;
             _outGameDatabase = outGameDatabase;
             
-            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase,debugCharacter);
             SetDatabase();
             
             var cameraController = _inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveCamera(inGameDatabase, commonDatabase, targetGroup,
@@ -62,6 +65,10 @@ namespace SceneSequencer
                 MoveNextScene);
             
             _commonInGameDatabaseInstaller.InstallAllPlayer(_firstStageStageManager,StageArea.FirstStageFirst);
+            foreach (var playerController in _firstStageStageManager.Controllers)
+            {
+                playerController.InitHealAndRevive();
+            }
             _firstStageStageManager.LateInit();
             _playerCount = _commonDatabase.GetUseCharacterData().Count;
         }
@@ -86,6 +93,13 @@ namespace SceneSequencer
             try
             {
                 Debug.Log($"FadeOut!!");
+                await LoadManager.Instance.TryFadeOutPlayingInfo(PlayingInfoType.Fix);
+                
+                await LoadManager.Instance.TryFadeInPlayingInfo(PlayingInfoType.Damage,PlayingInfoToFadeOutDurationMin);
+                await LoadManager.Instance.TryFadeOutPlayingInfo(PlayingInfoType.Damage);
+                
+                await LoadManager.Instance.TryFadeInPlayingInfo(PlayingInfoType.Punch,PlayingInfoToFadeOutDurationMin);
+                await LoadManager.Instance.TryFadeOutPlayingInfo(PlayingInfoType.Punch);
                 await LoadManager.Instance.TryPlayFadeOut();
             }
             catch (OperationCanceledException)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using InGame.Common.Database;
-using InGame.Common.Interface;
+using Common.Interface;
 using InGame.Database;
 using InGame.Stage.Logic;
 using InGame.Stage.Manager;
@@ -31,7 +31,7 @@ namespace InGame.Stage.Installer
             var scoreEntity = new ScoreEntity(inGameDatabase,stageArea);
 
             var scoreView = FindObjectOfType<ScoreView>();
-            scoreView.Init(inGameDatabase.GetAllStageData().score);
+            scoreView.Init(inGameDatabase.GetAllStageData().score,inGameDatabase.GetStageGimmickData().AllStageSumScore());
             foreach (var backgroundView in FindObjectsOfType<BackgroundView>())
             {
                 backgroundView.Init();
@@ -74,7 +74,7 @@ namespace InGame.Stage.Installer
 
             var backgroundLogic = new BackgroundLogic(stageBaseEntity);
             var animationEventLogic = new AnimationEventLogic(GameObjectExtensions
-                .FindObjectsOfInterface<IAnimationCallbackSender>(),stageGimmickEntity);
+                .FindInterface<IAnimationCallbackSender>(),stageGimmickEntity);
 
             List<ISweets> sweets = new List<ISweets>();
             sweets.AddRange(defaultSweetsView);

@@ -14,6 +14,8 @@ namespace InGame.Database.ScriptableData
         public float BackgroundScrollSpeed => backgroundScrollSpeed;
         public float GameOverFadeInDuration => gameOverFadeInDuration;
         public float GameOverBGMFadeOutDuration => gameOverBGMFadeOutDuration;
+        public float PlayingInfoFadeInDuration => playingInfoFadeInDuration;
+        public float PlayingInfoFadeOutDuration => playingInfoFadeOutDuration;
 
 
         //[SerializeField] private float longLoaderXSize=18;
@@ -27,6 +29,8 @@ namespace InGame.Database.ScriptableData
         [SerializeField] private float backgroundScrollSpeed = 1;
         [SerializeField] private float gameOverFadeInDuration = 3;
         [SerializeField] private float gameOverBGMFadeOutDuration = 1;
+        [SerializeField] private float playingInfoFadeInDuration = 1;
+        [SerializeField] private float playingInfoFadeOutDuration = 0.5f;
 
     }
 }

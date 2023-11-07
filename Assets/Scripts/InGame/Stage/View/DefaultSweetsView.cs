@@ -17,6 +17,8 @@ namespace InGame.Stage.View
         public PlayableCharacter Specialist => specialist;
         public FixState fixState { get; private set; }
         public ReactiveProperty<bool> onFix { get; private set; }
+        public bool isActive => gameObject.activeSelf;
+        public FixState IsInitState => isInitFixed ? FixState.Fixed : FixState.Broken;
 
         [SerializeField] private SweetsScoreType sweetsScoreType = SweetsScoreType.Normal;
         [SerializeField] private SpriteRenderer fadeSpriteRenderers;

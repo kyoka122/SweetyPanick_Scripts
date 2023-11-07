@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace InGame.Common.Database.ScriptableData
+namespace Common.Database.ScriptableData
 {
     [CreateAssetMenu(fileName = "CameraData", menuName = "ScriptableObjects/CameraData")]
     public class CameraData:ScriptableObject

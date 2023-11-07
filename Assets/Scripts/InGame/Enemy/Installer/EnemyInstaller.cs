@@ -113,7 +113,7 @@ namespace InGame.Enemy.Installer
                 if (enemyView.TryGetComponent(out HavingKeyEnemyView havingKeyEnemyLogic))
                 {
                     havingKeyEnemyLogics.Add(havingKeyEnemyLogic);
-                    enemyView.Init();
+                    havingKeyEnemyLogic.Init();
                 }
             }
 
@@ -125,6 +125,7 @@ namespace InGame.Enemy.Installer
         {
             DefaultEnemyView defaultEnemyView=SpawnRandomDefaultEnemy(spawnPos);
             defaultEnemyView.Init();
+            defaultEnemyView.SetActiveAnimator(true);
             enemyManager.AddEnemy(new NotMoveLimitEnemyLogic(new DefaultEnemyEntity(_inGameDatabase, _commonDatabase),
                 defaultEnemyView));
             return defaultEnemyView;

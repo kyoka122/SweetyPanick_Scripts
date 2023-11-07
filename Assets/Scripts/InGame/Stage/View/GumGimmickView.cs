@@ -20,7 +20,8 @@ namespace InGame.Stage.View
         public PlayableCharacter Specialist => PlayableCharacter.Fu;
         public FixState fixState { get; private set; }
         public ReactiveProperty<bool> onFix { get; private set; }
-        
+        public bool isActive => gameObject.activeSelf;
+        public FixState IsInitState => isInitFixed ? FixState.Fixed : FixState.Broken;
         private bool Fading => _fadeOutTransitionAtFix.IsActiveFadeIn() || _fadeOutTransitionAtFix.IsActiveFadeOut() ||
                                _fadeInTransitionAtFix.IsActiveFadeIn() || _fadeInTransitionAtFix.IsActiveFadeOut();
         
@@ -30,7 +31,8 @@ namespace InGame.Stage.View
         [SerializeField] private Transform scoreInstanceTransform;
         [SerializeField] private GameObject fixGaugeObj;
         [SerializeField] private SpriteRenderer fixGaugeSlider;
-
+        [SerializeField] private bool isInitFixed = false;
+        
         private Transition _fadeInTransitionAtFix;
         private Transition _fadeOutTransitionAtFix;
         private CutOffTransition _cutOffTransition;
@@ -41,8 +43,8 @@ namespace InGame.Stage.View
             _fadeInTransitionAtFix = new Transition(fadeOutSpriteRenderersAtFix.material, this,1);
             _fadeOutTransitionAtFix = new Transition(fadeInSpriteRenderersAtFix.material, this,0);
             _cutOffTransition = new CutOffTransition(fixGaugeSlider.material,1,0);
-            fixState = FixState.Broken;
-            onFix = new ReactiveProperty<bool>();
+            fixState = isInitFixed ? FixState.Fixed : FixState.Broken;
+            onFix = new ReactiveProperty<bool>(isInitFixed);
         }
 
         public async UniTask FixSweets(float duration, CancellationToken token)

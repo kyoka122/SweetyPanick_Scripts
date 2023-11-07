@@ -1,10 +1,10 @@
 ﻿using Cinemachine;
-using InGame.Common.Database.ScriptableData;
-using InGame.MyCamera.Logic;
+using Common.Database.ScriptableData;
+using Common.MyCamera.Logic;
 using MyApplication;
 using UnityEngine;
 
-namespace InGame.MyCamera.Controller
+namespace Common.MyCamera.Controller
 {
     public class CameraController
     {
@@ -29,9 +29,15 @@ namespace InGame.MyCamera.Controller
         {
         }
 
+        public void LateInit()
+        {
+            _playingInStageLogic.LateInit();
+        }
+        
         public void FixedUpdate()
         {
             _switchCameraLogic.UpdateCameraPriority();
+            _playingInStageLogic.FixedUpdate();
         }
 
         public void SetCameraMoveState(StageArea area)

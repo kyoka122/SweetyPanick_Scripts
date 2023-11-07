@@ -47,13 +47,21 @@ namespace Utility
             return obj;
         }
         
-        public T GetObjectParentSet(Transform parent,Vector3 pos,Quaternion rotation,Vector3 scale)
+        public T GetObjectAndParentSet(Transform parent,Vector3 pos,Quaternion rotation,Vector3 scale)
         {
             T obj=GetObject();
             obj.transform.parent = parent;
             obj.transform.localPosition = pos;
             obj.transform.localRotation = rotation;
             obj.transform.localScale = scale;
+            return obj;
+        }
+        
+        public T GetObjectAndParentSet(Transform parent,Vector3 pos)
+        {
+            T obj=GetObject();
+            obj.transform.parent = parent;
+            obj.transform.localPosition = pos;
             return obj;
         }
 
@@ -100,6 +108,19 @@ namespace Utility
                 return;
             }
             releaseObjInData.isUsing = false;
+        }
+        
+        public bool TryReleaseObject(T obj)
+        {
+            obj.gameObject.SetActive(false);
+            ObjectPoolData releaseObjInData=_poolObjectsData.Find(data=>data.obj==obj);
+
+            if (releaseObjInData==null)
+            {
+                return false;
+            }
+            releaseObjInData.isUsing = false;
+            return true;
         }
     }
 }

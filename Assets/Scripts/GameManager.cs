@@ -2,14 +2,14 @@
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.SceneLoader;
+using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.Database;
 using SceneSequencer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Utility;
 
-public class GameManager : SingletonMonoBehaviour<GameManager>
+public class GameManager : Utility.SingletonMonoBehaviour<GameManager>
 {
     [SerializeField] private ScriptableDataInstaller scriptableDataInstaller;
 
@@ -95,6 +95,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         Debug.LogWarning($"DisposeDatabase!", gameObject);
         _inGameDatabase?.Dispose();
         _outGameDatabase?.Dispose();
+        _commonDatabase?.Dispose();
+        SEManager.Instance.Stop();
+        //BGMManager.Instance.Stop();
     }
 
 

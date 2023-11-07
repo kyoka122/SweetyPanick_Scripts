@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace InGame.Common.Interface
+namespace Common.Interface
 {
     public interface IAnimationCallbackSender
     {

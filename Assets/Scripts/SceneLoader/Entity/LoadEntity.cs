@@ -27,6 +27,8 @@ namespace InGame.SceneLoader.Entity
         
         public float GameOverFadeInDuration => _commonDatabase.GetSceneLoadData().GameOverFadeInDuration;
         public float GameOverBGMFadeOutDuration => _commonDatabase.GetSceneLoadData().GameOverBGMFadeOutDuration;
+        public float PlayingInfoFadeInDuration => _commonDatabase.GetSceneLoadData().PlayingInfoFadeInDuration;
+        public float PlayingInfoFadeOutDuration => _commonDatabase.GetSceneLoadData().PlayingInfoFadeOutDuration;
 
         private readonly InGameDatabase _inGameDatabase;
         private readonly CommonDatabase _commonDatabase;

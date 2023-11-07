@@ -81,6 +81,7 @@ namespace OutGame.ColateStage
             skipGaugeChargeView.PlayFadeOutObjects(_outGameDatabase.GetTalkPartUIScriptableData().SkipFadeOutDuration);
             await backGroundMaterial.DOFade(0, _outGameDatabase.GetColateStageScriptableData().TalkPartFadeOutDuration)
                 .ToUniTask(cancellationToken:this.GetCancellationTokenOnDestroy());
+            dialogs.DisposeDialog();
             _onBattleEvent.Invoke();
         }
 

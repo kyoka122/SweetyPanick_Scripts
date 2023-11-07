@@ -2,13 +2,13 @@
 using Cinemachine;
 using InGame.Common.Database;
 using InGame.Database;
-using InGame.MyCamera.Controller;
-using InGame.MyCamera.Entity;
-using InGame.MyCamera.Logic;
-using InGame.MyCamera.View;
+using Common.MyCamera.Controller;
+using Common.MyCamera.Entity;
+using Common.MyCamera.Logic;
+using Common.MyCamera.View;
 using UnityEngine;
 
-namespace InGame.MyCamera.Installer
+namespace Common.MyCamera.Installer
 {
     public class CameraInstaller:MonoBehaviour
     {

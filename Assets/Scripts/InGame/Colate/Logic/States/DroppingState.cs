@@ -34,7 +34,9 @@ namespace InGame.Colate.Logic
                 nextStateInstance = new IsGroundState(colateEntity, colateView, colateStatusView, spawnEnemyEvent,
                     sweetsLiftViews);
                 stage = Event.Exit;
+                return;
             }
+            base.Update();
         }
         
         private bool IsGround()

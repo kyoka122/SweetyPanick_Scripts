@@ -75,11 +75,17 @@ namespace InGame.SceneLoader
             
         }
 
+        /// <summary>
+        /// FadeInする前の状態
+        /// </summary>
         public void SetFadeInCondition()
         {
             _transition.TransitionFadeInCondition();
         }
         
+        /// <summary>
+        /// FadeOutする前の状態
+        /// </summary>
         public void SetFadeOutCondition()
         {
             _transition.TransitionFadeOutCondition();

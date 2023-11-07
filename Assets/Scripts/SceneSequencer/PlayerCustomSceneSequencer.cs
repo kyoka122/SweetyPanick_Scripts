@@ -3,7 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Database;
-using InGame.MyCamera.Installer;
+using Common.MyCamera.Installer;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.PlayerCustom.Installer;
@@ -21,14 +21,17 @@ namespace SceneSequencer
 {
     public class PlayerCustomSceneSequencer:BaseSceneSequencer
     {
-        private const float ToNextStageDelay = 1.0f;
-        private const float ToMoveSceneFadeOutDurationMin = 5.0f;
+        private const float ToNextStageDelay = 0.3f;
+        private const float ToMoveSceneToFadeOutDurationMin = 5.0f;
+        private const float PlayingInfoToFadeOutDurationMin = 4f;
         
         [SerializeField] private PlayerCountView playerCountView;
         [SerializeField] private ControllersPanelView controllersPanelView;
         [SerializeField] private CharacterSelectPanelView characterSelectPanelView;
         [SerializeField] private FromMessageWindowRecieverView fromMessageWindowRecieverView;
         [SerializeField] private ToMessageWindowSenderView toMessageWindowSenderView;
+        [SerializeField] private CharacterIconView[] characterIconView;
+        
         [SerializeField] private Camera camera;
         
         [SerializeField] private Dialogs playerCountDialog;
@@ -44,10 +47,9 @@ namespace SceneSequencer
             inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallConstCamera(inGameDatabase,commonDatabase,camera);
             var onMoveScene = new Subject<bool>();
             _playerCustomInstaller = new PlayerCustomInstaller();
-            _manager=_playerCustomInstaller.Install(playerCountView, controllersPanelView, 
-                characterSelectPanelView, fromMessageWindowRecieverView, toMessageWindowSenderView,
-                playerCountDialog,controllerDialog,characterDialog,cheerDialog,
-                outGameDatabase,commonDatabase, onMoveScene);
+            _manager=_playerCustomInstaller.Install(playerCountView, controllersPanelView, characterSelectPanelView,
+                fromMessageWindowRecieverView, toMessageWindowSenderView,characterIconView, playerCountDialog,
+                controllerDialog,characterDialog,cheerDialog, outGameDatabase,commonDatabase, onMoveScene);
             
             onMoveScene
                 .Subscribe(_=> toNextSceneFlag.OnNext(SceneName.FirstStage)).AddTo(this);
@@ -69,7 +71,8 @@ namespace SceneSequencer
             _manager.Dispose();
             try
             {
-                await LoadManager.Instance.TryPlayLoadScreen(ToNextStageDelay,ToMoveSceneFadeOutDurationMin);
+                await LoadManager.Instance.TryPlayLoadScreen(ToNextStageDelay,ToMoveSceneToFadeOutDurationMin);
+                await LoadManager.Instance.TryFadeInPlayingInfo(PlayingInfoType.Fix,PlayingInfoToFadeOutDurationMin);
             }
             catch (OperationCanceledException)
             {

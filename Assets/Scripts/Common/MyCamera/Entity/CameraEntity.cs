@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InGame.Common.Database;
 using InGame.Database;
 using MyApplication;
 using UniRx;
 using UnityEngine;
 
-namespace InGame.MyCamera.Entity
+namespace Common.MyCamera.Entity
 {
     public class CameraEntity
     {
@@ -27,11 +28,14 @@ namespace InGame.MyCamera.Entity
 
         public Dictionary<PlayableCharacter,CharacterUpdateableInStageData> GetCharacterUpdateableInStageData() =>
             _inGameDatabase.GetAllCharacterInStageData();
+
+        public Dictionary<Transform, float> cameraWeightTarget { get; private set; }
         //public Dictionary<PlayableCharacter, bool> HadTargetGroup => _hadTargetGroup;
         
         public CameraInitData GetCameraInitData(StageArea area)=>_commonDatabase.GetCameraInitData(area);
         
         private readonly Dictionary<PlayableCharacter, bool> _hadTargetGroup;
+        private readonly Dictionary<PlayableCharacter, Vector3> _characterPrevPos;
         private readonly InGameDatabase _inGameDatabase;
         private readonly CommonDatabase _commonDatabase;
 
@@ -39,19 +43,24 @@ namespace InGame.MyCamera.Entity
         {
             _inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
-            _hadTargetGroup = new Dictionary<PlayableCharacter, bool>();
+            _hadTargetGroup = new Dictionary<PlayableCharacter, bool>(4);
+            _characterPrevPos = new Dictionary<PlayableCharacter, Vector3>(4);
+            cameraWeightTarget = new Dictionary<Transform, float>(4);
             var playableCharacterArray = Enum.GetValues(typeof(PlayableCharacter));
-            for (int i = 0; i < playableCharacterArray.Length; i++)
+            Debug.LogWarning($"playableCharacterArray.Length:{playableCharacterArray.Length}");
+            for (int i = 1; i < playableCharacterArray.Length; i++)
             {
                 _hadTargetGroup.Add((PlayableCharacter) i, false);
             }
         }
-        
-        /*public void SetCameraFunctionInDatabase(IReadOnlyCameraFunction readOnlyFunction)
+
+        public void InitTransform()
         {
-            _commonDatabase.SetReadOnlyCameraFunction(readOnlyFunction);
-            _commonDatabase.SetReadOnlyCameraFunction();
-        }*/
+            foreach (var inStageData in _inGameDatabase.GetAllCharacterInStageData())
+            {
+                _characterPrevPos.Add(inStageData.Key, inStageData.Value.transform.position);
+            }
+        }
 
         public bool GetHadTargetGroup(PlayableCharacter characterType)
         {
@@ -68,6 +77,19 @@ namespace InGame.MyCamera.Entity
             _hadTargetGroup[characterType] = false;
         }
 
+        public void SetCharacterPrevPos(PlayableCharacter characterType,Vector3 moveVec)
+        {
+            _characterPrevPos[characterType] = moveVec;
+        }
 
+        public Vector3 GetCharacterPrevPos(PlayableCharacter characterType)
+        {
+            return _characterPrevPos[characterType];
+        }
+
+        public void SetCameraWeightTarget(Transform transform,float value)
+        {
+            cameraWeightTarget[transform] = value;
+        }
     }
 }

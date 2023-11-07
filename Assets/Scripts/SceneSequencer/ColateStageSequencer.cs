@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using InGame.Colate.View;
 using InGame.Common.Database;
-using InGame.Common.Database.ScriptableData;
+using Common.Database.ScriptableData;
 using InGame.Database;
 using InGame.Database.Installer;
 using InGame.Database.ScriptableData;
@@ -26,6 +26,8 @@ namespace SceneSequencer
         private const float ToFadeInTime = 2;
         private const float FadeInBGMDuration = 3;
         
+        [SerializeField] private PlayableCharacter debugCharacter = PlayableCharacter.Candy;
+
         [SerializeField] private ColateStageTalkPartBehaviour colateStageTalkPartBehaviour;
         [SerializeField] private ColateStageGimmickInstaller colateStageGimmickInstaller;
         [SerializeField] private StageUIScriptableData stageUiScriptableData;
@@ -52,15 +54,17 @@ namespace SceneSequencer
             _outGameDatabase = outGameDatabase;
             _commonDatabase = commonDatabase;
 
-            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase,debugCharacter);
             SetDatabase();
             
             var cameraController = inGameDatabase.GetStageSettings().CameraInstallerPrefab.InstallMoveCamera(inGameDatabase, 
                 commonDatabase,camera);
             _colateStageStageManager=new ColateStageStageManager(colateStageGimmickInstaller,cameraController,battleCameraData,
-                sweetsLifts, _inGameDatabase,_commonDatabase, MoveNextScene);
+                _inGameDatabase,_commonDatabase, MoveNextScene);
             
             _commonInGameDatabaseInstaller.InstallAllPlayer(_colateStageStageManager,StageArea.ColateStageFirst);
+            _colateStageStageManager.InstallColate(sweetsLifts, _inGameDatabase);
+            
             colateStageTalkPartBehaviour.Init(StartBattle,outGameDatabase);
             _colateStageStageManager.LateInit();
         }
@@ -83,9 +87,12 @@ namespace SceneSequencer
         {
             colateStageTalkPartBehaviour.Dispose();
             BGMManager.Instance.Stop();
-            BGMManager.Instance.Play(BGMPath.STAGE_BGM);
+            BGMManager.Instance.Play(BGMPath.BOSS_BGM);
             _colateStageStageManager.StartBattle();
-            
+            foreach (var playerController in _colateStageStageManager.Controllers)
+            {
+                playerController.InitHealAndRevive();
+            }
             this.FixedUpdateAsObservable()
                 .Subscribe(_ =>
                 {

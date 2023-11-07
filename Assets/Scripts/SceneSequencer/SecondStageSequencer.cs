@@ -23,7 +23,8 @@ namespace SceneSequencer
         private const float ToMoveSceneFadeOutDurationMin = 5.0f;
         
         [SerializeField] private int currentMovePlayer;
-        
+        [SerializeField] private PlayableCharacter debugCharacter = PlayableCharacter.Candy;
+
         [SerializeField] private StageUIScriptableData stageUIScriptableData;
         [SerializeField] private PlayerInstanceData secondStageStartInstanceData;
         [SerializeField] private PlayerInstanceData secondStageMiddleInstanceData;
@@ -43,6 +44,7 @@ namespace SceneSequencer
         [SerializeField] private GameObject trailEffect;
         
         [SerializeField] private Camera camera;
+        
 
         private SecondStageStageManager _secondStageStageManager;
         private CommonInGameDatabaseInstaller _commonInGameDatabaseInstaller;
@@ -66,6 +68,10 @@ namespace SceneSequencer
                 _commonDatabase, MoveNextScene);
 
             _commonInGameDatabaseInstaller.InstallAllPlayer(_secondStageStageManager,StageArea.SecondStageFirst);
+            foreach (var playerController in _secondStageStageManager.Controllers)
+            {
+                playerController.InitHealAndRevive();
+            }
             _secondStageStageManager.LateInit();
         }
 
@@ -128,7 +134,7 @@ namespace SceneSequencer
         
         private void SetDatabase()
         {
-            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase);
+            _commonInGameDatabaseInstaller = new CommonInGameDatabaseInstaller(_inGameDatabase,_outGameDatabase,_commonDatabase,debugCharacter);
             
             EachStagePlayerInstanceData[] eachStagePlayerInstanceData =
             {

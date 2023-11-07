@@ -4,7 +4,7 @@ using System.Threading;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Enemy;
-using InGame.MyCamera.Controller;
+using Common.MyCamera.Controller;
 using InGame.Player.Controller;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
@@ -54,6 +54,7 @@ namespace StageManager
             {
                 playerController.LateInit();
             }
+            _cameraController.LateInit();
         }
         
         public void FixedUpdatePlayableCharacter(int currentMovePlayer)
@@ -123,7 +124,7 @@ namespace StageManager
             switch (stageEvent)
             {
                 case StageEvent.EnterFirstStageGoalDoor:
-                    SetAllPlayerStop();
+                    SetAllPlayerNoOperation();
                     _moveNextSceneEvent.Invoke(SceneName.SecondStage);
                     break;
                 case StageEvent.EnterSecondStageMiddleDoor:
@@ -133,7 +134,7 @@ namespace StageManager
                     MoveStage(StageArea.SecondStageMiddle);
                     break;
                 case StageEvent.EnterSecondStageGoalDoor:
-                    SetAllPlayerStop();
+                    SetAllPlayerNoOperation();
                     _moveNextSceneEvent.Invoke(SceneName.ColateStage);
                     break;
                 default:
@@ -144,12 +145,9 @@ namespace StageManager
         
         private async void MoveStage(StageArea nextStageArea)
         {
-            SetAllPlayerStop();
+            SetAllPlayerNoOperation();
             _cameraController.SetCameraMoveState(nextStageArea);
-            foreach (var controller in _controllers)
-            {
-                controller.MoveStage(nextStageArea);
-            }
+            
             try
             {
                 await LoadManager.Instance.TryPlayFadeOut();
@@ -158,22 +156,34 @@ namespace StageManager
             {
                 Debug.Log($"Cancel Loading");
             }
-            SetAllPlayerReStart();
+            foreach (var controller in _controllers)
+            {
+                controller.OnMoveStageInScene(nextStageArea);
+            }
+            SetAllPlayerResetAndStart();
+        }
+        
+        private void SetAllPlayerNoOperation()
+        {
+            foreach (var controller in _controllers)
+            {
+                controller.SetNoOperationPlayer();
+            }
         }
 
         private void SetAllPlayerStop()
         {
             foreach (var controller in _controllers)
             {
-                controller.StopPlayer();
+                controller.SetNoOperationPlayer();
             }
         }
         
-        private void SetAllPlayerReStart()
+        private void SetAllPlayerResetAndStart()
         {
             foreach (var controller in _controllers)
             {
-                controller.ReStartPlayer();
+                controller.OnHadMovedStageInScene();
             }
         }
 

@@ -67,8 +67,7 @@ namespace InGame.Player.Logic
         
         private DoorView GetFacedDoor()
         {
-            //MEMO: とりあえずスイーツの距離と同値に。
-            float rayDistance = _playerConstEntity.ToSweetsDistance;
+            float rayDistance = _playerConstEntity.ToDoorDistance;
             Vector2 direction = new Vector2(_playerCommonInStageEntity.playerDirection,0);
             
             RaycastHit2D raycastHit2D = Physics2D.Raycast(_playerView.GetToSweetsRayPos(), direction,

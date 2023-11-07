@@ -14,6 +14,8 @@ namespace InGame.Stage.View
         public PlayableCharacter Specialist { get; }
         public FixState fixState { get; }
         public ReactiveProperty<bool> onFix{ get; }
+        public bool isActive{ get; }
+        public FixState IsInitState{ get; }
         
         public UniTask FixSweets(float duration,CancellationToken token);
         public UniTask BreakSweets(float duration,CancellationToken token);

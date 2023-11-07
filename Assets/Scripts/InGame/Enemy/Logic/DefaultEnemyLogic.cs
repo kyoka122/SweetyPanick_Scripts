@@ -38,7 +38,7 @@ namespace InGame.Enemy.Logic
             {
                 return;
             }
-            if (!(enemyEntity.hadMoved||enemyView.inScreenX))//MEMO: 一度動き出したら画面外でも止まらない
+            if (!(enemyEntity.hadMoved||enemyEntity.inScreenX))//MEMO: 一度動き出したら画面外でも止まらない
             {
                 return;
             }

@@ -7,9 +7,9 @@ using InGame.Enemy;
 using InGame.Colate.Manager;
 using InGame.Colate.View;
 using InGame.Common.Database;
-using InGame.Common.Database.ScriptableData;
+using Common.Database.ScriptableData;
 using InGame.Enemy.Installer;
-using InGame.MyCamera.Controller;
+using Common.MyCamera.Controller;
 using InGame.Player.Controller;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
@@ -25,16 +25,16 @@ namespace StageManager
         public IReadOnlyList<BasePlayerController> Controllers=>_controllers;
         private readonly List<BasePlayerController> _controllers;
         private readonly EnemyManager _enemyManager;
-        private readonly ColateController _colateController;
+        private ColateController _colateController;
         private readonly ColateStageGimmickManager _stageGimmickManager;
         private readonly EnemyInstaller _enemyInstaller;
         private readonly CameraData _battleCameraData;
-        private readonly ColateInstaller _colateInstaller;
+        private ColateInstaller _colateInstaller;
         private readonly CameraController _cameraController;
         private readonly Action<string> _moveNextSceneEvent;
 
         public ColateStageStageManager(ColateStageGimmickInstaller colateStageGimmickInstaller,CameraController cameraController,
-            CameraData battleCameraData,DefaultSweetsLiftView[] sweetsLifts, InGameDatabase inGameDatabase, CommonDatabase commonDatabase,Action<string> moveNextSceneEvent)
+            CameraData battleCameraData, InGameDatabase inGameDatabase, CommonDatabase commonDatabase,Action<string> moveNextSceneEvent)
         {
             _stageGimmickManager = colateStageGimmickInstaller.Install(inGameDatabase);
             _cameraController = cameraController;
@@ -43,12 +43,16 @@ namespace StageManager
             _controllers = new List<BasePlayerController>();
             _enemyInstaller = inGameDatabase.GetEnemyData().EnemyInstaller;
             _enemyManager = _enemyInstaller.Install();
-            _colateInstaller = inGameDatabase.GetColateData().Installer;
-            _colateController = _colateInstaller.Install(inGameDatabase, SpawnEnemyEvent,sweetsLifts);
-            RegisterObserver();
         }
 
-        private void RegisterObserver()
+        public void InstallColate(DefaultSweetsLiftView[] sweetsLifts, InGameDatabase inGameDatabase)
+        {
+            _colateInstaller = inGameDatabase.GetColateData().Installer;
+            _colateController = _colateInstaller.Install(inGameDatabase, SpawnEnemyEvent,sweetsLifts);
+            RegisterColateObserver();
+        }
+
+        private void RegisterColateObserver()
         {
             _colateController.IsColateDead.Subscribe(_ =>
             {
@@ -68,6 +72,7 @@ namespace StageManager
             {
                 playerController.LateInit();
             }
+            _cameraController.LateInit();
         }
 
         public void StartTalk()
@@ -128,9 +133,9 @@ namespace StageManager
         {
             foreach (var controller in _controllers)
             {
-                controller.onChangedUseData.Subscribe(_ =>
+                controller.onChangedInStageData.Subscribe(_ =>
                 {
-                    if (_controllers.Count(data=>data.inStage)==0)
+                    if (_controllers.Count(data=>data.isInStage)==0)
                     {
                         LoadManager.Instance.TryPlayGameOverFadeIn();
                     }

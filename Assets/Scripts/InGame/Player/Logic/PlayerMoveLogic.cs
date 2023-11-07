@@ -74,7 +74,6 @@ namespace InGame.Player.Logic
 
         public void UpdateStopping()
         {
-            Debug.Log($"Move Stopping");
             _playerView.SetXVelocity(0);
             _playerAnimatorView.PlayBoolAnimation(PlayerAnimatorParameter.IsHorizontalMove,false);
         }
@@ -209,7 +208,7 @@ namespace InGame.Player.Logic
         {
             int fallDirection = (_playerView.GetPosition().x - _playerCommonInStageEntity.prevStandPos.x)>0 ? 1 : -1;
             var warpPos = new Vector2(_playerCommonInStageEntity.prevStandPos.x - fallDirection * 
-                _playerConstEntity.WarpPosOffsetY, _playerCommonInStageEntity.prevStandPos.y);
+                _playerConstEntity.WarpPosOffset.x, _playerCommonInStageEntity.prevStandPos.y+_playerConstEntity.WarpPosOffset.y);
             Warp(warpPos,_playerConstEntity.WarpDuration);
         }
         
@@ -235,13 +234,15 @@ namespace InGame.Player.Logic
         {
             Debug.Log($"Warp! endPos:{endPos}");
             _playerCommonUpdateableEntity.SetWarping(true);
+            _playerView.SetYVelocity(0);
             _playerView.OffCollider();
             _playerView.OffSprite();
             _playerView.SetPlayerIcon(true);
             int audioId=SEManager.Instance.Play(SEPath.WARP,isLoop:true);
 
             await _playerView.Warp(endPos, duration, _playerView.thisToken);
-            
+
+            _playerView.SetYVelocity(0);
             _playerView.OnCollider();
             _playerView.OnSprite();
             _playerView.SetPlayerIcon(false);

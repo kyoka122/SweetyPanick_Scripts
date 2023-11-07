@@ -7,16 +7,17 @@ namespace InGame.Player.Controller
 {
     public class CandyController : BasePlayerController
     {
-        public CandyController(int playerNum,PlayerMoveLogic playerMoveLogic, PlayerJumpLogic playerJumpLogic,
-            PlayerPunchLogic playerPunchLogic, BasePlayerSkillLogic playerSkillLogic,
-            PlayerReShapeLogic playerReShapeLogic, PlayerHealLogic playerHealLogic,
-            PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic, 
+        public CandyController(int playerNum, PlayerMoveLogic playerMoveLogic, PlayerJumpLogic playerJumpLogic,
+            PlayerPunchLogic playerPunchLogic, BasePlayerSkillLogic playerSkillLogic, PlayerReShapeLogic playerReShapeLogic, 
+            PlayerHealLogic playerHealLogic, PlayerStatusLogic playerStatusLogic, PlayerParticleLogic playerParticleLogic,
             PlayerFixSweetsLogic playerFixSweetsLogic, PlayerEnterDoorLogic playerEnterDoorLogic,
-            PlayableCharacterSelectLogic playableCharacterSelectLogic,PlayerTalkLogic playerTalkLogic,
-            PlayerGetKeyLogic playerGetKeyLogic, List<IDisposable> disposables,IObservable<bool> onChangedUseData) 
-            : base(playerNum,playerMoveLogic, playerJumpLogic, playerPunchLogic, playerSkillLogic, playerReShapeLogic, 
+            PlayableCharacterSelectLogic playableCharacterSelectLogic, PlayerTalkLogic playerTalkLogic,
+            PlayerGetKeyLogic playerGetKeyLogic, ActionKeyLogic actionKeyLogic, PlayerReviveLogic playerReviveLogic,
+            List<IDisposable> disposables, bool initUsed,bool isInStage,IObservable<bool> onChangedInStageData,IObservable<bool> onChangedRevivingData)
+            : base(playerNum, playerMoveLogic, playerJumpLogic, playerPunchLogic, playerSkillLogic, playerReShapeLogic,
                 playerHealLogic, playerStatusLogic, playerParticleLogic, playerFixSweetsLogic, playerEnterDoorLogic,
-                playableCharacterSelectLogic,playerTalkLogic,playerGetKeyLogic,disposables,onChangedUseData)
+                playableCharacterSelectLogic, playerTalkLogic, playerGetKeyLogic, actionKeyLogic, playerReviveLogic, 
+                disposables, initUsed,isInStage,onChangedInStageData, onChangedRevivingData)
         {
         }
 

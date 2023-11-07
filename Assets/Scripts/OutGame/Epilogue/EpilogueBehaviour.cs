@@ -48,6 +48,7 @@ namespace OutGame.Epilogue
         private void MoveNextScene()
         {
             dialogs.ExitDialog();
+            dialogs.DisposeDialog();
             _toNextSceneEvent.Invoke();
         }
 

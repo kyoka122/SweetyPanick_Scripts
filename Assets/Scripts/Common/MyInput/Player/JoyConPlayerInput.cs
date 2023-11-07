@@ -8,7 +8,7 @@ namespace Common.MyInput.Player
 	{
 		private readonly Joycon _joycon;
 		
-		private const float OnShakeValue = 1.3f;
+		private const float OnShakeValue = 1.0f;
 		private Vector3 _accel;
 		private Vector3 _accelCache;
 		
@@ -142,7 +142,7 @@ namespace Common.MyInput.Player
 		private void Rumble()
 		{
 			//MEMO: https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/rumble_data_table.md
-			_joycon.SetRumble(160, 320, 0.6f, 200);
+			_joycon.SetRumble(160, 320, 0.511f, 170);
 		}
 
 		public override void Dispose()

@@ -56,6 +56,7 @@ namespace InGame.Player.View
         
         public void SetPosition(Vector2 pos)
         {
+            Debug.Log($"pos:{pos},type:{type}");
             transform.position = pos;
         }
         
@@ -72,6 +73,11 @@ namespace InGame.Player.View
         public GameObject GetWeaponObject()
         {
             return _playerChildComponents.WeaponColliderObject;
+        }
+        
+        public GameObject GetFirstActionKeyObject()
+        {
+            return _playerChildComponents.FirstActionKeyObject;
         }
 
         public GameObject GetAnimatorObject()
@@ -196,6 +202,11 @@ namespace InGame.Player.View
         {
             _playerChildComponents.PlayerIcon.enabled = on;
         }
+        
+        public Vector2 GetModelAppearEffectPivot()
+        {
+            return _playerChildComponents.ModelAppearEffectPivot;
+        }
 
         public void PlayParticle(ParticleSystem particle)
         {
@@ -249,6 +260,12 @@ namespace InGame.Player.View
         public void SetActive(bool active)
         {
             gameObject.SetActive(active);
+        }
+
+        public Vector2 GetModelAppearEffectScale()
+        {
+            Debug.Log($"ModelAppearEffectScale:{_playerChildComponents.ModelAppearEffectScale}");
+            return _playerChildComponents.ModelAppearEffectScale;
         }
     }
 }

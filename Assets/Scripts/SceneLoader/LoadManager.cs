@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Database;
@@ -21,11 +22,13 @@ namespace InGame.SceneLoader
         [SerializeField] private BlackFadeView blackFadeView;
         [SerializeField] private GameOverView gameOverView;
         [SerializeField] private LoadCameraView loadCameraView;
+        [SerializeField] private PlayingInfoView playingInfoView;
         
         private LoadEntity _loadEntity;
         private BlackFadeLogic _blackFadeLogic;
         private LoadLogic _loadLogic;
         private GameOverLogic _gameOverLogic;
+        private PlayingInfoLogic _playingInfoLogic;
 
         public void Init(InGameDatabase inGameDatabase,CommonDatabase commonDatabase)
         {
@@ -33,10 +36,12 @@ namespace InGame.SceneLoader
             blackFadeView.Init();
             gameOverView.Init();
             loadCameraView.Init();
+            playingInfoView.Init();
             _loadEntity = new LoadEntity(inGameDatabase,commonDatabase);
             _loadLogic = new LoadLogic(_loadEntity, loadScreenView,blackFadeView,loadCameraView);
             _blackFadeLogic = new BlackFadeLogic(_loadEntity, blackFadeView,loadCameraView);
             _gameOverLogic = new GameOverLogic(_loadEntity, gameOverView, loadCameraView);
+            _playingInfoLogic = new PlayingInfoLogic(_loadEntity, playingInfoView, loadCameraView);
         }
 
         protected override void Awake()
@@ -90,7 +95,7 @@ namespace InGame.SceneLoader
         /// <summary>
         /// ロード中でなければロード演出を開始する
         /// </summary>
-        public async UniTask TryPlayLoadScreen(float thisTaskDuration,float toFadeOutDurationMin)
+        public async UniTask TryPlayLoadScreen(float thisTaskDelay,float toFadeOutDurationMin)
         {
             CancellationToken thisToken = this.GetCancellationTokenOnDestroy();
             await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading||
@@ -104,10 +109,55 @@ namespace InGame.SceneLoader
                 return;
             }
             await _loadLogic.PlayLoadScreen(toFadeOutDurationMin,thisToken);
-            await UniTask.Delay(TimeSpan.FromSeconds(thisTaskDuration), cancellationToken: thisToken);
-            
+            await UniTask.Delay(TimeSpan.FromSeconds(thisTaskDelay), cancellationToken: thisToken);
+            Debug.Log($"Load FadeIn Finish");
+        }
+        
+        /// <summary>
+        /// 指定の操作説明画面をフェードインさせる
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="toFadeOutDurationMin"></param>
+        public async UniTask TryFadeInPlayingInfo(PlayingInfoType type,float toFadeOutDurationMin)
+        {
+            CancellationToken thisToken = this.GetCancellationTokenOnDestroy();
+            await UniTask.WaitWhile(() => _blackFadeLogic.isFading || _loadLogic.isFading ||
+                                          _gameOverLogic.isFading|| _playingInfoLogic.isFading,cancellationToken: thisToken);
+
+            Debug.Log($"WaitWhile:{_blackFadeLogic.isFading || _loadLogic.isFading || _gameOverLogic.isFading|| _playingInfoLogic.isFading}");
+            //MEMO: 他のLoadが実行中であれば実行しない
+            if (_blackFadeLogic.isFadeIn||_gameOverLogic.isFadeIn)
+            {
+                Debug.Log(
+                    $"Already Load. Load: BlackFade:{_blackFadeLogic.isFadeIn}, gameOver:{_gameOverLogic.isFadeIn}");
+                return;
+            }
+            //MEMO: LoadScreenが出ていなければ実行しない
+            if (!_loadLogic.isLoading)
+            {
+                Debug.Log($"Not Active LoadScreen.");
+                return;
+            }
+            await _playingInfoLogic.PlayPlayingInfoFadeIn(type,toFadeOutDurationMin,thisToken);
         }
 
+        public async void TryPlayGameOverFadeIn()
+        {
+            CancellationToken thisToken = this.GetCancellationTokenOnDestroy();
+            await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading, cancellationToken: thisToken);
+
+            //MEMO: 他のLoadが実行中であれば実行しない
+            if (_blackFadeLogic.isFadeIn||_loadLogic.isLoading||_gameOverLogic.isFadeIn)
+            {
+                Debug.Log(
+                    $"Already Load. Load:{_loadLogic.isLoading}, BlackFade:{_blackFadeLogic.isFadeIn}, gameOver:{_gameOverLogic.isFadeIn}");
+                return;
+            }
+            await _gameOverLogic.PlayFadeIn(thisToken);
+            await _gameOverLogic.WaitOnNextKey();
+            await _blackFadeLogic.PlayFadeIn(thisToken);
+            SceneManager.LoadScene(SceneName.Title);
+        }
         
         /// <summary>
         /// 現在のフェード、Load状態に合わせてフェードアウトする
@@ -135,23 +185,28 @@ namespace InGame.SceneLoader
             Debug.Log($"Couldn`t FadeOut!");
         }
         
-        public async void TryPlayGameOverFadeIn()
+        
+        /// <summary>
+        /// 指定の操作説明画面をフェードアウトさせる
+        /// </summary>
+        /// <param name="playingInfoType"></param>
+        public async UniTask TryFadeOutPlayingInfo(PlayingInfoType playingInfoType)
         {
             CancellationToken thisToken = this.GetCancellationTokenOnDestroy();
-            await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading, cancellationToken: thisToken);
+            await UniTask.WaitWhile(() => _blackFadeLogic.isFading||_loadLogic.isFading|| !_playingInfoLogic.canFadeOut,
+                cancellationToken: thisToken);
 
-            //MEMO: 他のLoadが実行中であれば実行しない
-            if (_blackFadeLogic.isFadeIn||_loadLogic.isLoading||_gameOverLogic.isFadeIn)
+            if (_playingInfoLogic.currentPlayingInfoType==playingInfoType)
             {
-                Debug.Log(
-                    $"Already Load. Load:{_loadLogic.isLoading}, BlackFade:{_blackFadeLogic.isFadeIn}, gameOver:{_gameOverLogic.isFadeIn}");
+                Debug.Log($"PlayingInfoFadeOut!");
+                await _playingInfoLogic.TryPlayPlayingInfoFadeOut(thisToken);
                 return;
             }
-            await _gameOverLogic.PlayFadeIn(thisToken);
-            await _gameOverLogic.WaitOnNextKey();
-            await _blackFadeLogic.PlayFadeIn(thisToken);
-            SceneManager.LoadScene(SceneName.Title);
+            
+            Debug.Log($"Couldn`t FadeOut!");
         }
+
+        
 
         private void OnDestroy()
         {

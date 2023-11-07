@@ -20,6 +20,10 @@ namespace InGame.Database
             _mashInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
             _kureInStageData = new ReactiveProperty<CharacterUpdateableInStageData>();
             _eachStagePlayerInstanceData = new List<EachStagePlayerInstanceData>();
+            _candyFirstActionKeyData = new List<Key>(5);
+            _fuFirstActionKeyData = new List<Key>(5);
+            _mashFirstActionKeyData = new List<Key>(5);
+            _kureFirstActionKeyData = new List<Key>(5);
         }
         
         ///////////////////////////////////////////////////////////////////////////
@@ -171,7 +175,56 @@ namespace InGame.Database
                     break;
             }
         }
+        
+        private readonly List<Key> _candyFirstActionKeyData;
+        private readonly List<Key> _mashFirstActionKeyData;
+        private readonly List<Key> _fuFirstActionKeyData;
+        private readonly List<Key> _kureFirstActionKeyData;
 
+        public List<Key>[] GetAllFirstActionKeyData()
+        {
+            return new[]{_candyFirstActionKeyData, _mashFirstActionKeyData, _fuFirstActionKeyData,_kureFirstActionKeyData};
+        }
+        
+        public IReadOnlyList<Key> GetFirstActionKeyData(PlayableCharacter type)
+        {
+            switch (type)
+            {
+                case PlayableCharacter.Candy:
+                    return _candyFirstActionKeyData;
+                case PlayableCharacter.Mash:
+                    return _mashFirstActionKeyData;
+                case PlayableCharacter.Fu:
+                    return _fuFirstActionKeyData;
+                case PlayableCharacter.Kure:
+                    return _kureFirstActionKeyData;
+                default:
+                    Debug.LogError($"ArgumentOutOfRangeException. type{type}");
+                    return null;
+            }
+        }
+
+        public void AddFirstActionKeyData(PlayableCharacter type,Key key)
+        {
+            switch (type)
+            {
+                case PlayableCharacter.Candy:
+                    _candyFirstActionKeyData.Add(key);
+                    break;
+                case PlayableCharacter.Mash:
+                    _mashFirstActionKeyData.Add(key);
+                    break;
+                case PlayableCharacter.Fu:
+                    _fuFirstActionKeyData.Add(key);
+                    break;
+                case PlayableCharacter.Kure:
+                    _kureFirstActionKeyData.Add(key);
+                    break;
+                default:
+                    Debug.LogError($"ArgumentOutOfRangeException. type{type}");
+                    break;
+            }
+        }
         
         #endregion
 

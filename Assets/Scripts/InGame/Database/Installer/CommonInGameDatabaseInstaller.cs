@@ -18,11 +18,18 @@ namespace InGame.Database.Installer
         private readonly OutGameDatabase _outGameDatabase;
         private readonly CommonDatabase _commonDatabase;
 
-        public CommonInGameDatabaseInstaller(InGameDatabase inGameDatabase, OutGameDatabase outGameDatabase, CommonDatabase commonDatabase)
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly PlayableCharacter _debugCharacter;
+
+        public CommonInGameDatabaseInstaller(InGameDatabase inGameDatabase, OutGameDatabase outGameDatabase, CommonDatabase commonDatabase,
+        PlayableCharacter debugCharacter)
         {
             _inGameDatabase = inGameDatabase;
             _outGameDatabase = outGameDatabase;
             _commonDatabase = commonDatabase;
+            _debugCharacter = debugCharacter;
         }
 
         public void SetInGameDatabase(StageUIData stageUIData, StageSettingsScriptableData stageSettingsScriptableData,
@@ -69,8 +76,10 @@ namespace InGame.Database.Installer
                 
                 if (playerUpdateableData==null)
                 {
+                    //MEMO: 初めてステージシーンをプレイするとき
                     if (selectCharacterData==null)
                     {
+                        //MEMO: 使わないキャラがいる時
                         SetPlayerUpdateableData(type,playerDummyNum);
                         playerDummyNum++;
                     }
@@ -95,8 +104,8 @@ namespace InGame.Database.Installer
         /// <param name="characterData"></param>
         private void SetPlayerUpdateableData(PlayableCharacter type,UseCharacterData characterData)
         {
-            PlayerUpdateableData playerUpdateableData=new PlayerUpdateableData(characterData.playerNum,
-                _inGameDatabase.GetCharacterCommonStatus(type).MaxHp,true,false);
+            PlayerUpdateableData playerUpdateableData = new PlayerUpdateableData(characterData.playerNum,
+                _inGameDatabase.GetCharacterCommonStatus(type).MaxHp, true, true, false,false);
             _inGameDatabase.SetPlayerUpdateableData(type, playerUpdateableData);
         }
         
@@ -108,7 +117,7 @@ namespace InGame.Database.Installer
         private void SetPlayerUpdateableData(PlayableCharacter type,int playerDummyNum)
         {
             PlayerUpdateableData playerUpdateableData=new PlayerUpdateableData(playerDummyNum,
-                _inGameDatabase.GetCharacterCommonStatus(type).MaxHp,false,false);
+                _inGameDatabase.GetCharacterCommonStatus(type).MaxHp,false,false,false,false);
             _inGameDatabase.SetPlayerUpdateableData(type, playerUpdateableData);
         }
 
@@ -120,7 +129,7 @@ namespace InGame.Database.Installer
             //MEMO: Player設定シーンを飛ばした場合、仮でキーボード、Candyのデータを追加する
             if (characterData == null)
             {
-                new DebugInputInstaller().Install(_commonDatabase);
+                new DebugInputInstaller().Install(_commonDatabase,_debugCharacter);
             }
             characterData = _commonDatabase.GetUseCharacterData();
 

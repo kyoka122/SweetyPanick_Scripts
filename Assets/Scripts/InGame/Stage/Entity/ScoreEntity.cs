@@ -34,14 +34,9 @@ namespace InGame.Stage.Entity
         
         public int GetScore(SweetsType type,SweetsScoreType scoreType)
         {
-            return type switch
-            {
-                SweetsType.Sweets => scoreType == SweetsScoreType.Gold
-                    ? _inGameDatabase.GetStageGimmickData().GoldSweetsScore
-                    : _inGameDatabase.GetStageGimmickData().NormalSweetsScore,
-                SweetsType.GimmickSweets => _inGameDatabase.GetStageGimmickData().GimmickSweetsScore,
-                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-            };
+            var stageGimmickData = _inGameDatabase.GetStageGimmickData();
+            return ScoreCalculator.GetScore(type, scoreType, stageGimmickData.NormalSweetsScore,
+                stageGimmickData.GoldSweetsScore, stageGimmickData.GimmickSweetsScore);
         }
 
         public void AddSweetsScore(int score)

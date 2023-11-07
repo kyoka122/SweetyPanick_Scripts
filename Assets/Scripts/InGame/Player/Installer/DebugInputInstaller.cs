@@ -14,7 +14,7 @@ namespace InGame.Player.Installer
     /// </summary>
     public class DebugInputInstaller
     {
-        public void Install(CommonDatabase commonDatabase)
+        public void Install(CommonDatabase commonDatabase,PlayableCharacter debugCharacter)
         {
             var inputDevices = InputSystem.devices.ToArray();
             foreach (var inputDevice in inputDevices)
@@ -26,7 +26,7 @@ namespace InGame.Player.Installer
                     commonDatabase.SetAllControllerData(inputData);
                 }
             }
-            var characterDataList = new List<UseCharacterData> {new(1, PlayableCharacter.Kure)};
+            var characterDataList = new List<UseCharacterData> {new(1, debugCharacter)};
             commonDatabase.SetUseCharacterData(characterDataList);
         }
     }

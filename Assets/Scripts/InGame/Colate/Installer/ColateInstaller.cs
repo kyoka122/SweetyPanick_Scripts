@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InGame.Colate.Entity;
 using InGame.Colate.Logic;
 using InGame.Colate.Manager;
@@ -20,9 +21,13 @@ namespace InGame.Colate.Installer
         public ColateController Install(InGameDatabase inGameDatabase,Func<Vector2, IColateOrderAble> spawnEnemyEvent,
             DefaultSweetsLiftView[] sweetsLifts)
         {
+            var maxHp = (int) Mathf.Floor(inGameDatabase.GetAllPlayerUpdateableData()
+                                              .Count(playerUpdateableData => playerUpdateableData.isUsed)
+                                          * inGameDatabase.GetColateData().MaxHpByOnePlayer * 0.8f);
+
             var colateConstEntity=new ColateEntity(inGameDatabase,
                 new ObjectPool<ParticleSystem>(bigMiscParticleGeneratorView),
-                new ObjectPool<ParticleSystem>(smallMiscParticleGeneratorView));
+                new ObjectPool<ParticleSystem>(smallMiscParticleGeneratorView),maxHp);
             
             ColateView colateView = FindObjectOfType<ColateView>();
             if (colateView==null)
@@ -34,7 +39,7 @@ namespace InGame.Colate.Installer
             StageUIData stageUIData = inGameDatabase.GetUIData();
             ColateStatusView colateStatusView = viewGenerator.GenerateColateStatusView(stageUIData.ColateStatusView,
                 stageUIData.Canvas.transform,stageUIData.ColateStatusDataPos);
-            colateStatusView.Init(inGameDatabase.GetColateData().MaxHp);
+            colateStatusView.Init(maxHp);
             colateStatusView.SetActive(false);
             
             foreach (var sweetsLiftView in sweetsLifts)

@@ -64,8 +64,6 @@ namespace Common.MyInput.PlayerCustom
                 return 0;
             }
 
-            Debug.Log($"currentValue:{currentValue}");
-            Debug.Log($"currentValue:{currentValue}");
             return currentValue;
         }
 

@@ -12,16 +12,18 @@ namespace InGame.Player.Logic
         private readonly PlayerConstEntity _playerConstEntity;
         private readonly PlayerCommonInStageEntity _playerCommonInStageEntity;
         private readonly PlayerCommonUpdateableEntity _playerCommonUpdateableEntity;
+        private readonly PlayerInputEntity _playerInputEntity;
         private readonly BasePlayerView _playerView;
         private readonly PlayerAnimatorView _playerAnimatorView;
 
         public PlayerStatusLogic(PlayerConstEntity playerConstEntity, PlayerCommonInStageEntity playerCommonInStageEntity, 
-            PlayerCommonUpdateableEntity playerCommonUpdateableEntity,BasePlayerView playerView,
+            PlayerCommonUpdateableEntity playerCommonUpdateableEntity,PlayerInputEntity playerInputEntity,BasePlayerView playerView,
             PlayerAnimatorView playerAnimatorView)
         {
             _playerConstEntity = playerConstEntity;
             _playerCommonInStageEntity = playerCommonInStageEntity;
             _playerCommonUpdateableEntity = playerCommonUpdateableEntity;
+            _playerInputEntity=playerInputEntity;
             _playerView = playerView;
             _playerAnimatorView = playerAnimatorView;
         }
@@ -57,10 +59,17 @@ namespace InGame.Player.Logic
             }
         }
 
-        public void Stop()
+        public void Pause()
         {
-            _playerAnimatorView.ResetAllParameter();
-            _playerAnimatorView.PlayTriggerAnimation(PlayerAnimatorParameter.ForceIdle);
+            _playerAnimatorView.Pause();
+            Debug.Log("Pause");
+        }
+
+        public void Reset()
+        {
+            _playerAnimatorView.Rebind();
+            _playerInputEntity.ResetAllFlag();
+            Debug.Log("ResetFlag");
         }
         
         public PlayableCharacter GetCharacterType()

@@ -1,4 +1,5 @@
 ﻿using MyApplication;
+using UnityEngine;
 
 namespace InGame.Database
 {
@@ -18,6 +19,9 @@ namespace InGame.Database
         public float HighJumpValue{ get; }
         public float ToGroundDistance{ get; }
         public float ToSweetsDistance{ get; }
+        public float ToUpStairsDistance{ get; }
+        public float ToDoorDistance{ get; }
+        public float ToEnemyDistance{ get; }
         public float ToSlopeDistance{ get; }
         public float UnderToSlopeDistance { get; }
         public float NormalSweetsFixingTime{ get; }
@@ -25,10 +29,14 @@ namespace InGame.Database
         public float NormalSweetsSpecialistFixingTime { get; }
         public float GimmickSweetsSpecialistFixingTime { get; }
         public float KnockBackValue{ get; }
+        public float ToActiveMoveKeyDuration{ get; }
         public float WarpDuration{ get; }
-        public float WarpPosOffsetY{ get; }
+        public Vector2 WarpPosOffset{ get; }
         public float MaxColliderSizeX{ get; }
         public float SlopeHelpPower { get; }
+        public float ToFacedObjectsMaxDistance { get; }
+        public int HealHpToRevive { get; }
+        public float ToReviveTime { get; }
 
         public BaseCharacterCommonStatus(CharacterBaseParameter characterBaseParameter)
         {
@@ -45,6 +53,10 @@ namespace InGame.Database
             HighJumpValue = characterBaseParameter.highJumpValue;
             ToGroundDistance = characterBaseParameter.toGroundDistance;
             ToSweetsDistance = characterBaseParameter.toSweetsDistance;
+            ToUpStairsDistance = characterBaseParameter.toUpStairsDistance;
+            ToDoorDistance = characterBaseParameter.toDoorDistance;
+            ToEnemyDistance = characterBaseParameter.toEnemyDistance;
+            ToFacedObjectsMaxDistance = Mathf.Max(ToSweetsDistance, ToUpStairsDistance, ToDoorDistance,ToEnemyDistance);
             UnderToSlopeDistance = characterBaseParameter.underToSlopeDistance;
             ToSlopeDistance = characterBaseParameter.toSlopeDistance;
             NormalSweetsFixingTime = characterBaseParameter.normalSweetsFixingTime;
@@ -52,10 +64,13 @@ namespace InGame.Database
             NormalSweetsSpecialistFixingTime = characterBaseParameter.normalSweetsSpecialistFixingTime;
             GimmickSweetsSpecialistFixingTime = characterBaseParameter.gimmickSweetsSpecialistFixingTime;
             KnockBackValue = characterBaseParameter.knockBackValue*10;
+            ToActiveMoveKeyDuration = characterBaseParameter.toActiveMoveKeyDuration;
             WarpDuration = characterBaseParameter.warpDuration;
-            WarpPosOffsetY = characterBaseParameter.warpPoaOffsetY;
+            WarpPosOffset = characterBaseParameter.warpPoaOffset;
             MaxColliderSizeX=characterBaseParameter.maxColliderSizeX;
             SlopeHelpPower=characterBaseParameter.slopeHelpPower;
+            HealHpToRevive = characterBaseParameter.healHpToRevive;
+            ToReviveTime = characterBaseParameter.toReviveTime;
         }
         
     }

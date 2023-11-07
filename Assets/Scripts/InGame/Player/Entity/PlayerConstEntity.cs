@@ -39,6 +39,10 @@ namespace InGame.Player.Entity
         public float BoundValue => GetCharacterCommonStatus().BoundValue;
         public float ToGroundDistance => GetCharacterCommonStatus().ToGroundDistance;
         public float ToSweetsDistance => GetCharacterCommonStatus().ToSweetsDistance;
+        public float ToUpStairsDistance => GetCharacterCommonStatus().ToUpStairsDistance;
+        public float ToDoorDistance => GetCharacterCommonStatus().ToDoorDistance;
+        public float ToEnemyDistance => GetCharacterCommonStatus().ToEnemyDistance;
+        public float ToFacedObjectsMaxDistance => GetCharacterCommonStatus().ToFacedObjectsMaxDistance;
         public float ToSlopeDistance => GetCharacterCommonStatus().ToSlopeDistance;
         public float UnderToSlopeDistance => GetCharacterCommonStatus().UnderToSlopeDistance;
         public float GimmickSweetsFixingTime => GetCharacterCommonStatus().GimmickSweetsFixingTime;
@@ -46,13 +50,18 @@ namespace InGame.Player.Entity
         public float NormalSweetsFixingTime => GetCharacterCommonStatus().NormalSweetsFixingTime;
         public float NormalSweetsSpecialistFixingTime => GetCharacterCommonStatus().NormalSweetsSpecialistFixingTime;
         public float KnockBackValue => GetCharacterCommonStatus().KnockBackValue;
+        public float ToActiveMoveKeyDuration => GetCharacterCommonStatus().ToActiveMoveKeyDuration;
         public float WarpDuration => GetCharacterCommonStatus().WarpDuration;
-        public float WarpPosOffsetY => GetCharacterCommonStatus().WarpPosOffsetY;
+        public Vector2 WarpPosOffset => GetCharacterCommonStatus().WarpPosOffset;
         public float MaxColliderSizeX => GetCharacterCommonStatus().MaxColliderSizeX;
         public int BoundDelayCount => GetCharacterCommonStatus().BoundDelayCount;
+        public int HealHpToRevive => GetCharacterCommonStatus().HealHpToRevive;
+        public float toReviveTime => GetCharacterCommonStatus().ToReviveTime;
         public int HealValue => _inGameDatabase.GetKureStatus().healValue;
+        public float MaxHp => GetCharacterCommonStatus().MaxHp;
         public float StageBottom => _inGameDatabase.GetStageSettings().StageBottom;
         public float SlopeHelpPower => GetCharacterCommonStatus().SlopeHelpPower;
+        
 
         public Vector2 FixSweetsParticleSize(SweetsType type)
         {
@@ -65,6 +74,9 @@ namespace InGame.Player.Entity
 
         private BaseCharacterCommonStatus GetCharacterCommonStatus()=>_inGameDatabase.GetCharacterCommonStatus(Type);
         private CharacterCommonConstData GetCommonCharacterConstData()=>_inGameDatabase.GetCharacterConstData(Type);
+        
+        public Animation GetKeySprite(Key key,MyInputDeviceType deviceType) => _commonDatabase.GetKeySpriteScriptableData()
+            .GetAnimation(key,deviceType);
         
         private readonly InGameDatabase _inGameDatabase;
         private readonly CommonDatabase _commonDatabase;

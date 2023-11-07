@@ -16,16 +16,19 @@ namespace OutGame.PlayerCustom.Installer
     public class PlayerCustomInstaller
     {
         public PlayerCustomManager Install(PlayerCountView playerCountView, ControllersPanelView controllersPanelView,
-            CharacterSelectPanelView characterSelectPanelView,
-            FromMessageWindowRecieverView fromMessageWindowRecieverView,
-            ToMessageWindowSenderView toMessageWindowSenderView, Dialogs playerCountDialog, Dialogs controllerDialog,
-            Dialogs characterDialog, Dialogs cheerDialog, OutGameDatabase outGameDatabase,
-            CommonDatabase commonDatabase,
-            Subject<bool> moveNextScene)
+            CharacterSelectPanelView characterSelectPanelView, FromMessageWindowRecieverView fromMessageWindowReceiverView,
+            ToMessageWindowSenderView toMessageWindowSenderView,CharacterIconView[] characterIconViews,
+            Dialogs playerCountDialog, Dialogs controllerDialog, Dialogs characterDialog, Dialogs cheerDialog, 
+            OutGameDatabase outGameDatabase, CommonDatabase commonDatabase, Subject<bool> moveNextScene)
         {
             playerCountView.Init();
             controllersPanelView.Init();
             characterSelectPanelView.Init();
+            foreach (var characterIconView in characterIconViews)
+            {
+                characterIconView.Init();
+            }
+            
             var inputCaseUnknownControllerEntity = new InputEntity();
             var inSceneDataEntity = new InSceneDataEntity(outGameDatabase, commonDatabase);
             var constDataEntity = new ConstDataEntity(outGameDatabase, commonDatabase);
@@ -35,14 +38,14 @@ namespace OutGame.PlayerCustom.Installer
             characterDialog.Init(outGameDatabase.GetDialogFaceSpriteScriptableData());
             cheerDialog.Init(outGameDatabase.GetDialogFaceSpriteScriptableData());
             
-            fromMessageWindowRecieverView.Init(moveNextScene);
+            fromMessageWindowReceiverView.Init(moveNextScene);
             toMessageWindowSenderView.Init(playerCountDialog,controllerDialog,characterDialog,cheerDialog);
             PlayerCountButtonLogic playerCountButtonLogic = new PlayerCountButtonLogic(inputCaseUnknownControllerEntity,
                 inSceneDataEntity, playerCountView, toMessageWindowSenderView);
             ControllerLogic controllerLogic = new ControllerLogic(inputCaseUnknownControllerEntity,
                 inSceneDataEntity, controllersPanelView, toMessageWindowSenderView);
             CharacterSelectLogic characterSelectLogic = new CharacterSelectLogic(inSceneDataEntity, constDataEntity,
-                toMessageWindowSenderView, characterSelectPanelView);
+                toMessageWindowSenderView, characterSelectPanelView,characterIconViews);
             PanelLogic panelLogic = new PanelLogic(playerCountView, controllersPanelView, characterSelectPanelView,
                 inSceneDataEntity, constDataEntity);
             FinishTalkLogic finishTalkLogic = new FinishTalkLogic(inSceneDataEntity, toMessageWindowSenderView);

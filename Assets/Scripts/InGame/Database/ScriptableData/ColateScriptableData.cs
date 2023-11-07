@@ -10,7 +10,7 @@ namespace InGame.Database.ScriptableData
         public ColateView Prefab => prefab;
         public ColateInstaller Installer => installer;
         
-        public int MaxHp => maxHp;
+        public int MaxHpByOnePlayer => maxHpByOnePlayer;
         public float MoveSpeed => moveSpeed;
         public float ConfuseDuration => confuseDuration;
         public float ThrowEnemyInterval => throwEnemyInterval;
@@ -36,7 +36,7 @@ namespace InGame.Database.ScriptableData
         [SerializeField] private ColateView prefab;
         [SerializeField] private ColateInstaller installer;
         
-        [SerializeField] private int maxHp=15;
+        [SerializeField] private int maxHpByOnePlayer=10;
         [SerializeField] private float moveSpeed=2f;
         [SerializeField] private float confuseDuration=5f;
         [SerializeField] private float throwEnemyInterval = 8f;

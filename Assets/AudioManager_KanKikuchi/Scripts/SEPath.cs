@@ -13,6 +13,7 @@ public static class SEPath{
 	public const string CONTROLLER_SELECT = "SE/ControllerSelect";
 	public const string CREPE_ROLLING     = "SE/CrepeRolling";
 	public const string DAMAGE            = "SE/Damage";
+	public const string DOG_BARK          = "SE/DogBark";
 	public const string DOOR_OPEN         = "SE/DoorOpen";
 	public const string DRUM_ROLL         = "SE/DrumRoll";
 	public const string EAT_SWEETS        = "SE/EatSweets";

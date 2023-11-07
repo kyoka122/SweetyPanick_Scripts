@@ -41,8 +41,8 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Utility\TransitionFade\IUtilTransition.cs" />
      <Compile Include="Assets\Scripts\Utility\TransitionFade\Transition.cs" />
+     <Compile Include="Assets\Scripts\Utility\TransitionFade\IUtilTransition.cs" />
      <None Include="Assets\Scripts\Utility\TransitionFade\Transition.asmdef" />
      <Reference Include="UnityEngine">
      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.6f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>

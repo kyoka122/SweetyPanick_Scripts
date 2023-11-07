@@ -43,12 +43,12 @@ namespace InGame.Colate.Entity
         private readonly InGameDatabase _inGameDatabase;
 
         public ColateEntity(InGameDatabase inGameDatabase,ObjectPool<ParticleSystem> bigMiscParticleObjectPool,
-            ObjectPool<ParticleSystem> smallMiscParticleObjectPool)
+            ObjectPool<ParticleSystem> smallMiscParticleObjectPool,int maxHp)
         {
             _inGameDatabase = inGameDatabase;
             bigMiscParticle = bigMiscParticleObjectPool;
             smallMiscParticle = smallMiscParticleObjectPool;
-            _colateHp = new ReactiveProperty<int>(_inGameDatabase.GetColateData().MaxHp);
+            _colateHp = new ReactiveProperty<int>(maxHp);
             _deadMotionFinished = new Subject<bool>();
         }
 
@@ -59,6 +59,7 @@ namespace InGame.Colate.Entity
 
         public void OnFinishedDeadMotion()
         {
+            Debug.Log($"Dead!");
             _deadMotionFinished.OnNext(true);
         }
 

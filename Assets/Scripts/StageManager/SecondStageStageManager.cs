@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.Enemy;
-using InGame.MyCamera.Controller;
+using Common.MyCamera.Controller;
 using InGame.Player.Controller;
 using InGame.SceneLoader;
 using InGame.Stage.Installer;
@@ -61,6 +61,7 @@ namespace StageManager
             {
                 playerController.LateInit();
             }
+            _cameraController.LateInit();
         }
         
         public void FixedUpdatePlayableCharacter(int currentMovePlayer)
@@ -96,9 +97,10 @@ namespace StageManager
         {
             foreach (var controller in _controllers)
             {
-                controller.onChangedUseData.Subscribe(_ =>
+                controller.onChangedInStageData.Subscribe(_ =>
                 {
-                    if (_controllers.Count(data=>data.inStage)==0)
+                    Debug.Log($"_controllers.Count(data=>data.inStage):{_controllers.Count(data => data.isInStage)}");
+                    if (_controllers.Count(data=>data.isInStage)==0)
                     {
                         LoadManager.Instance.TryPlayGameOverFadeIn();
                     }
@@ -140,9 +142,9 @@ namespace StageManager
         {
             switch (stageEvent)
             {
-                case StageEvent.EnterFirstStageGoalDoor:
-                    MoveScene(SceneName.SecondStage);
-                    break;
+                // case StageEvent.EnterFirstStageGoalDoor:
+                //     MoveScene(SceneName.SecondStage);
+                //     break;
                 case StageEvent.EnterSecondStageMiddleDoor:
                     MoveStage(StageArea.SecondHiddenStage);
                     break;
@@ -160,7 +162,11 @@ namespace StageManager
 
         private async void MoveStage(StageArea nextStageArea)
         {
-            SetAllPlayerStop();
+            foreach (var controller in _controllers)
+            {
+                controller.SetNoOperationPlayer();
+            }
+            
             await UniTask.Delay(TimeSpan.FromSeconds(ToMoveStageTime),cancellationToken:_tokenSource.Token);
             try
             {
@@ -182,13 +188,21 @@ namespace StageManager
                 Debug.Log($"Cancel Loading");
             }
             
-            SetAllPlayerReStart();
+            SetAllPlayerResetAndStart();
         }
         
         private async void MoveScene(string sceneName)
         {
-            SetAllPlayerStop();
+            foreach (var controller in _controllers)
+            {
+                controller.SetNoOperationPlayer();
+            }
+            
             await UniTask.Delay(TimeSpan.FromSeconds(ToMoveStageTime),cancellationToken:_tokenSource.Token);
+            foreach (var controller in _controllers)
+            {
+                controller.OnMoveScene();
+            }
             _moveNextSceneEvent.Invoke(sceneName);
         }
         
@@ -197,27 +211,36 @@ namespace StageManager
             _stageGimmickManager.UnsetBackGround();
             foreach (var controller in _controllers)
             {
-                controller.MoveStage(nextStageArea);
+                controller.OnMoveStageInScene(nextStageArea);
             }
             _cameraController.SetCameraMoveState(nextStageArea);
             _stageGimmickManager.InitAtStageMove(nextStageArea);
         }
-
+        
         private void SetAllPlayerStop()
         {
             foreach (var controller in _controllers)
             {
-                controller.StopPlayer();
+                controller.SetNoOperationPlayer();
             }
         }
         
-        private void SetAllPlayerReStart()
+        //MEMO: ステージ移動時
+        private void SetAllPlayerResetAndStart()
         {
             foreach (var controller in _controllers)
             {
-                controller.ReStartPlayer();
+                controller.OnHadMovedStageInScene();
             }
         }
+        
+        /*private void SetAllPlayerReStart()
+        {
+            foreach (var controller in _controllers)
+            {
+                controller.ReSetAndStartPlayer();
+            }
+        }*/
 
         private void SetPlayerPosition()
         {

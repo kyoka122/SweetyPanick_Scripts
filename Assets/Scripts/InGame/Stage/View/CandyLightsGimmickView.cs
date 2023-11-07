@@ -8,10 +8,14 @@ namespace InGame.Stage.View
     public class CandyLightsGimmickView:DefaultGimmickSweetsView
     {
         public IObservable<bool> FixedCandy=>_fixedCandy;
-        
+    
         [SerializeField] private Light firstLight;
         [SerializeField] private Light endLight;
         [SerializeField] private Light[] aroundLights;
+        [SerializeField] private float smallLightValue=1.02f;
+        [SerializeField] private float smallLightRange=10.7f;
+        [SerializeField] private float lightingLightValue=0.7f;
+        [SerializeField] private float lightingLightRange=38f;
         
         [SerializeField] private Transform particleTransform;
 
@@ -20,6 +24,11 @@ namespace InGame.Stage.View
         public override void Init()
         {
             _fixedCandy = new Subject<bool>();
+            
+            firstLight.intensity = smallLightValue;
+            firstLight.range = smallLightRange;
+            endLight.enabled = false;
+            
             base.Init();
         }
         
@@ -36,8 +45,11 @@ namespace InGame.Stage.View
                 .DOMove(endLight.transform.position, particleMoveDuration)
                 .OnComplete(() =>
                 {
-                    firstLight.enabled = true;
                     endLight.enabled = true;
+                    firstLight.intensity = lightingLightValue;
+                    endLight.intensity = lightingLightValue;
+                    firstLight.range = lightingLightRange;
+                    endLight.range = lightingLightRange;
                     foreach (var aroundLight in aroundLights)
                     {
                         aroundLight.enabled = true;

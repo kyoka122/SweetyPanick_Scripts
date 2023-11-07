@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using InGame.Common.Database;
 using InGame.Database;
 using Common.MyInput.Player;
+using MyApplication;
 using OutGame.Database;
 using UniRx;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace InGame.Player.Entity
 {
     public class PlayerInputEntity:IDisposable
     {
+        public MyInputDeviceType DeviceType => _playerInput.DeviceType;
         public float xMoveValue { get; private set; }
         public bool jumpFlag { get; private set; }
         public bool punchFlag{ get; private set; }
@@ -21,7 +23,7 @@ namespace InGame.Player.Entity
         public Action rumble => _playerInput.rumbleEvent;
 
         public bool IsOnPlayerSelector => OnPlayerSelector.Value;
-        
+
         //MEMO: ↓UI系
         public IReadOnlyReactiveProperty<bool> OnPlayerSelector => _playerInput.PlayerSelector;
         public IReadOnlyReactiveProperty<int> PlayerSelectorMoveDirection => _playerInput.PlayerSelectDirection;
@@ -42,11 +44,21 @@ namespace InGame.Player.Entity
             RegisterReactiveProperty();
         }
 
-        public void SetPlayerInput(BasePlayerInput playerInput)
+        public void ReSetPlayerInput(BasePlayerInput playerInput)
         {
             DisposeCurrentInputObserver();
             _playerInput = playerInput;
             RegisterReactiveProperty();
+        }
+
+        public void ResetAllFlag()
+        {
+            xMoveValue=0;
+            jumpFlag = false;
+            enterDoorFlag = false;
+            punchFlag = false;
+            skillFlag = false;
+            fixFlag = false;
         }
 
         private void RegisterReactiveProperty()

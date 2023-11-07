@@ -10,13 +10,15 @@ namespace InGame.Player.Entity
 {
     public class PlayerCommonUpdateableEntity:IDisposable
     {
-        public IObservable<bool> OnUse => _onUseSubject;
-        public IObservable<bool> OnDead => _onDeadSubject;
-        public bool IsDead => CurrentHp == 0;
+        public IObservable<bool> OnIsInStage => _onIsInStageSubject.SkipLatestValueOnSubscribe();
+        public bool IsDead => _inGameDatabase.GetPlayerUpdateableData(_type).isDead;
+        public IObservable<bool> OnReviving => _onRevivingSubject.SkipLatestValueOnSubscribe();
+        public bool IsReviving => _inGameDatabase.GetPlayerUpdateableData(_type).isReviving;
         public bool canAttackedByEnemy { get; private set; } = true;
-        public int PlayerNum => _inGameDatabase.GetPlayerUpdateableData(_type).playerNum;
-        public int CurrentHp=> _inGameDatabase.GetPlayerUpdateableData(_type).currentHp;
         public bool IsUsed=> _inGameDatabase.GetPlayerUpdateableData(_type).isUsed;
+        public bool IsInStage => _inGameDatabase.GetPlayerUpdateableData(_type).isInStage;
+        public int PlayerNum => _inGameDatabase.GetPlayerUpdateableData(_type).playerNum;
+        public float CurrentHp=> _inGameDatabase.GetPlayerUpdateableData(_type).currentHp;
         public bool HavingKey=> _inGameDatabase.GetAllStageData().havingKey;
 
         public float NearnessFromTargetView => _inGameDatabase.GetCharacterInStageData(_type).nearnessFromTargetView;
@@ -25,7 +27,7 @@ namespace InGame.Player.Entity
         //TODO: キャラ切り替えできるようになったら条件を変える
         public int LivingPlayerCount => Mathf.Min(
             _commonDatabase.GetMaxPlayerCount(),
-            _inGameDatabase.GetAllPlayerUpdateableData().Where(data=>data!=null).Count(data => data.isUsed));
+            _inGameDatabase.GetAllPlayerUpdateableData().Where(data=>data!=null).Count(data => data.isInStage));
         
         public int LivingPlayer => 
             _inGameDatabase.GetAllPlayerUpdateableData().Where(data=>data!=null).Count(data => data.isUsed);
@@ -37,13 +39,18 @@ namespace InGame.Player.Entity
             .Any(status=>status.Value.isWarping);
 
         public Transform GetEachTransform(PlayableCharacter type) => _inGameDatabase.GetCharacterInStageData(type).transform;
+        public PlayerUpdateableData GetPlayerUpdateableData(PlayableCharacter type) => _inGameDatabase.GetPlayerUpdateableData(type);
         public bool IsUsedEachPlayer(PlayableCharacter type) => _inGameDatabase.GetPlayerUpdateableData(type).isUsed;
+        public Transform GetCanvasTransform => _inGameDatabase.GetUIData().Canvas.transform;
+        
+        public bool HadUsedFirstActionKey(Key key)
+            => _inGameDatabase.GetFirstActionKeyData(_type).Contains(key);
         
         private readonly InGameDatabase _inGameDatabase;
         private readonly CommonDatabase _commonDatabase;
         private readonly PlayableCharacter _type;
-        private readonly ReactiveProperty<bool> _onDeadSubject;
-        private readonly ReactiveProperty<bool> _onUseSubject;
+        private readonly ReactiveProperty<bool> _onIsInStageSubject;
+        private readonly ReactiveProperty<bool> _onRevivingSubject;
         
         public PlayerCommonUpdateableEntity(InGameDatabase inGameDatabase,CommonDatabase commonDatabase,
             PlayableCharacter type,int playerNum, Transform playerTransform)
@@ -51,8 +58,8 @@ namespace InGame.Player.Entity
             _type = type;
             _inGameDatabase = inGameDatabase;
             _commonDatabase = commonDatabase;
-            _onDeadSubject = new ReactiveProperty<bool>();
-            _onUseSubject = new ReactiveProperty<bool>(IsUsed);
+            _onIsInStageSubject = new ReactiveProperty<bool>(IsInStage);
+            _onRevivingSubject = new ReactiveProperty<bool>(IsReviving);
             InitDatabase(playerTransform);
         }
 
@@ -78,27 +85,34 @@ namespace InGame.Player.Entity
 
         public void SetCanDamageFlag(bool canDamage)
         {
-            canAttackedByEnemy = canDamage && !_onDeadSubject.Value;
+            canAttackedByEnemy = canDamage && !IsDead;
         }
-               
-        public void Damage(int damageValue)
+
+        private void Damage(int damageValue)
         {
             PlayerUpdateableData updateableData = _inGameDatabase.GetPlayerUpdateableData(_type);
             updateableData.currentHp -= damageValue;
             if (updateableData.currentHp<=0)
             {
-                _onDeadSubject.Value = true;
                 Debug.Log($"Dead!!!!!");
+                updateableData.isDead = true;
             }
-            updateableData.isDead = true;
             _inGameDatabase.SetPlayerUpdateableData(_type,updateableData);
         }
 
-        public void HealHp(int healValue)
+        public void SetCurrentHp(float hp)
         {
             PlayerUpdateableData updateableData =  _inGameDatabase.GetPlayerUpdateableData(_type);
-            updateableData.currentHp += healValue;
-            Debug.Log($"playerNum:{PlayerNum}: currentHp={updateableData.currentHp}");
+            updateableData.currentHp = hp;
+            _inGameDatabase.SetPlayerUpdateableData(_type,updateableData);
+        }
+        
+        public void SetIsReviving(bool isReviving)
+        {
+            Debug.Log($"isReviving:{isReviving}");
+            PlayerUpdateableData updateableData =  _inGameDatabase.GetPlayerUpdateableData(_type);
+            updateableData.isReviving = isReviving;
+            _onRevivingSubject.Value = isReviving;
             _inGameDatabase.SetPlayerUpdateableData(_type,updateableData);
         }
 
@@ -127,11 +141,28 @@ namespace InGame.Player.Entity
         /// このキャラを使用し始める場合と使用し終わる場合（キャラクターチェンジの際など）に呼び出し
         /// </summary>
         /// <param name="use"></param>
-        public void SetOnUseCharacter(bool use)
+        public void SetOnInStageCharacter(bool use)
         {
             PlayerUpdateableData updateableData = _inGameDatabase.GetPlayerUpdateableData(_type);
-            _onUseSubject.Value = use;
-            updateableData.isUsed = false;
+            Debug.Log($"InStageCharacter");
+            _onIsInStageSubject.Value = use;
+            updateableData.isInStage = use;
+            _inGameDatabase.SetPlayerUpdateableData(_type,updateableData);
+        }
+
+        public void SetHealedParameter()
+        {
+            PlayerUpdateableData updateableData = _inGameDatabase.GetPlayerUpdateableData(_type);
+            updateableData.isDead = false;
+            _onIsInStageSubject.Value = true;
+            updateableData.isInStage = true;
+            _inGameDatabase.SetPlayerUpdateableData(_type,updateableData);
+        }
+        
+        public void SetRevivedParameter()
+        {
+            PlayerUpdateableData updateableData = _inGameDatabase.GetPlayerUpdateableData(_type);
+            
             _inGameDatabase.SetPlayerUpdateableData(_type,updateableData);
         }
 
@@ -141,11 +172,17 @@ namespace InGame.Player.Entity
             data.havingKey = true;
             _inGameDatabase.SetAllStageData(data);
         }
-        
+
+        public void AddUsedFirstActionKey(Key key)
+        {
+            _inGameDatabase.AddFirstActionKeyData(_type,key);
+        }
+
+
         public void Dispose()
         {
-            _onDeadSubject?.Dispose();
-            _onUseSubject?.Dispose();
+            _onIsInStageSubject?.Dispose();
+            _onRevivingSubject?.Dispose();
         }
     }
 }

@@ -17,6 +17,7 @@ namespace InGame.Player.Logic
         private Vector3 InvertedScale=>new(-_defaultScale.x,_defaultScale.y);
 
         private readonly BasePlayerView _playerView;
+        private readonly ActionKeyView _actionKeyView;
         private readonly PlayerInputEntity _playerInputEntity;
         private readonly PlayerCommonInStageEntity _playerCommonInStageEntity;
         private readonly Vector3 _defaultModelScale;
@@ -24,9 +25,11 @@ namespace InGame.Player.Logic
 
         private bool _isCurrentTowardsRight;
 
-        public PlayerReShapeLogic(BasePlayerView playerView,PlayerInputEntity playerInputEntity,PlayerCommonInStageEntity playerCommonInStageEntity)
+        public PlayerReShapeLogic(BasePlayerView playerView,ActionKeyView actionKeyView,PlayerInputEntity playerInputEntity,
+            PlayerCommonInStageEntity playerCommonInStageEntity)
         {
             _playerView = playerView;
+            _actionKeyView = actionKeyView;
             _playerInputEntity = playerInputEntity;
             _playerCommonInStageEntity = playerCommonInStageEntity;
             _defaultScale = _playerView.transform.localScale;
@@ -52,6 +55,7 @@ namespace InGame.Player.Logic
                 _isCurrentTowardsRight = isTowardsRight;
                 InvertModel(xMoveValue);
                 InvertRigidbody(xMoveValue);
+                InvertActionKey(xMoveValue);
             }
 
         }
@@ -68,6 +72,12 @@ namespace InGame.Player.Logic
         {
             Vector3 newScale = inputDirection > 0 ? _defaultScale : InvertedScale;
             _playerView.SetScale(newScale);
+        }
+        
+        private void InvertActionKey(float inputValue)
+        {
+            Quaternion newRot = inputValue > 0 ? _rightMoveRot : _leftMoveRot;
+            _actionKeyView.SetRotation(newRot);
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using InGame.SceneLoader.Entity;
 using InGame.SceneLoader.View;
+using MyApplication;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
@@ -138,6 +140,5 @@ namespace InGame.SceneLoader.Logic
                 rectTransform.localPosition=new Vector3(defaultPosX,rectTransform.localPosition.y,rectTransform.localPosition.z);
             }
         }
-
     }
 }

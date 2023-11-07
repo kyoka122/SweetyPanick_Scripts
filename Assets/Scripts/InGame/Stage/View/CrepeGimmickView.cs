@@ -1,6 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using InGame.Common.Interface;
+using Common.Interface;
 using InGame.Enemy.View;
 using MyApplication;
 using UniRx;
@@ -40,6 +40,10 @@ namespace InGame.Stage.View
                 {
                     if (other.gameObject.TryGetComponent<IEnemyDamageAble>(out var damageable))
                     {
+                        if (!damageable.canDamage)
+                        {
+                            return;
+                        }
                         damageable.OnDamaged(new Struct.DamagedInfo(Attacker.Crepe,transform.position));
                     }
                 }).AddTo(this);

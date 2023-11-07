@@ -15,6 +15,7 @@ namespace MyApplication
         public static readonly string Fixed = "Fixed";
         public static readonly string OnDamaged = "OnDamaged";
         public static readonly string OnDeath = "OnDeath";
+        public static readonly string OnRevive = "OnRevive";
         public static readonly string ForceIdle = "ForthIdle";
         
     }
@@ -60,10 +61,62 @@ namespace MyApplication
     public static class PlayerEffectAnimatorParameter
     {
         public static readonly string OnChange = "OnChange";//MEMO: PlayerChangeCloudAnimatorのパラメータ
+        public static readonly string Appear = "Appear";//MEMO: PlayerChangeCloudAnimatorのパラメータ
     }
     
     public static class PlayerEffectAnimationName
     {
-        public static readonly string PlayerChangeCloudAnimation = "PlayerChangeCloudAnimation";
+        public static readonly string CloudOpen = "CloudOpenAnimation";
+    }
+    
+    public static class PlayerEffectAnimationCallbackName
+    {
+        public static readonly string OnPlayer = "OnPlayer";
+    }
+    
+    public static class PlayerKeyAnimationName
+    {
+        public static string GetKeyName(Key key)
+        {
+            key = key switch
+            {
+                Key.MarshmallowJump => Key.Jump,
+                Key.EnterDoor => Key.Punch,
+                _ => key
+            };
+
+            return key.ToString();
+        }
+        
+        public static string GetDeviceName(MyInputDeviceType deviceType)
+        {
+            switch (deviceType)
+            {
+                case MyInputDeviceType.Procon:
+                case MyInputDeviceType.GamePad:
+                    return deviceType.ToString();
+                case MyInputDeviceType.JoyconLeft:
+                case MyInputDeviceType.JoyconRight:
+                    return "Joycon";
+            }
+
+            return deviceType.ToString();
+        }
+        
+    }
+
+    public class PlayerName
+    {
+        public static string GetPlayerNameStrings(PlayableCharacterIndex playableCharacterIndex)
+        {
+            return playableCharacterIndex switch
+            {
+                PlayableCharacterIndex.Candy => "キャンディ",
+                PlayableCharacterIndex.Mash => "マシュ",
+                PlayableCharacterIndex.Fu => "フー",
+                PlayableCharacterIndex.Kure => "クレー",
+                _ => throw new ArgumentOutOfRangeException(nameof(playableCharacterIndex), playableCharacterIndex, null)
+            };
+        }
     }
 }

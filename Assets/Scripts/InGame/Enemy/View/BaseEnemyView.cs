@@ -18,6 +18,7 @@ namespace InGame.Enemy.View
     public abstract class BaseEnemyView:MonoBehaviour,IEnemyDamageAble,IEnemyBindable,IEnemyDecoyAble,IEnemyPullAble,
         ICollideAbleToPlayer,IColateOrderAble,ICollideAbleToColate
     {
+        public bool canDamage { get; private set; } = true;
         public IObservable<Collision2D> SearchedCollisionObject => _searchedCollisionObject;
         public IObservable<Collision2D> OnHitFlyingCollider => hitFlyingCollider;
         public IObservable<Vector2> OnPlayerPunch => _punchSubject;
@@ -34,8 +35,6 @@ namespace InGame.Enemy.View
 
         public CancellationToken thisToken { get; private set; }
         public EnemyState state { get; private set; } = EnemyState.Walk;
-        public bool inScreen { get; private set; } = true;
-        public bool inScreenX { get; private set; } = true;
         public int enemyDirectionX { get; protected set; }
         public ISweets eatingSweets { get; private set; }
         public float currentEatingTime { get; private set; }
@@ -51,11 +50,11 @@ namespace InGame.Enemy.View
         [SerializeField] private float moveLeftLimit;
         [SerializeField] private float moveRightLimit;
         [SerializeField] private bool isRightMoveFirst;
-        [SerializeField] private EnemyChildComponents enemyChildComponents;
+        [SerializeField] protected EnemyChildComponents enemyChildComponents;
         [SerializeField] private bool onDrawRay;
         
         protected Rigidbody2D rigidbody2D;
-        private Animator _animator;
+        protected Animator _animator;
         private CancellationTokenSource _changeDirectionTaskSource;
         private CancellationTokenSource _releaseGumReactionTokenSource;
         private CancellationTokenSource _eatSweetsTokenSource;
@@ -72,7 +71,7 @@ namespace InGame.Enemy.View
         private Vector3 towardRightScale;
         private Vector3 towardLeftScale;
 
-        public void Init()
+        public virtual void Init()
         {
             rigidbody2D = GetComponent<Rigidbody2D>();
             _animator = enemyChildComponents.Animator;
@@ -218,24 +217,17 @@ namespace InGame.Enemy.View
             switch (info.attacker)
             {
                 case Attacker.Player:
+                    canDamage = false;
                     _punchSubject.OnNext(info.attackerPos);
                     break;
                 case Attacker.Crepe:
+                    canDamage = false;
                     _rolledSubject.OnNext(true);
                     break;
                 default:
                     Debug.Log($"Not Found Type:{info.attacker}");
                     break;
             }
-        }
-        public void SetInScreen(bool on)
-        {
-            inScreen = on;
-        } 
-        
-        public void SetInScreenX(bool on)
-        {
-            inScreenX = on;
         }
 
         public void SetGravity(float scale)
@@ -357,10 +349,7 @@ namespace InGame.Enemy.View
             return Instantiate(shockSpriteView, pos, shockSpriteView.transform.rotation);
         }
         
-        public void Destroy()
-        {
-            Destroy(gameObject);
-        }
+        
 
         private void SetSpriteSize()
         {
@@ -378,6 +367,45 @@ namespace InGame.Enemy.View
         public void SetActiveAnimator(bool active)
         {
             _animator.enabled = active;
+        }
+        
+        public string GetCurrentAnimationName()
+        {
+            AnimationClip firstClip = _animator.GetCurrentAnimatorClipInfo(0)
+                .FirstOrDefault().clip;
+            if (firstClip == null)
+            {
+                Debug.LogWarning($"None Clip");
+                return null;
+            }
+
+            return firstClip.name;
+        }
+        
+        public AnimatorStateInfo GetCurrentAnimatorStateInfo()
+        {
+            return _animator.GetCurrentAnimatorStateInfo(0);
+        }
+        
+        public void Destroy()
+        {
+            Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            Dispose();
+        }
+
+        protected virtual void Dispose()
+        {
+            _searchedCollisionObject.Dispose();
+            _punchSubject.Dispose();
+            _rolledSubject.Dispose();
+            _bindByPlayerSubject.Dispose();
+            _decoyByPlayerSubject.Dispose(); 
+            _pullByPlayerSubject.Dispose();
+            hitFlyingCollider.Dispose();
         }
     }
 }

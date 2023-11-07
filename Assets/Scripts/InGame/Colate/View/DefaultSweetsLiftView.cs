@@ -23,6 +23,8 @@ namespace InGame.Colate.View
         public CancellationToken cancellationToken { get; private set; }
         public FixState fixState { get; protected set; }
         public ReactiveProperty<bool> onFix { get; private set; }
+        public bool isActive => gameObject.activeSelf;
+        public FixState IsInitState => isInitFixed ? FixState.Fixed : FixState.Broken;
         public LiftState liftState { get; private set; } = LiftState.Up;
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace InGame.Colate.View
         [SerializeField] private GameObject colliderObj;
         [SerializeField] private Transform appearParticleInstanceTransform;
         [SerializeField] private Transform scoreInstanceTransform;
-
+        [SerializeField] private bool isInitFixed = false;
 
         private Rigidbody2D _rigidbody2D;
         private int _moveDirection;
@@ -55,8 +57,8 @@ namespace InGame.Colate.View
             cancellationToken = this.GetCancellationTokenOnDestroy();
             transition = new Transition(FadeMaterial, this,1);
             cutOffTransition = new CutOffTransition(fixGaugeSlider.material,1,0);
-            fixState = FixState.Broken;
-            onFix = new ReactiveProperty<bool>();
+            fixState = isInitFixed ? FixState.Fixed : FixState.Broken;
+            onFix = new ReactiveProperty<bool>(isInitFixed);
             _rigidbody2D = GetComponent<Rigidbody2D>();
             gameObject.SetActive(false);
         }
@@ -183,7 +185,7 @@ namespace InGame.Colate.View
         {
             transform.position = new Vector2(transform.position.x,yPos);
         }
-        
+
         public virtual void OnDestroy()
         {
             onFix?.Dispose();

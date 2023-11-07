@@ -13,16 +13,17 @@ namespace InGame.Player.Logic
         private readonly PlayerCommonInStageEntity _playerCommonInStageEntity;
 
         public PlayerParticleLogic(PlayerConstEntity playerConstEntity, BasePlayerView playerView,
-            PlayerCommonInStageEntity playerCommonInStageEntity,ParticleGeneratorView fixSweetsParticleGeneratorView)
+            PlayerCommonInStageEntity playerCommonInStageEntity, ParticleGeneratorView fixSweetsParticleGeneratorView,
+            ParticleGeneratorView healHpBarParticleGeneratorView)
         {
             _playerConstEntity = playerConstEntity;
             _playerView = playerView;
             _playerCommonInStageEntity = playerCommonInStageEntity;
-            RegisterEffects(fixSweetsParticleGeneratorView);
+            RegisterEffects(fixSweetsParticleGeneratorView, healHpBarParticleGeneratorView);
             RegisterObserver();
         }
 
-        private void RegisterEffects(ParticleGeneratorView fixSweetsParticleGeneratorView)
+        private void RegisterEffects(ParticleGeneratorView fixSweetsParticleGeneratorView,ParticleGeneratorView healHpBarParticleGeneratorView)
         {
             ParticleSystem runningParticle = _playerView.InstanceParticle(_playerConstEntity.RunParticle);
             _playerView.SetChild(runningParticle.transform);
@@ -42,7 +43,10 @@ namespace InGame.Player.Logic
             _playerCommonInStageEntity.SetOnSkillParticle(onSkillParticle);
             
             ObjectPool<ParticleSystem> sweetsFixedParticle = new ObjectPool<ParticleSystem>(fixSweetsParticleGeneratorView);
-            _playerCommonInStageEntity.SetFixSweetsParticle(sweetsFixedParticle);
+            _playerCommonInStageEntity.SetFixSweetsParticlePool(sweetsFixedParticle);
+            
+            ObjectPool<ParticleSystem> healHpBarParticle = new ObjectPool<ParticleSystem>(healHpBarParticleGeneratorView);
+            _playerCommonInStageEntity.SetHealHpBarParticlePool(healHpBarParticle);
         }
 
         private void RegisterObserver()

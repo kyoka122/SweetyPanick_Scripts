@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using InGame.Player.Installer;
 using InGame.Stage.View;
 using InGame.Player.View;
@@ -91,17 +92,23 @@ namespace MyApplication
         public float highJumpValue=8;
         public float toGroundDistance=1;
         public float toSweetsDistance=1;
+        public float toUpStairsDistance=2f;
+        public float toDoorDistance=1;
+        public float toEnemyDistance = 2f;
         public float toSlopeDistance=1;
         public float normalSweetsFixingTime=1;
         public float gimmickSweetsFixingTime=3;
         public float normalSweetsSpecialistFixingTime = 1;
         public float gimmickSweetsSpecialistFixingTime=3;
         public float knockBackValue=1;
+        public float toActiveMoveKeyDuration=10;
         public float warpDuration=1;
-        public float warpPoaOffsetY=1;
+        public Vector2 warpPoaOffset = new Vector2(2f, 0.5f);
         public float maxColliderSizeX=1.3f;
         public float slopeHelpPower = 20;
         public float underToSlopeDistance=0.5f;
+        public int healHpToRevive = 2;
+        public float toReviveTime = 60;
 
         public CharacterBaseParameter Clone()
         {
@@ -269,4 +276,28 @@ namespace MyApplication
         [SerializeField] private MobFaceSpriteType mobFace;
         [SerializeField] private ColateFaceSpriteType colateFace;
     }
+
+    /// <summary>
+    /// キー入力に対応したSpriteデータ
+    /// </summary>
+    [Serializable]
+    public class KeyAnimationData
+    {
+        public Key Key => key;
+        public Animation Sprite=>sprite;
+
+        [SerializeField] private Key key;
+        [SerializeField] private Animation sprite;
+    }
+    
+    [Serializable]
+    public class EachDeviceKeyAnimationData
+    {
+        public MyInputDeviceType Device=>device;
+        public List<KeyAnimationData> Sprites=>sprites;
+        
+        [SerializeField] private MyInputDeviceType device;
+        [SerializeField] private List<KeyAnimationData> sprites;
+    }
+    
 }

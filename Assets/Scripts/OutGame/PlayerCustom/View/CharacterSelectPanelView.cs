@@ -1,31 +1,52 @@
-﻿using MyApplication;
+﻿using System;
+using MyApplication;
 using UnityEngine;
 
 namespace OutGame.PlayerCustom.View
 {
     public class CharacterSelectPanelView:MonoBehaviour
     {
-        public RectTransform UpPanelRectTransform => upPanelRectTransform;
-        public RectTransform DownPanelRectTransform => downPanelRectTransform;
-        public Vector2 UpTargetExitEndPos=>upTargetExitEndPos;
-        public Vector2 DownTargetExitEndPos=>downTargetExitEndPos;
-        public Vector2 UpTargetEnterEndPos=>upTargetEnterEndPos;
-        public Vector2 DownTargetEnterEndPos=>downTargetEnterEndPos;
+        //public RectTransform UpPanelRectTransform => upPanelRectTransform;
+        //public RectTransform DownPanelRectTransform => downPanelRectTransform;
+        //public Vector2 UpTargetExitEndPos=>upTargetExitEndPos;
+        //public Vector2 DownTargetExitEndPos=>downTargetExitEndPos;
+        //public Vector2 UpTargetEnterEndPos=>upTargetEnterEndPos;
+        //public Vector2 DownTargetEnterEndPos=>downTargetEnterEndPos;
 
-        [SerializeField] private RectTransform upPanelRectTransform;
-        [SerializeField] private RectTransform downPanelRectTransform;
-        [SerializeField] private Vector2 upTargetExitEndPos;
-        [SerializeField] private Vector2 downTargetExitEndPos;
-        [SerializeField] private Vector2 upTargetEnterEndPos;
-        [SerializeField] private Vector2 downTargetEnterEndPos;
-        [SerializeField] private Animator keyConfigAnimator;
-
+        //[SerializeField] private RectTransform upPanelRectTransform;
+        //[SerializeField] private RectTransform downPanelRectTransform;
+        //[SerializeField] private Vector2 upTargetExitEndPos;
+        //[SerializeField] private Vector2 downTargetExitEndPos;
+        //[SerializeField] private Vector2 upTargetEnterEndPos;
+        //[SerializeField] private Vector2 downTargetEnterEndPos;
+        //[SerializeField] private Animator keyConfigAnimator;
+        public GameObject PanelObj => panelObj;
+        [SerializeField] private GameObject panelObj;
+        [SerializeField] private Transform firstInitIconPos;
+        [SerializeField] private Transform secondInitIconPos;
+        [SerializeField] private Transform thirdInitIconPos;
+        [SerializeField] private Transform fourthInitIconPos;
+        
         public void Init()
         {
-            keyConfigAnimator.enabled = false;
+            PanelObj.SetActive(false);
+            PanelObj.transform.localScale = Vector3.zero;
+            //keyConfigAnimator.enabled = false;
+        }
+
+        public Vector2 GetCursorPos(int num)
+        {
+            return num switch
+            {
+                1 => firstInitIconPos.localPosition,
+                2 => secondInitIconPos.localPosition,
+                3 => thirdInitIconPos.localPosition,
+                4 => fourthInitIconPos.localPosition,
+                _ => throw new ArgumentOutOfRangeException(nameof(num), num, null)
+            };
         }
         
-        public void ResetAnimator()
+        /*public void ResetAnimator()
         {
             keyConfigAnimator.Rebind();
         }
@@ -55,6 +76,6 @@ namespace OutGame.PlayerCustom.View
             keyConfigAnimator.SetBool(UIAnimatorParameter.UseProcon,false);
             keyConfigAnimator.SetBool(UIAnimatorParameter.UseXBox,false);
             keyConfigAnimator.SetBool(UIAnimatorParameter.UseKeyboard,false);
-        }
+        }*/
     }
 }

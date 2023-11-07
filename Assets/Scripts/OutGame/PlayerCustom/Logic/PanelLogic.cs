@@ -71,11 +71,12 @@ namespace OutGame.PlayerCustom.Logic
                 case PlayerCustomState.Controller:
                     return new PopAnimation(_controllersPanelView.PanelObj,_constDataEntity.PopUpDuration,_constDataEntity.PopDownDuration);
                 case PlayerCustomState.Character:
-                    return new UIMoveAnimation(_characterSelectPanelView.UpPanelRectTransform,
-                        _characterSelectPanelView.DownPanelRectTransform,
-                        _constDataEntity.PopUpDuration, _constDataEntity.PopDownDuration,
-                        _characterSelectPanelView.UpTargetExitEndPos, _characterSelectPanelView.DownTargetExitEndPos,
-                        _characterSelectPanelView.UpTargetEnterEndPos, _characterSelectPanelView.DownTargetEnterEndPos);
+                    // return new UIMoveAnimation(_characterSelectPanelView.UpPanelRectTransform,
+                    //     _characterSelectPanelView.DownPanelRectTransform,
+                    //     _constDataEntity.PopUpDuration, _constDataEntity.PopDownDuration,
+                    //     _characterSelectPanelView.UpTargetExitEndPos, _characterSelectPanelView.DownTargetExitEndPos,
+                    //     _characterSelectPanelView.UpTargetEnterEndPos, _characterSelectPanelView.DownTargetEnterEndPos);
+                    return new PopAnimation(_characterSelectPanelView.PanelObj,_constDataEntity.PopUpDuration,_constDataEntity.PopDownDuration);
                 case PlayerCustomState.Finish:
                     return null;
                 default:

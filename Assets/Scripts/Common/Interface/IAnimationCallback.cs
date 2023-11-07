@@ -1,4 +1,4 @@
-﻿namespace InGame.Common.Interface
+﻿namespace Common.Interface
 {
     public interface IAnimationCallback
     {

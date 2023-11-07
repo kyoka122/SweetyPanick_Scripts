@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Common.View;
 using InGame.Database;
 using InGame.Stage.View;
 using MyApplication;
@@ -27,8 +28,9 @@ namespace InGame.Player.Entity
         public ParticleSystem offJumpParticle{ get; private set; }
         public ParticleSystem onPunchParticle{ get; private set; }
         public ParticleSystem onSkillParticle{ get; private set; }
-        
         public ObjectPool<ParticleSystem> fixSweetsParticlePool { get; private set; }
+        public ObjectPool<ParticleSystem> healHpBarParticlePool { get; private set; }
+        public ObjectPool<CallbackAnimatorView> reviveCharacterAnimatorPool{ get; private set; }
         public float playerDirection { get; private set; }
         public bool isUsingSkill { get; private set; }
         public bool isNormalSweetsFixing { get; private set; }
@@ -46,13 +48,18 @@ namespace InGame.Player.Entity
         public float currentBoundDelayCount { get; private set; }
 
         public bool HavingKey => _inGameDatabase.GetAllStageData().havingKey;
-        
+
+        public Key currentFirstActionKey { get; private set; }
+
+        public IObservable<Unit> HadHealed => _hadHealed;
+
         private readonly ReactiveProperty<bool> _isRunning;
         private readonly ReactiveProperty<bool> _isJumping;
         private readonly Subject<bool> _onJump;
         private readonly Subject<bool> _onPunch;
         private readonly Subject<bool> _onSkill;
         private readonly Subject<bool> _onFall;
+        private readonly Subject<Unit> _hadHealed;
         private readonly InGameDatabase _inGameDatabase;
         
         
@@ -65,6 +72,7 @@ namespace InGame.Player.Entity
             _onPunch = new Subject<bool>();
             _onSkill = new Subject<bool>();
             _onFall = new Subject<bool>();
+            _hadHealed = new Subject<Unit>();
             _inGameDatabase = inGameDatabase;
         }
         
@@ -189,11 +197,20 @@ namespace InGame.Player.Entity
             currentBoundDelayCount = 0;
         }
 
-        public void SetFixSweetsParticle(ObjectPool<ParticleSystem> newParticlePool)
+        public void SetFixSweetsParticlePool(ObjectPool<ParticleSystem> newParticlePool)
         {
             fixSweetsParticlePool = newParticlePool;
         }
+        
+        public void SetHealHpBarParticlePool(ObjectPool<ParticleSystem> newParticlePool)
+        {
+            healHpBarParticlePool = newParticlePool;
+        }
 
+        public void SetReviveCharacterAnimatorPool(ObjectPool<CallbackAnimatorView> newReviveCharacterAnimatorPool)
+        {
+            reviveCharacterAnimatorPool = newReviveCharacterAnimatorPool;
+        }
         
         public void AddScore(int score)
         {
@@ -209,6 +226,16 @@ namespace InGame.Player.Entity
             _inGameDatabase.SetAllStageData(data);
         }
 
+        public void SetCurrentFirstActionKey(Key key)
+        {
+            currentFirstActionKey = key;
+        }
+        
+        public void OnHadHealed()
+        {
+            _hadHealed.OnNext(Unit.Default);
+        }
+
         public void Dispose()
         {
             _isRunning?.Dispose();
@@ -217,6 +244,7 @@ namespace InGame.Player.Entity
             _onPunch?.Dispose();
             _onSkill?.Dispose();
             _onFall?.Dispose();
+            _hadHealed?.Dispose();
             fixingSweetsTokenSource?.Dispose();
         }
     }

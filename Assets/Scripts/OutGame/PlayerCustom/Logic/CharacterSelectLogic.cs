@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using InGame.Database;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.PlayerCustom.Data;
@@ -19,17 +20,20 @@ namespace OutGame.PlayerCustom.Logic
         private readonly ConstDataEntity _constDataEntity;
         private readonly ToMessageWindowSenderView _toMessageWindowSenderView;
         private readonly CharacterSelectPanelView _characterSelectPanelView;
+        private readonly CharacterIconView[] _characterIconViews;
         private List<PlayerCursorData> _playerCursorData; //MEMO: キャラクターチェンジの度にリセット
         private readonly List<IDisposable> _disposables;
         private readonly List<IDisposable> _onCancelControllerDisposables;
 
         public CharacterSelectLogic(InSceneDataEntity inSceneDataEntity, ConstDataEntity constDataEntity,
-            ToMessageWindowSenderView toMessageWindowSenderView, CharacterSelectPanelView characterSelectPanelView)
+            ToMessageWindowSenderView toMessageWindowSenderView, CharacterSelectPanelView characterSelectPanelView,
+            CharacterIconView[] characterIconViews)
         {
             _inSceneDataEntity = inSceneDataEntity;
             _constDataEntity = constDataEntity;
             _toMessageWindowSenderView = toMessageWindowSenderView;
             _characterSelectPanelView = characterSelectPanelView;
+            _characterIconViews = characterIconViews;
             _disposables = new List<IDisposable>();
             _onCancelControllerDisposables = new List<IDisposable>();
             RegisterObserver();
@@ -49,7 +53,7 @@ namespace OutGame.PlayerCustom.Logic
                 .Where(state => state == PlayerCustomState.Character)
                 .Subscribe(_ =>
                 {
-                    SetKeyConfigInfoAnimator();
+                    //SetKeyConfigInfoAnimator();
                     InitPlayerInputEntity();
                     RegisterInputObserver();
                 })
@@ -59,7 +63,7 @@ namespace OutGame.PlayerCustom.Logic
                 .Where(state => state != PlayerCustomState.Character)
                 .Subscribe(_ =>
                 {
-                    _characterSelectPanelView.SetEnableAnimator(false);
+                    //_characterSelectPanelView.SetEnableAnimator(false);
                 })
                 .AddTo(_characterSelectPanelView);
         }
@@ -74,99 +78,146 @@ namespace OutGame.PlayerCustom.Logic
                 var playerInputEntity = new CharacterSelectInputEntity(_inSceneDataEntity.RegisteredPlayerSelectController[i]);
                 var playerCursorData = new PlayerCursorData(i+1, playerInputEntity,
                     _constDataEntity.CharacterSelectCursorInstaller.Install(_constDataEntity.CharacterSelectCursorPrefab,
-                        i+1,_characterSelectPanelView.UpPanelRectTransform.transform,_constDataEntity.CursorInterval*i));
+                        i+1,_characterSelectPanelView.PanelObj.transform,_characterSelectPanelView.GetCursorPos(i+1)));
                 _playerCursorData.Add(playerCursorData);
                 _disposables.Add(playerInputEntity);
+            }
+            foreach (var characterIconView in _characterIconViews)
+            {
+                characterIconView.Reset();
             }
         }
 
         private void RegisterInputObserver()
         {
+            foreach (var characterIconView in _characterIconViews)
+            {
+                _onCancelControllerDisposables.Add(
+                characterIconView.FixedUpdateAsObservable()
+                    .Where(on =>
+                    {
+                        return _inSceneDataEntity.FinishedPopUpWindowState == PlayerCustomState.Character &&
+                               _inSceneDataEntity.PlayerCustomState == PlayerCustomState.Character;
+                    }).Subscribe(_ =>
+                    {
+                        foreach (var iconView in _characterIconViews)
+                        {
+                            iconView.SetColor();
+                        }
+                    }).AddTo(characterIconView));
+            }
+
             foreach (var playerCursorData in _playerCursorData)
             {
                 _onCancelControllerDisposables.Add(
                     playerCursorData.characterSelectInputEntity.next
-                        .Where(on => on)
-                        .Where(_ => _inSceneDataEntity.FinishedPopUpWindowState == PlayerCustomState.Character)
-                        .Where(_ => _inSceneDataEntity.PlayerCustomState == PlayerCustomState.Character)
+                        .Where(on =>
+                        {
+                            return on && _inSceneDataEntity.FinishedPopUpWindowState == PlayerCustomState.Character &&
+                                   _inSceneDataEntity.PlayerCustomState == PlayerCustomState.Character;
+                        })
                         .Subscribe(_ =>
                         {
-                            Vector2 clickPos =
-                                _constDataEntity.WorldToScreenPoint(playerCursorData.characterSelectCursorView
-                                    .GetRectPos());
-                            var icon = GetClickIcon(clickPos);
-                            if (icon == null)
+                            if (playerCursorData.characterSelectCursorView.selectType==UISelectState.Selected)
                             {
                                 return;
                             }
-                            if (_inSceneDataEntity.useCharacterData.Any(data => data.playerNum == playerCursorData.playerNum))
-                            {
-                                return;
-                            }
-                            if (_inSceneDataEntity.useCharacterData.Any(data => data.type == icon.Type))
+                            
+                            var selectedView=_characterIconViews
+                                .Where(view=>view.IsOverlap(playerCursorData.playerNum))
+                                .FirstOrDefault(view=>!view.IsSelected());
+                            if (selectedView == null)
                             {
                                 return;
                             }
 
-                            SetCharacter(playerCursorData, icon);
+                            SetCharacter(playerCursorData, selectedView);
 
                         })
                         .AddTo(_characterSelectPanelView));
 
                 _onCancelControllerDisposables.Add(
                     playerCursorData.characterSelectInputEntity.back
-                        .Where(on => on)
-                        .Where(_ => _inSceneDataEntity.FinishedPopUpWindowState == PlayerCustomState.Character)
-                        .Where(_ => _inSceneDataEntity.PlayerCustomState == PlayerCustomState.Character)
+                        .Where(on =>
+                        {
+                            return on && _inSceneDataEntity.FinishedPopUpWindowState == PlayerCustomState.Character &&
+                                   _inSceneDataEntity.PlayerCustomState == PlayerCustomState.Character;
+                        })
                         .Subscribe(_ =>
                         {
-                            if (_inSceneDataEntity.useCharacterData
-                                .Select(data => data.playerNum)
-                                .Any(num => num == playerCursorData.playerNum))
+                            if (playerCursorData.characterSelectCursorView.selectType==UISelectState.Selected)
                             {
-                                return;
+                                playerCursorData.characterSelectCursorView.SetType(UISelectState.None);
+                                foreach (var characterIconView in _characterIconViews)
+                                {
+                                    characterIconView.SetType(playerCursorData.playerNum,UISelectState.None);
+                                }
+                                _inSceneDataEntity.CancelUseCharacter(playerCursorData.playerNum);
                             }
-
-                            playerCursorData.characterSelectCursorView.OnSelectableIcon();
-                            _inSceneDataEntity.CancelUseCharacter(playerCursorData.playerNum);
+                            else //if (_inSceneDataEntity.useCharacterData.Count == 0)
+                            {
+                                DestroyCursor();
+                                DisposeOnCancelController();
+                                _inSceneDataEntity.SetSettingsState(PlayerCustomState.Controller);
+                            }
                         })
                         .AddTo(_characterSelectPanelView));
 
                 _onCancelControllerDisposables.Add(
-                    playerCursorData.characterSelectCursorView.FixedUpdateAsObservable()
-                        .Where(_ => _inSceneDataEntity.FinishedPopUpWindowState == PlayerCustomState.Character)
-                        .Where(_ => _inSceneDataEntity.PlayerCustomState == PlayerCustomState.Character)
+                        playerCursorData.characterSelectCursorView.FixedUpdateAsObservable()
+                        .Where(_ =>
+                        {
+                            return _inSceneDataEntity.FinishedPopUpWindowState == PlayerCustomState.Character &&
+                                   _inSceneDataEntity.PlayerCustomState == PlayerCustomState.Character;
+                        })
                         .Subscribe(_ =>
                         {
-                            TryMoveCursor(playerCursorData,
+                            if (playerCursorData.characterSelectCursorView.selectType==UISelectState.Selected)
+                            {
+                                return;
+                            }
+                            MoveCursor(playerCursorData,
                                 new Vector2(playerCursorData.characterSelectInputEntity.horizontalValue.Value,
                                     playerCursorData.characterSelectInputEntity.verticalValue.Value));
-                        })
-                        .AddTo(playerCursorData.characterSelectCursorView));
+                            Vector2 clickPos =
+                                _constDataEntity.WorldToScreenPoint(playerCursorData.characterSelectCursorView.GetRectPos());
+                            var icon = GetOverlapIcon(clickPos);
+                            if (icon == null)
+                            {
+                                playerCursorData.characterSelectCursorView.SetType(UISelectState.None);
+                                foreach (var iconView in _characterIconViews)
+                                {
+                                    iconView.SetType(playerCursorData.playerNum,UISelectState.None);
+                                }
+                                return;
+                            }
 
-                _onCancelControllerDisposables.Add(
-                    playerCursorData.characterSelectInputEntity.back
-                        .Where(on => on)
-                        .Where(_ => _inSceneDataEntity.FinishedPopUpWindowState == PlayerCustomState.Character)
-                        .Where(_ => _inSceneDataEntity.PlayerCustomState == PlayerCustomState.Character)
-                        .Where(_ => _inSceneDataEntity.useCharacterData.Count == 0)
-                        .Subscribe(_ =>
-                        {
-                            DestroyCursor();
-                            DisposeOnCancelController();
-                            _inSceneDataEntity.SetSettingsState(PlayerCustomState.Controller);
+                            playerCursorData.characterSelectCursorView.SetType(UISelectState.Overlap);
+                            foreach (var characterIconView in _characterIconViews)
+                            {
+                                if (characterIconView==icon)
+                                {
+                                    characterIconView.SetType(playerCursorData.playerNum,UISelectState.Overlap);
+                                    continue;
+                                }
+                                characterIconView.SetType(playerCursorData.playerNum,UISelectState.None);
+                            }
+
                         })
                         .AddTo(playerCursorData.characterSelectCursorView));
+                
             }
         }
 
         private void SetCharacter(PlayerCursorData playerCursorData, CharacterIconView icon)
         {
-            playerCursorData.characterSelectCursorView.SetSelected(true);
-            playerCursorData.characterSelectCursorView.OffSelectableIcon();
+            icon.SetType(playerCursorData.playerNum,UISelectState.Selected);
+            icon.SetColor();
+            playerCursorData.characterSelectCursorView.SetType(UISelectState.Selected);
+            
             SEManager.Instance.Play(SEPath.CLICK);
             _inSceneDataEntity.SetUseCharacter(playerCursorData.playerNum,icon.Type);
-                     
+            
             if (_inSceneDataEntity.useCharacterData.Count==_inSceneDataEntity.MaxPlayerCount)
             {
                 _inSceneDataEntity.SetUseCharacterToDatabase();
@@ -174,9 +225,10 @@ namespace OutGame.PlayerCustom.Logic
             }
         }
         
-        private CharacterIconView GetClickIcon(Vector2 cursorRectPos)
+        private CharacterIconView GetOverlapIcon(Vector2 cursorRectPos)
         {
             PointerEventData pointData = new PointerEventData(EventSystem.current);
+            pointData.radius = _constDataEntity.CursorRayRadius;
             pointData.position = cursorRectPos;
             List<RaycastResult> raycastResults=new List<RaycastResult>();
             EventSystem.current.RaycastAll(pointData,raycastResults);
@@ -187,12 +239,8 @@ namespace OutGame.PlayerCustom.Logic
             return selectedView;
         }
         
-        private void TryMoveCursor(PlayerCursorData data,Vector2 moveDirection)
+        private void MoveCursor(PlayerCursorData data,Vector2 moveDirection)
         {
-            if (data.characterSelectCursorView.isSelected)
-            {
-                return;
-            }
             Vector2 currentPos=data.characterSelectCursorView.GetRectAnchorPosition();
             
             currentPos += moveDirection * 3;
@@ -201,16 +249,16 @@ namespace OutGame.PlayerCustom.Logic
         
         private void SetKeyConfigInfoAnimator()
         {
-            _characterSelectPanelView.ResetAnimator();
-            _characterSelectPanelView.InActiveAllKeyConfigAnimatorParameter();
-            _characterSelectPanelView.SetChangeAnimationParameter(!IsUsedOnlyOneTypeController());
+            //_characterSelectPanelView.ResetAnimator();
+            //_characterSelectPanelView.InActiveAllKeyConfigAnimatorParameter();
+            //_characterSelectPanelView.SetChangeAnimationParameter(!IsUsedOnlyOneTypeController());
             
-            foreach (var playerCustomInput in _inSceneDataEntity.RegisteredPlayerSelectController)
+            /*foreach (var playerCustomInput in _inSceneDataEntity.RegisteredPlayerSelectController)
             {
                 _characterSelectPanelView.SetBoolKeyConfigAnimator(
                     UIAnimatorParameter.GetKeyConfigAnimatorParameter(playerCustomInput.DeviceType),true);
-            }
-            _characterSelectPanelView.SetEnableAnimator(true);
+            }*/
+            //_characterSelectPanelView.SetEnableAnimator(true);
         }
 
         private void DestroyCursor()
@@ -238,9 +286,6 @@ namespace OutGame.PlayerCustom.Logic
                 //MEMO: Joyconの場合、左右が違っても同じコントローラー解説画面を使用するため
                 if (type is MyInputDeviceType.JoyconLeft or MyInputDeviceType.JoyconRight)
                 {
-                    Debug.Log($"type is MyInputDeviceType.JoyconLeft or MyInputDeviceType.JoyconRight");
-                    Debug.Log($"{_inSceneDataEntity.RegisteredPlayerSelectController[i].DeviceType==MyInputDeviceType.JoyconLeft}");
-                    Debug.Log($"{_inSceneDataEntity.RegisteredPlayerSelectController[i].DeviceType==MyInputDeviceType.JoyconRight}");
                     if (_inSceneDataEntity.RegisteredPlayerSelectController[i].DeviceType is not
                         (MyInputDeviceType.JoyconLeft or MyInputDeviceType.JoyconRight))
                     {
