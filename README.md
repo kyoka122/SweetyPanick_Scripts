@@ -21,6 +21,10 @@
 * 2D PSD Importer (ver.3.1.4) (UnityRegistry)
 
 
+## アピール箇所
+[Assets/Scripts/Loader](https://github.com/kyoka122/SweetyPanick_Scripts/tree/main/Assets/Scripts/Loader) 以下のファイルは業務レベルのコード品質にリファクタしております。
+シーン遷移時のロード画面やゲームオーバー画面等の表示の役割を担うスクリプトが入ったフォルダです。
+
 ## クラス図（インゲーム部分）
 
 [pumlファイル](https://github.com/kyoka122/SweetyPanick_Scripts/blob/main/Assets/Scripts/ClassDiagram/InGame.puml)
