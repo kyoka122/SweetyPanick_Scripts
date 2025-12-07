@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Cinemachine;
-using Cysharp.Threading.Tasks;
 using DebugInput;
 using InGame.Common.Database;
 using InGame.Database;
@@ -9,8 +8,7 @@ using InGame.Database.Installer;
 using InGame.Stage.Installer;
 using MyApplication;
 using InGame.Database.ScriptableData;
-using Common.MyCamera.Installer;
-using InGame.SceneLoader;
+using Loader;
 using OutGame.Database;
 using StageManager;
 using UniRx;

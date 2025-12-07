@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Common.MyCamera.Installer
 {
-    public class CameraInstaller:MonoBehaviour
+    public class CameraInstaller : MonoBehaviour
     {
         /// <summary>
         /// キャラクター追跡をしたり、カメラの設定が切り替わる場合、かつシーン内でステージを移動する場合ののInstaller
@@ -37,8 +37,8 @@ namespace Common.MyCamera.Installer
             
             var playingInStageLogic = new PlayingInStageLogic(cameraEntity,cameraView);
             var moveStageLogic = new MoveStageLogic(cameraEntity, cameraView,cinemachineConfiner2D);
-            var switchCameraLogic = new SwitchCameraLogic(cameraEntity,
-                subCameraViews.OrderBy(view => view.LeftEdge).ToArray());
+            SubCameraView[] orderedByLeftEdgeSubCameraViews = subCameraViews.OrderBy(view => view.LeftEdge).ToArray();
+            var switchCameraLogic = new SwitchCameraLogic(cameraEntity, orderedByLeftEdgeSubCameraViews);
             
             var cameraController = new CameraController(playingInStageLogic,moveStageLogic,switchCameraLogic);
             

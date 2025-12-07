@@ -1,7 +1,7 @@
 ﻿using System;
 using InGame.Common.Database;
 using InGame.Database;
-using InGame.SceneLoader;
+using Loader;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.Database;
@@ -24,11 +24,9 @@ public class GameManager : Utility.SingletonMonoBehaviour<GameManager>
         base.Awake();
         if (isDuplication)
         {
-            Debug.Log($"isDuplication:{isDuplication}", gameObject);
             return;
         }
 
-        Debug.LogWarning($"InstanceGameManager", gameObject);
         if (SceneManager.GetActiveScene().name!=SceneName.Title)
         {
             InstallDatabaseAndManager();
@@ -50,7 +48,6 @@ public class GameManager : Utility.SingletonMonoBehaviour<GameManager>
 
         return currentSceneName switch
         {
-            //MEMO: コメントアウト箇所はSequencer作成後に解除
             SceneName.Title => TitleSequencer.Instance,
             SceneName.PlayerCustom => PlayerCustomSceneSequencer.Instance,
             SceneName.Prologue => PrologueSequencer.Instance,

@@ -150,7 +150,7 @@ namespace InGame.Common.Database
         #endregion
         private static class StaticDatabase
         {
-            // region PlayerInput
+            //MEMO: PlayerInput(コントローラー)情報
             public static List<ControllerNumData> input;
 
         }

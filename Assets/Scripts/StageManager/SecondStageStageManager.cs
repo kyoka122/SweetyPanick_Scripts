@@ -8,7 +8,7 @@ using InGame.Database;
 using InGame.Enemy;
 using Common.MyCamera.Controller;
 using InGame.Player.Controller;
-using InGame.SceneLoader;
+using Loader;
 using InGame.Stage.Installer;
 using InGame.Stage.Manager;
 using MyApplication;
@@ -102,7 +102,7 @@ namespace StageManager
                     Debug.Log($"_controllers.Count(data=>data.inStage):{_controllers.Count(data => data.isInStage)}");
                     if (_controllers.Count(data=>data.isInStage)==0)
                     {
-                        LoadManager.Instance.TryPlayGameOverFadeIn();
+                        LoadManager.Instance.TryPlayGameOverFadeIn().Forget();
                     }
                 });
             }

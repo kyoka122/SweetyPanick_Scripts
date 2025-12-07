@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using InGame.SceneLoader;
+using Loader;
 using OutGame.Database;
 using TalkSystem;
 using UnityEngine;
@@ -113,6 +113,7 @@ namespace OutGame.Prologue
         {
             dialogs.ExitDialog();
             dialogs.DisposeDialog();
+            dialogs.UnloadBigResource();//MEMO: Textureのサイズが大きく負荷になるため、使用後にUnloadしておく。
             _toNextSceneEvent.Invoke();
         }
 

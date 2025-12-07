@@ -56,7 +56,6 @@ namespace InGame.Player.View
         
         public void SetPosition(Vector2 pos)
         {
-            Debug.Log($"pos:{pos},type:{type}");
             transform.position = pos;
         }
         
@@ -264,7 +263,6 @@ namespace InGame.Player.View
 
         public Vector2 GetModelAppearEffectScale()
         {
-            Debug.Log($"ModelAppearEffectScale:{_playerChildComponents.ModelAppearEffectScale}");
             return _playerChildComponents.ModelAppearEffectScale;
         }
     }

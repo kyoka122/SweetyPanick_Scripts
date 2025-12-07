@@ -10,7 +10,6 @@ using Utility;
 
 namespace InGame.Player.Entity
 {
-    //TODO: アニメーション監視から変える
     public class PlayerCommonInStageEntity:IDisposable
     {
         public readonly PlayableCharacter CharacterType;

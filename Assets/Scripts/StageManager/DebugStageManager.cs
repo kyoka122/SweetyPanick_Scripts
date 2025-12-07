@@ -6,7 +6,7 @@ using InGame.Database;
 using InGame.Enemy;
 using Common.MyCamera.Controller;
 using InGame.Player.Controller;
-using InGame.SceneLoader;
+using Loader;
 using InGame.Stage.Installer;
 using InGame.Stage.Manager;
 using MyApplication;

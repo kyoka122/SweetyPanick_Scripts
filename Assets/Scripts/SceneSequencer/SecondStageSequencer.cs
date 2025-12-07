@@ -4,7 +4,7 @@ using InGame.Common.Database;
 using InGame.Database;
 using InGame.Database.Installer;
 using InGame.Database.ScriptableData;
-using InGame.SceneLoader;
+using Loader;
 using InGame.Stage.Installer;
 using KanKikuchi.AudioManager;
 using MyApplication;

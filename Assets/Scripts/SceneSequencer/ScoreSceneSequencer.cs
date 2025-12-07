@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Database;
 using InGame.OutGame.Score;
-using InGame.SceneLoader;
+using Loader;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.Database;

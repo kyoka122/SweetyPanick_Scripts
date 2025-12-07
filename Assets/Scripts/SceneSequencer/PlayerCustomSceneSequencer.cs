@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using InGame.Common.Database;
 using InGame.Database;
-using Common.MyCamera.Installer;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.PlayerCustom.Installer;
 using OutGame.PlayerCustom.Manager;
-using InGame.SceneLoader;
+using Loader;
 using OutGame.Database;
-using OutGame.Database.ScriptableData;
 using OutGame.PlayerCustom.View;
 using TalkSystem;
 using UniRx;
@@ -79,6 +75,7 @@ namespace SceneSequencer
                 Debug.Log($"Cancel Loading");
             }
             
+            cheerDialog.UnloadBigResource();
             SceneManager.LoadScene(nextSceneName);
         }
 

@@ -84,5 +84,18 @@ namespace TalkSystem
             }
             return sprite;
         }
+
+        public Sprite[] GetAllMemberFaces()
+        {
+            return candyFaces.Select(face => face.Sprite)
+                .Concat(candyFaces.Select(face => face.Sprite))
+                .Concat(fuFaces.Select(face => face.Sprite))
+                .Concat(mashFaces.Select(face => face.Sprite))
+                .Concat(kureFaces.Select(face => face.Sprite))
+                .Concat(queenFaces.Select(face => face.Sprite))
+                .Concat(mobFaces.Select(face => face.Sprite))
+                .Concat(colateFaces.Select(face => face.Sprite))
+                .ToArray();
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using InGame.Common.Database;
 using InGame.Database;
-using InGame.SceneLoader;
+using Loader;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using OutGame.Database;

@@ -2,17 +2,19 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using InGame.SceneLoader.Entity;
-using InGame.SceneLoader.View;
+using Loader.Entity;
+using Loader.View;
 using MyApplication;
-using UnityEngine;
 
-namespace InGame.SceneLoader.Logic
+namespace Loader.Logic
 {
+    /// <summary>
+    /// Load画面を出しているときに操作説明を表示する際のLogic
+    /// </summary>
     public class PlayingInfoLogic
     {
         public PlayingInfoType currentPlayingInfoType { get; private set; }
-        public bool isFading { get; private set; }
+        public bool isPlayingFade { get; private set; }
         public bool canFadeOut { get; private set; } = true;
         
         private readonly LoadEntity _loadEntity;
@@ -31,15 +33,14 @@ namespace InGame.SceneLoader.Logic
         public async UniTask PlayPlayingInfoFadeIn(PlayingInfoType type, float toFadeOutDurationMin,
             CancellationToken token)
         {
-            isFading = true;
+            isPlayingFade = true;
             currentPlayingInfoType = type;
             canFadeOut = false;
             _tokenSource = new CancellationTokenSource();
             _playingInfoView.InitOnFadeIn();
 
-            //MEMO: ↓フェード
             await _playingInfoView.FadeInInfo(type,_loadEntity.PlayingInfoFadeInDuration,Ease.Unset,token);
-            isFading = false;
+            isPlayingFade = false;
             WaitActiveDuration(toFadeOutDurationMin,token).Forget();
         }
         
@@ -54,14 +55,14 @@ namespace InGame.SceneLoader.Logic
         /// </summary>
         public async UniTask TryPlayPlayingInfoFadeOut(CancellationToken token)
         {
-            isFading = true;
+            isPlayingFade = true;
             _tokenSource.Cancel();
 
-            Debug.Log($"StartFadeOut");
             await _playingInfoView.FadeOutInfo(currentPlayingInfoType, _loadEntity.PlayingInfoFadeOutDuration,
                 Ease.Unset, token);
-            currentPlayingInfoType = PlayingInfoType.None;//MEMO: Fade後でないとFade時の引数がNoneになる
-            isFading = false;
+            _playingInfoView.UnloadTexture(currentPlayingInfoType);//MEMO: Textureのサイズが大きく負荷になるため、使用後にUnloadしておく。
+            currentPlayingInfoType = PlayingInfoType.None;
+            isPlayingFade = false;
         }
         
         

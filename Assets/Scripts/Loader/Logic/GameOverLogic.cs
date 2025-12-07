@@ -1,31 +1,33 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using InGame.SceneLoader.Entity;
-using InGame.SceneLoader.View;
 using KanKikuchi.AudioManager;
+using Loader.Entity;
+using Loader.View;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
 
-namespace InGame.SceneLoader.Logic
+namespace Loader.Logic
 {
+    /// <summary>
+    /// ゲームオーバーを表示して遷移する時のLogic
+    /// </summary>
     public class GameOverLogic
     {
-        public bool isFadeIn { get; private set; }
-        public bool isFading { get; private set; }
-        
+        public bool isFadeInState { get; private set; }
+        public bool isPlayingFade { get; private set; }
+
         private readonly LoadEntity _loadEntity;
         private readonly GameOverView _gameOverView;
         private readonly LoadCameraView _loadCameraView;
         private CancellationTokenSource _tokenSource;
 
-        public GameOverLogic(LoadEntity loadEntity,GameOverView gameOverView,LoadCameraView loadCameraView)
+        public GameOverLogic(LoadEntity loadEntity, GameOverView gameOverView, LoadCameraView loadCameraView)
         {
             _loadEntity = loadEntity;
             _gameOverView = gameOverView;
             _loadCameraView = loadCameraView;
-            SetInitViewData();
+            InitViewData();
         }
 
         /// <summary>
@@ -33,38 +35,40 @@ namespace InGame.SceneLoader.Logic
         /// </summary>
         public async UniTask PlayFadeIn(CancellationToken token)
         {
-            isFading = true;
+            isPlayingFade = true;
             _gameOverView.InitOnFadeIn();
             _gameOverView.SetActive(true);
             _loadCameraView.SetActive(true);
             BGMManager.Instance.FadeOut(_loadEntity.GameOverBGMFadeOutDuration);
-            await _gameOverView.FadeIn(_loadEntity.GameOverFadeInDuration,token);
+            await _gameOverView.FadeIn(_loadEntity.GameOverFadeInDuration, token);
             SEManager.Instance.Play(SEPath.GAME_OVER);
             _tokenSource = new CancellationTokenSource();
             StartUpdateScrollAnimation();
-            isFadeIn = true;
-            isFading = false;
+            isFadeInState = true;
+            isPlayingFade = false;
         }
 
         /// <summary>
-        /// フェードアウト状態に切り替える（別スクリーンで隠れている間に実行）
+        /// フェードアウト状態に一瞬で切り替える（別スクリーンで隠れている間に実行）
         /// </summary>
-        public void TrySetFadeOut()
+        public void SetFadeOut()
         {
-            isFading = true;
+            isPlayingFade = true;
             _gameOverView.SetFadeOut();
             _gameOverView.SetActive(false);
-            //_loadCameraView.SetActive(false);//MEMO: カメラは別スクリーンでfalseにする
-            isFadeIn = false;
-            isFading = false;
+            isFadeInState = false;
+            isPlayingFade = false;
         }
-        
+
+        /// <summary>
+        /// 次に進むためのキー入力がされるまで待機する
+        /// </summary>
         public async UniTask WaitOnNextKey()
         {
             _loadEntity.RegisterInputObserver();
-            await _loadEntity.NextKeyAnyPlayer.ToUniTask(true,cancellationToken:_gameOverView.GetCancellationTokenOnDestroy());
+            await _loadEntity.NextKeyAnyPlayer.ToUniTask(true, _gameOverView.GetCancellationTokenOnDestroy());
         }
-        
+
         /// <summary>
         /// ロード中のスクロールアニメーション
         /// </summary>
@@ -78,26 +82,26 @@ namespace InGame.SceneLoader.Logic
                 }).AddTo(_tokenSource.Token);
         }
 
-        private void SetInitViewData()
+        private void InitViewData()
         {
-            _loadEntity.SetGameOverBackGroundMoveDistance(_gameOverView.BackgroundRectTransform.sizeDelta.x -
-                                                          _loadCameraView.cameraWidth);
+            _loadEntity.SetGameOverBackGroundMoveDistance(_gameOverView.BackgroundRectTransform.sizeDelta.x - _loadCameraView.cameraWidth);
         }
-        
+
         /// <summary>
-        /// ゲームオブジェクトをスクロールする。Update関数で呼び出すこと
+        /// 指定のゲームオブジェクトをスクロールする。
+        /// Update関数で呼び出すこと。
         /// </summary>
         /// <param name="rectTransform"></param>
         /// <param name="defaultPosX"></param>
         /// <param name="width"></param>
         /// <param name="speed"></param>
-        private void UpdateLeftScroll(RectTransform rectTransform,float defaultPosX,float width,float speed)
+        private void UpdateLeftScroll(RectTransform rectTransform, float defaultPosX, float width, float speed)
         {
             rectTransform.Translate(-speed * Time.deltaTime, 0, 0);
             if (defaultPosX - rectTransform.localPosition.x > width)
             {
-                rectTransform.localPosition = new Vector3(defaultPosX, rectTransform.localPosition.y,
-                    rectTransform.localPosition.z);
+                Vector3 prevPos = rectTransform.localPosition;
+                rectTransform.localPosition = new Vector3(defaultPosX, prevPos.y, prevPos.z);
             }
         }
     }

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utility.TransitionFade;
 
-namespace InGame.SceneLoader
+namespace Loader
 {
     /// <summary>
     /// Dissolveシェーダーを用いたフェード用クラス
@@ -17,40 +17,24 @@ namespace InGame.SceneLoader
 
         public ScreenFader(Image fadeImage)
         {
-            Material fadeMaterial=new Material(fadeImage.material);
+            Material fadeMaterial = new Material(fadeImage.material);
             fadeImage.material = fadeMaterial;
-            _transition = new Transition(fadeMaterial, fadeImage,1);
+            _transition = new Transition(fadeMaterial, fadeImage, 1);
         }
-        
+
         public ScreenFader(SpriteRenderer fadeSpriteRenderer)
         {
-            Material fadeMaterial=new Material(fadeSpriteRenderer.material);
+            Material fadeMaterial = new Material(fadeSpriteRenderer.material);
             fadeSpriteRenderer.material = fadeMaterial;
-            _transition = new Transition(fadeMaterial, fadeSpriteRenderer,1);
+            _transition = new Transition(fadeMaterial, fadeSpriteRenderer, 1);
         }
 
-        public async UniTask FadeIn(float duration,Ease ease,CancellationToken token)
+        public async UniTask FadeIn(float duration, Ease ease, CancellationToken token)
         {
             try
             {
-                _transition.FadeIn(duration,ease);
-                await UniTask.WaitWhile(() => _transition.IsActiveFadeIn(),
-                    cancellationToken: token);
-            }
-            catch (OperationCanceledException)
-            {
-                _transition.fadeTween.Kill();
-                throw;
-            }
-        }
-        
-        public async UniTask FadeOut(float duration,Ease ease,CancellationToken token)
-        {
-            try
-            {
-                _transition.FadeOut(duration,ease);
-                await UniTask.WaitWhile(() => _transition.IsActiveFadeOut(),
-                    cancellationToken: token);
+                _transition.FadeIn(duration, ease);
+                await UniTask.WaitWhile(() => _transition.IsActiveFadeIn(), cancellationToken: token);
             }
             catch (OperationCanceledException)
             {
@@ -59,20 +43,35 @@ namespace InGame.SceneLoader
             }
         }
 
-        public async UniTask FadeInOut(float fadeInDuration,float fadeOutDuration,float fadingDuration,Ease ease,CancellationToken token,Action afterFadeInAction)
+        public async UniTask FadeOut(float duration, Ease ease, CancellationToken token)
         {
             try
             {
-                await FadeIn(fadeInDuration,ease,token);
+                _transition.FadeOut(duration, ease);
+                await UniTask.WaitWhile(() => _transition.IsActiveFadeOut(), cancellationToken: token);
+            }
+            catch (OperationCanceledException)
+            {
+                _transition.fadeTween.Kill();
+                throw;
+            }
+        }
+
+        public async UniTask FadeInOut(float fadeInDuration, float fadeOutDuration, float fadingDuration, Ease ease,
+            CancellationToken token, Action afterFadeInAction)
+        {
+            try
+            {
+                await FadeIn(fadeInDuration, ease, token);
                 afterFadeInAction?.Invoke();
-                await UniTask.Delay(TimeSpan.FromSeconds(fadingDuration), cancellationToken:token);
-                await FadeOut(fadeOutDuration,ease,token);
+                await UniTask.Delay(TimeSpan.FromSeconds(fadingDuration), cancellationToken: token);
+                await FadeOut(fadeOutDuration, ease, token);
             }
             catch (OperationCanceledException)
             {
                 Debug.Log($"FadeCanceled");
             }
-            
+
         }
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace InGame.SceneLoader
         {
             _transition.TransitionFadeInCondition();
         }
-        
+
         /// <summary>
         /// FadeOutする前の状態
         /// </summary>
@@ -90,7 +89,7 @@ namespace InGame.SceneLoader
         {
             _transition.TransitionFadeOutCondition();
         }
-        
+
         /// <summary>
         /// オブジェクトの破棄と同時にこのマテリアルも破棄する
         /// </summary>

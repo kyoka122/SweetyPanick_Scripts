@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using InGame.Common.Database;
 using InGame.Database;
 using MyApplication;
@@ -29,8 +28,7 @@ namespace Common.MyCamera.Entity
         public Dictionary<PlayableCharacter,CharacterUpdateableInStageData> GetCharacterUpdateableInStageData() =>
             _inGameDatabase.GetAllCharacterInStageData();
 
-        public Dictionary<Transform, float> cameraWeightTarget { get; private set; }
-        //public Dictionary<PlayableCharacter, bool> HadTargetGroup => _hadTargetGroup;
+        public Dictionary<Transform, float> cameraWeightTarget { get; }
         
         public CameraInitData GetCameraInitData(StageArea area)=>_commonDatabase.GetCameraInitData(area);
         
@@ -47,7 +45,6 @@ namespace Common.MyCamera.Entity
             _characterPrevPos = new Dictionary<PlayableCharacter, Vector3>(4);
             cameraWeightTarget = new Dictionary<Transform, float>(4);
             var playableCharacterArray = Enum.GetValues(typeof(PlayableCharacter));
-            Debug.LogWarning($"playableCharacterArray.Length:{playableCharacterArray.Length}");
             for (int i = 1; i < playableCharacterArray.Length; i++)
             {
                 _hadTargetGroup.Add((PlayableCharacter) i, false);

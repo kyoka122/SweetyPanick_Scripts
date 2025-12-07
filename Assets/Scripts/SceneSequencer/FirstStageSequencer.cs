@@ -7,7 +7,7 @@ using InGame.Stage.Installer;
 using KanKikuchi.AudioManager;
 using MyApplication;
 using InGame.Database.ScriptableData;
-using InGame.SceneLoader;
+using Loader;
 using OutGame.Database;
 using StageManager;
 using UniRx;
@@ -92,7 +92,6 @@ namespace SceneSequencer
             
             try
             {
-                Debug.Log($"FadeOut!!");
                 await LoadManager.Instance.TryFadeOutPlayingInfo(PlayingInfoType.Fix);
                 
                 await LoadManager.Instance.TryFadeInPlayingInfo(PlayingInfoType.Damage,PlayingInfoToFadeOutDurationMin);

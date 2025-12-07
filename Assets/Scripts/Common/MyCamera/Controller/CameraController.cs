@@ -1,5 +1,4 @@
-﻿using Cinemachine;
-using Common.Database.ScriptableData;
+﻿using Common.Database.ScriptableData;
 using Common.MyCamera.Logic;
 using MyApplication;
 using UnityEngine;

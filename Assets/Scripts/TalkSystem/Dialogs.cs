@@ -180,6 +180,14 @@ namespace TalkSystem
             TryDisplayDialog();
         }
 
+        public void UnloadBigResource()
+        {
+            foreach (var allMemberFace in _faceData.GetAllMemberFaces())
+            {
+                Resources.UnloadAsset(allMemberFace.texture);
+            }
+        }
+
         private void SetInputObserver()
         {
             if (_talkKeyObserver==null)
