@@ -18,6 +18,7 @@
 
 * Cinemachine (ver.2.8.9) (UnityRegistry)
 * InputSystem (ver.1.3.0) (UnityRegistry)
+* 2D PSD Importer (ver.3.1.4) (UnityRegistry)
 
 
 ## クラス図（インゲーム部分）
