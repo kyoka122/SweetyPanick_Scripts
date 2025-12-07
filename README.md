@@ -1,7 +1,7 @@
 # README
 
 ## 概要
-[ゲームデモ動画](https://drive.google.com/file/d/1NRwR8zzAjPiQJP4uX30hk-wa03R6-PhX/view?usp=sharing) (制作途中のため、動画ではリポジトリ内のコードの内容と合わない挙動をする場合があります。)
+[ゲームダイジェスト動画](https://drive.google.com/file/d/1ssQo_TXTNnWQZ9PjxvHPZtk4buhI9USg/view?usp=drive_link)
 
 ## 担当箇所
 [Scripts/TalkSystem](https://github.com/kyoka122/SweetyPanick_Scripts/tree/main/Assets/Scripts/TalkSystem) の一部機能以外全て
